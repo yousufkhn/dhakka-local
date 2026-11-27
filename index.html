@@ -1057,6 +1057,7 @@ function tryGrab(ch) {
   }
   c.collideConnected = false; world.addConstraint(c);
   ch.grab = {c, anchor, type: best.type, ch: best.ch || null, t: 0};
+  if (ch.isMe && best.type !== 'ch' && (TR.curve || TR.jerk || TR.phase === 'brake' || TR.phase === 'accel')) HINT.grab++;
   sfx('grab');
   const vOut = ch.parts.torso.velocity.z * Math.sign(tz);
   if (best.type === 'pole' && T_now - (ch.saveT ?? -9) > 4 && (ch.outT > 0.15 || (Math.abs(tz) > HW + 0.15 && vOut > 1.2))) { ch.saveT = T_now; clutch(ch); }
@@ -1097,6 +1098,7 @@ function hitChar(o, dir, power, by, cause, word) {
 }
 
 function doShove(ch) {
+  if (ch.isMe) HINT.push++;
   const range = 1.15 + ch.charge * 0.4;
   if (!ch.isNpc) aimAssist(ch, range + 0.45, 0.25);
   const f = facing(ch), tp = ch.parts.torso.position;
@@ -1880,7 +1882,7 @@ function revengeUpdate(dt) {
     if (p.isMe || p.isRemote) {
       const C = p.isMe ? LOCAL : p.netCtrl;
       if (p.isMe) meAiming = true;
-      if (!p.aim) { p.aim = {x: 0, z: 0}; you(p, 'ban', 'Take revenge from the platform! PUSH = vada pav 🍔 · JUMP = banana 🍌', 4); }
+      if (!p.aim) { p.aim = {x: 0, z: 0}; you(p, 'ban', 'Revenge time! 🍔 🍌', 2.5); }
       p.aim.x = clamp(p.aim.x + C.mx * 6 * dt, -HL + 0.4, HL - 0.4); p.aim.z = clamp(p.aim.z + C.mz * 5 * dt, -HW + 0.3, HW - 0.3);
       const pe = C.push && !p.pHeld, je = C.jump && !p.jHeld; p.pHeld = C.push; p.jHeld = C.jump;
       if (pe && p.revCd <= 0) { throwVadaPav(p, p.aim.x, p.aim.z); p.revCd = 2.2; }
@@ -1948,7 +1950,7 @@ function seatUpdate(dt) {
 }
 // ================= end of match: podium + awards =================
 const MATCH_N = 5;
-const MODE_INFO = {classic: ['MOVE INSIDE!', 'Last one inside wins!'], seat: ['SEAT WARS!', 'Jump onto the glowing seat and hold it for ' + SEAT_WIN + ' seconds!'], virar: ['VIRAR FAST!', 'No stops. The uncles keep coming!'], monsoon: ['MONSOON MADNESS!', 'The whole floor is wet. Keep sliding!']};
+const MODE_INFO = {classic: ['MOVE INSIDE!', 'Push them out the door. Last one inside wins!'], seat: ['SEAT WARS!', 'Jump onto the glowing seat and hold it for ' + SEAT_WIN + ' seconds!'], virar: ['VIRAR FAST!', 'No stops. The uncles keep coming!'], monsoon: ['MONSOON MADNESS!', 'The whole floor is wet. Keep sliding!']};
 const PODIUM = {meshes: [], t: 0, next: 0};
 const PODIUM_TEX = ['1', '2', '3'].map((n, i) => canvasTex(128, 128, (c) => { c.fillStyle = ['#ffd23f', '#d0d6dc', '#d08a4a'][i]; c.fillRect(0, 0, 128, 128); c.fillStyle = '#3a1d0e'; c.font = '900 92px system-ui,sans-serif'; c.textAlign = 'center'; c.fillText(n, 64, 100); }));
 function clearPodium() { for (const m of PODIUM.meshes) scene.remove(m); PODIUM.meshes = []; }
@@ -2314,7 +2316,7 @@ function tbTick() {
     if (show) { const mv = KEYS.KeyW || KEYS.KeyA || KEYS.KeyS || KEYS.KeyD || KEYS.ArrowUp || KEYS.ArrowDown || KEYS.ArrowLeft || KEYS.ArrowRight;
       $('kMove').classList.toggle('on', !!mv); $('kPush').classList.toggle('on', !!LOCAL.push); $('kGrab').classList.toggle('on', !!LOCAL.grab); $('kJump').classList.toggle('on', !!LOCAL.jump); } }
   const carry = tbCarry(), pb = $('bPush');
-  if (carry !== TB.carry) { TB.carry = carry; pb.classList.toggle('throw', carry); pb.innerHTML = carry ? 'THROW!<br><small>slide here</small>' : 'PUSH!<br><small>hold = power</small>'; $('bGrab').classList.toggle('carry', carry); $('kPush').classList.toggle('throw', carry); $('kPushL').textContent = carry ? 'Throw!' : 'Push'; $('kPushS').textContent = carry ? 'they fly' : 'hold = power'; }
+  if (carry !== TB.carry) { TB.carry = carry; pb.classList.toggle('throw', carry); pb.innerHTML = carry ? 'THROW!<br><small>slide here</small>' : HINT.out ? '🍔<br><small>throw</small>' : 'PUSH!<br><small>hold = power</small>'; $('bGrab').classList.toggle('carry', carry); $('kPush').classList.toggle('throw', carry); $('kPushL').textContent = carry ? 'Throw!' : HINT.out ? 'Vada pav' : 'Push'; $('kPushS').textContent = carry ? 'they fly' : HINT.out ? 'throw' : 'hold = power'; }
   slideTick(carry);
   if (TB.latch != null && !carry && !tbHeld('grab')) { const id = TB.latch; TB.latch = null; tbSet('grab'); TB.latchGone = id; }
 }
@@ -3138,14 +3140,26 @@ if (!PROF.trained) $('bTrain').classList.add('new');
 // ---- fading tips for the first few matches ----
 const TIPS = ['Tap PUSH when someone is close. Missing makes you stumble.', 'Hold PUSH, then let go: a charged push sends people flying.', 'Hold GRAB on a strap when the train curves or brakes.', 'Holding GRAB also braces you: pushes hit you half as hard.', 'JUMP, then PUSH in the air = flying dropkick.', 'GRAB someone, then slide your thumb to THROW. They fly toward the door.', 'Spamming PUSH tires you out. Time your shoves.'];
 const TIP = {t: 0, i: 0};
+// First few matches: no tip text. The button you need right now pulses instead:
+// PUSH when someone is in reach, GRAB when the train is about to throw you around. Once you've used a move a few times, its hint stops.
+const HINT = {push: 0, grab: 0, cur: ''};
 function tipTick(dt) {
-  const el = $('tut');
-  if (GAME.tutorial) return;
-  const lvl = Math.max(0, 1 - PROF.matches / 3);
-  if (lvl <= 0 || GAME.state !== 'play' || GAME.phase !== 'round' || GAME.result || T_now > 40) { if (el.classList.contains('tip')) el.classList.add('hidden'); return; }
-  TIP.t -= dt;
-  if (TIP.t <= 0) { TIP.t = 7; TIP.i = (TIP.i + 1) % TIPS.length; el.classList.remove('hidden'); el.classList.add('tip'); el.querySelector('.tstep').textContent = '💡 Tip'; el.querySelector('.ttxt').textContent = kt(TIPS[TIP.i]); $('tutBtns').classList.add('hidden'); $('bTutSkip').classList.add('hidden'); }
-  el.style.opacity = (0.45 + 0.55 * lvl) * Math.min(1, TIP.t * 1.5, (7 - TIP.t) * 2);
+  const me = CHARS.find(c => c.isMe);
+  const outMe = GAME.state === 'play' && GAME.roster.some(p => p.isMe && !p.alive);
+  // on the platform after falling out: PUSH throws vada pav, JUMP drops a banana peel
+  if (outMe !== HINT.out) { HINT.out = outMe; $('bJump').innerHTML = outMe ? '🍌' : 'JUMP'; TB.carry = null; $('kJump').querySelector('b').textContent = outMe ? 'Banana' : 'Jump'; }
+  let want = '';
+  const learning = PROF.matches < 3 && !GAME.tutorial && GAME.state === 'play' && GAME.phase === 'round' && !GAME.result;
+  if (learning && me && !me.out && !me.grab && NET.role !== 'client') {
+    const danger = !!(TR.curve || TR.jerk || TR.phase === 'brake' || TR.phase === 'accel'), tp = me.parts.torso.position;
+    if (danger && HINT.grab < 2) want = 'grab';
+    else if (HINT.push < 4 && T_now > 2 && (me.pushCd ?? 0) <= 0) {
+      for (const o of CHARS) { if (o === me || o.out || o.isNpc) continue; const op = o.parts.torso.position; if (Math.hypot(op.x - tp.x, op.z - tp.z) < 1.5) { want = 'push'; break; } }
+    }
+  } else if (learning && outMe && T_now > 1 && HINT.push < 8) want = 'push';
+  if (want === HINT.cur) return; HINT.cur = want;
+  const set = (b, k, on) => { $(b).classList.toggle('hint', on); $(k).classList.toggle('hint', on); };
+  set('bPush', 'kPush', want === 'push'); set('bGrab', 'kGrab', want === 'grab');
 }
 function vetCheck() { document.body.classList.toggle('vet', PROF.matches >= 3); }
 
