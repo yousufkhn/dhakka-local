@@ -1794,17 +1794,32 @@ function netFail(t) { lmsg(t); try { NET.peer && NET.peer.destroy(); } catch (e)
 function shareUrl() { return location.origin + location.pathname + '?room=' + NET.code; }
 
 const ICE = {iceServers: [{urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302']}, {urls: 'stun:stun.cloudflare.com:3478'}, {urls: ['turn:eu-0.turn.peerjs.com:3478', 'turn:us-0.turn.peerjs.com:3478'], username: 'peerjs', credential: 'peerjsp'}]};
+// relay (TURN) for phones whose networks block a direct link; credentials come from the Metered free plan when configured
+const TURN_CFG = {domain: 'dhakka-local.metered.live', key: '0b0d17cbc36b4eb0eafd5f3dd22e4d6dc35f'};
+let iceCache = null;
+async function getIce() {
+  if (iceCache) return iceCache;
+  if (!TURN_CFG.domain || !TURN_CFG.key) return ICE;
+  try {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 5000);
+    const r = await fetch('https://' + TURN_CFG.domain + '/api/v1/turn/credentials?apiKey=' + encodeURIComponent(TURN_CFG.key), {signal: ctl.signal}); clearTimeout(t);
+    const list = await r.json();
+    if (Array.isArray(list) && list.length) return (iceCache = {iceServers: [...list, ...ICE.iceServers]});
+  } catch (e) {}
+  return ICE;
+}
 const SIGNAL_ERR = new Set(['network', 'server-error', 'socket-error', 'socket-closed', 'disconnected']);
 function netStatus(t) { const el = $('lstat'); if (el) el.textContent = t || ''; }
 async function hostRoom(tries) {
   if (onlineBlocked()) return lmsg('Is link pe online nahi chalta. Hosted link kholo.');
   audioInit(); $('bHost').disabled = true; lmsg('Room bana rahe hain…');
   try { await loadPeer(); } catch (e) { return netFail('Online server tak nahi pahunche. Network check karo.'); }
+  NET.iceCfg = await getIce();
   hostPeer(randCode(), tries || 0);
 }
 // the host keeps its room code even if the phone drops off the online server (screen off, WhatsApp open): it re-registers as soon as it can
 function hostPeer(code, tries) {
-  const peer = new Peer(PEER_PREFIX + code, {debug: 0, config: ICE});
+  const peer = new Peer(PEER_PREFIX + code, {debug: 0, config: NET.iceCfg || ICE});
   NET.peer = peer; NET.code = code; if (NET.role !== 'host') NET.peers = new Map();
   const to = setTimeout(() => { if (!peer.open && NET.role !== 'host') netFail('Online server se connect nahi hua. Network check karo, ya bots ke saath khelo.'); }, 12000);
   peer.on('open', () => {
@@ -1951,7 +1966,8 @@ async function joinRoom(again) {
   audioInit(); $('bJoin').disabled = true; lmsg(again ? 'Ek baar aur koshish…' : 'Dabbe mein ghus rahe hain…');
   try { await loadPeer(); } catch (e) { return netFail('Online server tak nahi pahunche. Network check karo.'); }
   try { NET.peer && NET.peer.destroy(); } catch (e) {}
-  const peer = new Peer(undefined, {debug: 0, config: ICE}); NET.peer = peer; NET.code = code; NET.stage = 'server'; NET.ice = '';
+  const cfg = await getIce();
+  const peer = new Peer(undefined, {debug: 0, config: cfg}); NET.peer = peer; NET.code = code; NET.stage = 'server'; NET.ice = '';
   const done = () => NET.role === 'lobby' || NET.role === 'client';
   const fail = (t) => { clearTimeout(to); if (!done() && NET.peer === peer) netFail(t); };
   const to = setTimeout(() => {
