@@ -548,7 +548,12 @@ const PANTS = [0x2b3a67,0x3d2c1e,0x1d1d1d,0x5b6b7a,0x7a5c2e];
 // ================= renderer / scene =================
 const canvas = $('c');
 const renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreference: 'high-performance'});
+// Cap how many pixels we draw: a big or high-DPI PC monitor at full resolution can starve the GPU and freeze the whole browser.
+function pixelCap() { const w = innerWidth, h = innerHeight, low = !!(pf && pf.low), maxPx = low ? 1.1e6 : 2.3e6; return Math.max(0.6, Math.min(low ? 1 : 2, window.devicePixelRatio || 1, Math.sqrt(maxPx / Math.max(1, w * h)))); }
 renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+// if the graphics driver resets, don't sit on a dead canvas: reload once it comes back
+canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); GAME.ctxLost = true; }, false);
+canvas.addEventListener('webglcontextrestored', () => location.reload(), false);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
@@ -577,8 +582,8 @@ const LIGHT = {tod: TODS[2], glow: 0, sky: new THREE.Color(0xffc48a), tmp: new T
 
 const grad = (() => { const d = new Uint8Array([90, 170, 255]); const t = new THREE.DataTexture(d, 3, 1, THREE.RedFormat); t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true; return t; })();
 const matCache = new Map();
-function toon(color) { let m = matCache.get(color); if (!m) { m = new THREE.MeshToonMaterial({color, gradientMap: grad}); matCache.set(color, m); } return m; }
-const outlineMat = new THREE.MeshBasicMaterial({color: 0x1e120c, side: THREE.BackSide});
+function toon(color) { let m = matCache.get(color); if (!m) { m = new THREE.MeshToonMaterial({color, gradientMap: grad}); m.userData.shared = true; matCache.set(color, m); } return m; }
+const outlineMat = new THREE.MeshBasicMaterial({color: 0x1e120c, side: THREE.BackSide}); outlineMat.userData.shared = true;
 function mesh(geo, color, {cast = true, recv = false, outline = false, ol = 1.08} = {}) {
   const m = new THREE.Mesh(geo, typeof color === 'number' ? toon(color) : color);
   m.castShadow = cast; m.receiveShadow = recv;
@@ -976,6 +981,15 @@ function buildCharMesh(ch) {
   if (ch.isNpc) ch.elB.classList.add('npc');
 }
 
+let SHARED_GEO = null;
+function freeGpu(root) {
+  if (!SHARED_GEO) { SHARED_GEO = new Set([...Object.values(GEO), PRING_GEO, ARROW_GEO, ...Object.values(PROP_GEO)]); }
+  root.traverse(o => {
+    if (o.geometry && !SHARED_GEO.has(o.geometry)) o.geometry.dispose();
+    const ms = Array.isArray(o.material) ? o.material : o.material ? [o.material] : [];
+    for (const m of ms) if (!m.userData.shared) { if (m.map && m.map.userData && m.map.userData.own) m.map.dispose(); m.dispose(); }
+  });
+}
 function removeChar(ch) {
   if (ch.removed) return;
   releaseGrab(ch);
@@ -983,6 +997,7 @@ function removeChar(ch) {
   for (const c of ch.cons) world.removeConstraint(c);
   for (const b of ch.list) world.removeBody(b);
   scene.remove(ch.group); scene.remove(ch.stars); scene.remove(ch.ring); if (ch.youRing) scene.remove(ch.youRing); if (ch.pring) scene.remove(ch.pring); if (ch.arrow) scene.remove(ch.arrow); ch.el.remove();
+  for (const o of [ch.group, ch.stars, ch.ring, ch.youRing, ch.pring, ch.arrow]) if (o) freeGpu(o);
   ch.removed = true;
   CHARS = CHARS.filter(c => c !== ch);
 }
@@ -3356,7 +3371,7 @@ function updateCamera(dt) {
   camera.lookAt(v3b.set(camTarget.x + FX.kick.x * 0.5, camTarget.y, camTarget.z + FX.kick.z * 0.5));
   camera.updateProjectionMatrix();
 }
-function resize() { renderer.setSize(innerWidth, innerHeight, false); checkRotate(); }
+function resize() { renderer.setPixelRatio(pixelCap()); renderer.setSize(innerWidth, innerHeight, false); checkRotate(); }
 addEventListener('resize', resize);
 
 // ================= main loop =================
@@ -3364,7 +3379,7 @@ let last = performance.now(), acc = 0;
 function step() {
   const dt = STEP * (GAME.slow > 0 ? 0.3 : 1);
   T_now += dt;
-  if (GAME.preview) { previewUpdate(dt); world.gravity.set(0, -18, 0); for (const ch of CHARS) controlChar(ch, dt); windAndGround(dt); world.step(dt); return; }
+  if (GAME.preview) { previewUpdate(dt); world.gravity.set(0, -18, 0); for (const ch of CHARS) controlChar(ch, dt); windAndGround(dt); world.step(STEP, dt, 4); return; }
   const pod = GAME.phase === 'podium';
   if (pod) { TR.gx = TR.gz = 0; podiumUpdate(dt); } else trainUpdate(dt);
   world.gravity.set(TR.gx, -18, TR.gz);
@@ -3406,15 +3421,15 @@ function frame(now) {
   if (!window.__noRender) { renderer.render(scene, camera); if (SHOT.at && performance.now() >= SHOT.at) takeShot(); }
   perf(dt);
 }
-let pf = {t: 0, n: 0, low: false};
-function perf(dt) { pf.t += dt; pf.n++; if (pf.t > 3) { const fps = pf.n / pf.t; if (GAME.state === 'play' && fps < 38) { if (!pf.low) { pf.low = true; renderer.setPixelRatio(1); sun.shadow.mapSize.set(512, 512); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } resize(); } else if (fps < 30 && sun.castShadow) { sun.castShadow = false; } } pf.t = 0; pf.n = 0; } }
+var pf = {t: 0, n: 0, low: false};
+function perf(dt) { pf.t += dt; pf.n++; if (pf.t > 3) { const fps = pf.n / pf.t; if ((GAME.state === 'play' || GAME.preview) && fps < 38 && document.visibilityState === 'visible') { if (!pf.low) { pf.low = true; renderer.setPixelRatio(pixelCap()); sun.shadow.mapSize.set(512, 512); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } resize(); } else if (fps < 30 && sun.castShadow) { sun.castShadow = false; } } pf.t = 0; pf.n = 0; } }
 
 buildPhysics(); buildCoach(); buildOutside(); drawBoard(STATIONS[0]);
 resize();
 applySettings(); vetCheck();
 $('loading').remove(); openMenu();
 requestAnimationFrame(frame);
-window.__sfx = sfx; window.__AU = AU; window.__T = () => T_now; window.__GAME = GAME; window.__CHARS = () => CHARS; window.__TR = TR; window.__LOCAL = LOCAL; window.__NET = NET; window.__podium = () => startPodium(); window.__newMatch = () => newMatch();
+window.__sfx = sfx; window.__AU = AU; window.__T = () => T_now; window.__R = renderer; window.__W = () => world; window.__scene = scene; window.__GAME = GAME; window.__CHARS = () => CHARS; window.__TR = TR; window.__LOCAL = LOCAL; window.__NET = NET; window.__podium = () => startPodium(); window.__newMatch = () => newMatch();
 window.__lamp = v => { LAMP_I = v; applyLight(Infinity); };
 window.__look = (tod, theme, rain) => { if (tod != null) LIGHT.tod = TODS[tod]; if (theme) setTheme(theme, true); if (rain != null) MONSOON.on = rain; applyLight(Infinity); };
 </script>
