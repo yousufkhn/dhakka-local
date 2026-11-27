@@ -315,10 +315,11 @@ body.roundover #controls{display:none}
 @media (max-height:460px){.lb-col p{display:none}.lob-body{padding:6px 12px 8px}.lcodebox b{font-size:34px;letter-spacing:6px}#plist{margin:5px 0!important}#plist li{padding:2px 6px}#bStart{font-size:20px;padding:6px}#lhint{font-size:13px}}
 
 .fxs{position:absolute;left:0;top:0;pointer-events:none;will-change:transform,opacity}
-.fxs.star{background:radial-gradient(circle,#fff 0 22%,var(--c) 23% 100%);clip-path:polygon(50% 0%,58% 30%,80% 8%,70% 36%,98% 30%,74% 50%,100% 66%,70% 64%,82% 92%,58% 72%,50% 100%,42% 72%,18% 92%,30% 64%,0% 66%,26% 50%,2% 30%,30% 36%,20% 8%,42% 30%);filter:drop-shadow(0 0 2px #1e120c)}
-.fxs.ring{border-radius:50%;border:6px solid var(--c);box-shadow:0 0 12px var(--c)}
-.fxs.coin{border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff6b0,#ffc400 55%,#c98a00);border:2px solid #5a3a00;color:#5a3a00;font:900 12px "Baloo 2",sans-serif;display:grid;place-items:center}
-#hurt{position:fixed;inset:0;pointer-events:none;z-index:5;opacity:0;box-shadow:inset 0 0 90px 30px rgba(232,40,60,.75);transition:opacity .35s ease-out}
+.fxs.star{border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95) 0 10%,var(--c) 22%,transparent 68%);mix-blend-mode:screen}
+.fxs.star.hard{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--c) 70%,transparent)}
+.fxs.ring{border-radius:50%;border:2.5px solid var(--c)}
+.fxs.coin{border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff6b0,#ffc400 55%,#c98a00);border:2px solid #5a3a00;color:#5a3a00;font:900 11px "Baloo 2",sans-serif;display:grid;place-items:center}
+#hurt{position:fixed;inset:0;pointer-events:none;z-index:5;opacity:0;box-shadow:inset 0 0 50px 6px rgba(232,40,60,.45);transition:opacity .4s ease-out}
 #hurt.on{opacity:1;transition:none}
 .lab .bub.emo{font-size:22px;padding:0 5px;border-radius:50%;line-height:1.25;background:#fff}
 </style>
@@ -1054,7 +1055,7 @@ function hitChar(o, dir, power, by, cause, word) {
   if (strong || word || cause === 'tc' || humanBy || humanO) burst(word || (cause === 'tc' ? 'fine' : (strong ? 'big' : 'light')), hp.x, hp.y + 0.5, hp.z, strong ? '#ff5964' : null);
   if (!word) hitSfx(power);
   if (strong) { hitstop(Math.min(0.12, 0.07 + (power - 9) * 0.01)); camKick(dir.x, dir.z, 0.22); if (Math.random() < 0.55 && loseSomething(o, dir)) { const bp = by && rosterOf(by); if (bp) bp.stats.props++; } }
-  vib(strong ? 60 : 22, o); vib(strong ? [35, 25, 70] : 30, by); if (!o.isNpc) you(o, 'hurt', strong ? 1 : 0.4);
+  vib(strong ? 60 : 22, o); vib(strong ? [35, 25, 70] : 30, by); if (!o.isNpc && strong) you(o, 'hurt', 1);
   if (by) by.smugT = T_now;
   for (const b of o.list) { b.velocity.x = b.velocity.x * 0.3 + dir.x * power * k; b.velocity.z = b.velocity.z * 0.3 + dir.z * power * k; b.velocity.y += up; }
   o.parts.torso.angularVelocity.set(rnd(-4, 4), rnd(-4, 4), rnd(-4, 4));
@@ -1256,7 +1257,7 @@ function buzz(ms) {
 }
 // effects meant for one player only: run locally for the host's own player, send to that phone for an online player
 const YOU = {big: (a, b, t) => bigText(a, b, t), ban: (t, d) => banner(t, d), burst: (k, x, y, z, c, t) => burst(k, x, y, z, c, t), buzz: ms => buzz(ms), hurt: v => hurtFlash(v)};
-function hurtFlash(v) { const h = $('hurt'); if (!h) return; h.style.setProperty('--v', v); h.classList.add('on'); h.style.opacity = Math.min(1, 0.35 + v * 0.6); requestAnimationFrame(() => requestAnimationFrame(() => { h.classList.remove('on'); h.style.opacity = ''; })); }
+function hurtFlash(v) { const h = $('hurt'); if (!h) return; h.style.setProperty('--v', v); h.classList.add('on'); h.style.opacity = Math.min(1, 0.15 + v * 0.6); requestAnimationFrame(() => requestAnimationFrame(() => { h.classList.remove('on'); h.style.opacity = ''; })); }
 function you(who, kind, ...a) {
   if (!who) return;
   if (who.isMe) { NET.mute++; try { YOU[kind](...a); } finally { NET.mute--; } return; }
@@ -1295,17 +1296,18 @@ const WORDS = {grab: ['GOT YOU!', 'COLLAR!', 'GOTCHA!'], out: ['OUT!', 'TATA!', 
 const BIGWORDS = new Set(['big', 'kick', 'khamba', 'save', 'throw']);
 // Hits are shown with shapes, not words: a comic impact star (size = how hard), a ring for grabs, saves and bracing,
 // and a small gold coin when you score. Callers still pass the old kind names.
-const STAR_KIND = {light: [44, '#fff3c4'], big: [92, '#ffd23f'], kick: [108, '#ff9f1c'], throw: [98, '#ffe14d'], khamba: [110, '#ffcc00'], fine: [78, '#ff5964'], land: [46, '#efe3cc'], out: [118, '#ff5964']};
-const RING_KIND = {grab: [54, '#ffffff'], save: [120, '#6bf178'], 'BRACED!': [80, '#6bf178']};
+const STAR_KIND = {light: [26, '#fff3c4'], big: [54, '#ffd23f'], kick: [60, '#ff9f1c'], throw: [56, '#ffe14d'], khamba: [62, '#ffcc00'], fine: [46, '#ff8a8f'], land: [30, '#efe3cc'], out: [64, '#ff8a8f']};
+const HARD_KIND = new Set(['big', 'kick', 'throw', 'khamba', 'out']);
+const RING_KIND = {grab: [36, 'rgba(255,255,255,.8)'], save: [70, '#6bf178'], 'BRACED!': [48, '#6bf178']};
 function burst(kind, x, y, z, color, text) {
   if (GAME.state !== 'play') return;
   netEv('b', kind, r2(x), r2(y), r2(z), color || '', text || '');
-  let type = 'star', size = 70, col = color || '#ffd23f', label = '';
-  if (typeof kind === 'string' && kind[0] === '+') { type = 'coin'; size = 30; label = kind.split(' ')[0]; }
+  let type = 'star', size = 44, col = color || '#ffd23f', label = '';
+  if (typeof kind === 'string' && kind[0] === '+') { type = 'coin'; size = 26; label = kind.split(' ')[0]; }
   else if (RING_KIND[kind]) { type = 'ring'; [size, col] = RING_KIND[kind]; }
   else if (STAR_KIND[kind]) { [size, col] = STAR_KIND[kind]; if (color && kind !== 'light') col = color; }
-  if (FX.bursts.length >= 5) { const o = FX.bursts.shift(); o.el.remove(); }
-  const el = document.createElement('div'); el.className = 'fxs ' + type;
+  if (FX.bursts.length >= 3) { const o = FX.bursts.shift(); o.el.remove(); }
+  const el = document.createElement('div'); el.className = 'fxs ' + type + (HARD_KIND.has(kind) ? ' hard' : '');
   el.style.width = el.style.height = size + 'px'; el.style.setProperty('--c', col);
   if (label) el.textContent = label;
   $('bursts').appendChild(el);
@@ -1318,8 +1320,8 @@ function updateBursts(dt) {
     v3.set(b.x, b.y + (b.type === 'coin' ? b.t * 1.1 : 0), b.z).project(camera);
     const x = (v3.x * 0.5 + 0.5) * W, y = (-v3.y * 0.5 + 0.5) * H;
     let sc, op;
-    if (b.type === 'star') { sc = k < 0.25 ? 0.3 + k / 0.25 * 0.9 : 1.2 - (k - 0.25) * 0.5; op = k < 0.55 ? 1 : Math.max(0, 1 - (k - 0.55) / 0.45); }
-    else if (b.type === 'ring') { sc = 0.3 + k * 1.2; op = Math.max(0, 1 - k); }
+    if (b.type === 'star') { sc = 0.5 + Math.min(1, k / 0.3) * 0.55; op = 0.8 * (k < 0.35 ? 1 : Math.max(0, 1 - (k - 0.35) / 0.65)); }
+    else if (b.type === 'ring') { sc = 0.4 + k * 0.9; op = 0.75 * Math.max(0, 1 - k); }
     else { sc = k < 0.15 ? 0.5 + k / 0.15 * 0.6 : 1; op = k < 0.7 ? 1 : Math.max(0, 1 - (k - 0.7) / 0.3); }
     b.el.style.transform = `translate(${x.toFixed(0)}px,${y.toFixed(0)}px) translate(-50%,-50%) rotate(${b.type === 'coin' ? 0 : b.rot}deg) scale(${sc.toFixed(2)})`;
     b.el.style.opacity = op.toFixed(2);
