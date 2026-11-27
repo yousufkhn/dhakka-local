@@ -547,13 +547,15 @@ const PANTS = [0x2b3a67,0x3d2c1e,0x1d1d1d,0x5b6b7a,0x7a5c2e];
 
 // ================= renderer / scene =================
 const canvas = $('c');
-const renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreference: 'high-performance'});
+// graphics level this device needed last time (0 full, 1 light, 2 lightest); kept for a week so a weak phone or laptop starts light
+const GFX0 = (() => { const g = store.get('dl_gfx', null); return g && Date.now() - g.t < 7 * 864e5 ? g.lvl | 0 : 0; })();
+const renderer = new THREE.WebGLRenderer({canvas, antialias: GFX0 === 0, powerPreference: 'high-performance'});
 // Cap how many pixels we draw: a big or high-DPI PC monitor at full resolution can starve the GPU and freeze the whole browser.
-function pixelCap() { const w = innerWidth, h = innerHeight, low = !!(pf && pf.low), maxPx = low ? 1.1e6 : 2.3e6; return Math.max(0.6, Math.min(low ? 1 : 2, window.devicePixelRatio || 1, Math.sqrt(maxPx / Math.max(1, w * h)))); }
+function pixelCap() { const w = innerWidth, h = innerHeight, low = !!(pf && pf.low), maxPx = pf && pf.lower ? 0.7e6 : low ? 1.1e6 : 2.3e6; return Math.max(0.5, Math.min(low ? 1 : 2, window.devicePixelRatio || 1, Math.sqrt(maxPx / Math.max(1, w * h)))); }
 renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
 // if the graphics driver resets, don't sit on a dead canvas: reload once it comes back
-canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); GAME.ctxLost = true; }, false);
-canvas.addEventListener('webglcontextrestored', () => location.reload(), false);
+canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); GAME.ctxLost = true; store.set('dl_gfx', {lvl: 2, t: Date.now()}); }, false);
+canvas.addEventListener('webglcontextrestored', () => { const last = +sessionStorage.getItem('dl_rl') || 0; if (Date.now() - last > 60000) { try { sessionStorage.setItem('dl_rl', Date.now()); } catch (e) {} location.reload(); } }, false);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 const scene = new THREE.Scene();
@@ -700,10 +702,42 @@ function buildCoach() {
     for (let i = 0; i < 6; i++) { const wdw = mesh(new THREE.BoxGeometry(1, 0.7, 0.02), 0x2a3540, {cast: false}); wdw.position.set(e * (HL + 2.6 + i * 2.1), 1.55, HW + 0.14); g.add(wdw); }
     const und = mesh(new THREE.BoxGeometry(14, 0.5, HW * 2), 0x2a2a2a); und.position.set(e * (HL + 7.6), -0.45, 0); g.add(und);
   }
+  mergeStatic(g);
+}
+// fewer draw calls: the coach's fixed parts that share a material become one mesh each (weak GPUs choke on hundreds of tiny draws)
+function mergeStatic(g) {
+  const bins = new Map();
+  for (const m of g.children) {
+    if (!m.isMesh || m.children.length || Array.isArray(m.material) || WHEELS.includes(m)) continue;
+    const a = m.geometry.attributes; if (!m.geometry.index || !a.uv || !a.normal || Object.keys(a).length !== 3) continue;
+    const k = m.material.uuid + (m.castShadow ? 'c' : '') + (m.receiveShadow ? 'r' : '') + m.renderOrder;
+    if (!bins.has(k)) bins.set(k, []); bins.get(k).push(m);
+  }
+  const v = new THREE.Vector3(), nm = new THREE.Matrix3();
+  for (const list of bins.values()) {
+    if (list.length < 2) continue;
+    let nv = 0, ni = 0; for (const m of list) { nv += m.geometry.attributes.position.count; ni += m.geometry.index.count; }
+    const P = new Float32Array(nv * 3), N = new Float32Array(nv * 3), U = new Float32Array(nv * 2), I = new Uint32Array(ni);
+    let vo = 0, io = 0;
+    for (const m of list) {
+      m.updateMatrix(); nm.getNormalMatrix(m.matrix);
+      const gp = m.geometry.attributes.position, gn = m.geometry.attributes.normal, gu = m.geometry.attributes.uv, gi = m.geometry.index;
+      for (let i = 0; i < gp.count; i++) {
+        const j = vo + i; v.fromBufferAttribute(gp, i).applyMatrix4(m.matrix); P[j * 3] = v.x; P[j * 3 + 1] = v.y; P[j * 3 + 2] = v.z;
+        v.fromBufferAttribute(gn, i).applyMatrix3(nm).normalize(); N[j * 3] = v.x; N[j * 3 + 1] = v.y; N[j * 3 + 2] = v.z;
+        U[j * 2] = gu.getX(i); U[j * 2 + 1] = gu.getY(i);
+      }
+      for (let i = 0; i < gi.count; i++) I[io + i] = gi.getX(i) + vo;
+      vo += gp.count; io += gi.count;
+    }
+    for (const m of list) g.remove(m);
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(P, 3)); geo.setAttribute('normal', new THREE.BufferAttribute(N, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(U, 2)); geo.setIndex(new THREE.BufferAttribute(I, 1)); geo.computeBoundingSphere();
+    const mm = new THREE.Mesh(geo, list[0].material); mm.castShadow = list[0].castShadow; mm.receiveShadow = list[0].receiveShadow; mm.renderOrder = list[0].renderOrder; g.add(mm);
+  }
 }
 function drawLED(dt) {
   const t = LED.tex; if (!t) return; const c = t._g, w = 512, h = 64;
-  LED.x -= dt * 110; const txt = LED.text || 'DHAKKA LOCAL';
+  LED.x -= dt * 110; LED.acc = (LED.acc || 0) + dt; if (LED.acc < 0.05) return; LED.acc = 0; const txt = LED.text || 'DHAKKA LOCAL';
   c.font = '700 38px ui-monospace,Consolas,monospace';
   const tw = c.measureText(txt).width + 120; if (LED.x < -tw) LED.x += tw;
   c.fillStyle = '#0b0b0b'; c.fillRect(0, 0, w, h); c.fillStyle = '#ff4d1a';
@@ -3435,14 +3469,18 @@ function frame(now) {
   updateCamera(dt);
   if (GAME.state === 'play') { updateHUD(dt); updateBursts(vdt); ambient(dt); progTick(); tipTick(dt); }
   if (AU.ctx) { musicTick(); ambLevels(dt); }
+  if (pf.lower && ++pf.sf % 3 === 0) renderer.shadowMap.needsUpdate = true;
   if (!window.__noRender) { renderer.render(scene, camera); if (SHOT.at && performance.now() >= SHOT.at) takeShot(); }
   perf(dt);
 }
-var pf = {t: 0, n: 0, low: false};
-function perf(dt) { pf.t += dt; pf.n++; if (pf.t > 3) { const fps = pf.n / pf.t; if ((GAME.state === 'play' || GAME.preview) && fps < 38 && document.visibilityState === 'visible') { if (!pf.low) { pf.low = true; renderer.setPixelRatio(pixelCap()); sun.shadow.mapSize.set(512, 512); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } resize(); } else if (fps < 30 && sun.castShadow) { sun.castShadow = false; } } pf.t = 0; pf.n = 0; } }
+var pf = {t: 0, n: 0, low: GFX0 >= 1, lower: GFX0 >= 2, sf: 0};
+function gfxSave() { store.set('dl_gfx', {lvl: pf.lower ? 2 : pf.low ? 1 : 0, t: Date.now()}); }
+function gfxLow() { renderer.setPixelRatio(pixelCap()); sun.shadow.mapSize.set(512, 512); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } resize(); }
+// a slow device steps down in place; switching shadows off would recompile every shader and freeze weak GPUs for seconds
+function perf(dt) { pf.t += dt; pf.n++; if (pf.t > 3) { const fps = pf.n / pf.t; if ((GAME.state === 'play' || GAME.preview) && document.visibilityState === 'visible') { if (fps < 38 && !pf.low) { pf.low = true; gfxLow(); gfxSave(); } else if (fps < 30 && !pf.lower) { pf.lower = true; renderer.shadowMap.autoUpdate = false; resize(); gfxSave(); } } pf.t = 0; pf.n = 0; } }
 
 buildPhysics(); buildCoach(); buildOutside(); drawBoard(STATIONS[0]);
-resize();
+resize(); if (pf.low) gfxLow(); if (pf.lower) renderer.shadowMap.autoUpdate = false;
 applySettings(); vetCheck();
 $('loading').remove(); openMenu();
 requestAnimationFrame(frame);
