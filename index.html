@@ -81,7 +81,8 @@ details li{margin:3px 0}
 #bJump{right:calc(max(14px,env(safe-area-inset-right)) + 176px);bottom:14px;width:64px;height:64px;background:rgba(120,220,255,.8)}
 #bGrab{right:calc(max(14px,env(safe-area-inset-right)) + 92px);bottom:62px;width:76px;height:76px;background:rgba(140,255,150,.8)}
 #bPush{right:max(14px,env(safe-area-inset-right));bottom:14px;width:90px;height:90px;background:rgba(255,80,110,.88);color:#fff;font-size:15px}
-#topbtns{position:fixed;top:8px;right:max(10px,env(safe-area-inset-right));z-index:6;display:flex;gap:6px}
+#bFS{position:fixed;top:8px;right:max(10px,env(safe-area-inset-right));z-index:26;width:40px;height:34px;padding:0;margin:0;font-size:19px;line-height:1;box-shadow:0 2px 0 #000;background:#fff4d6;color:#3a1d0e}
+#topbtns{position:fixed;top:8px;right:calc(max(10px,env(safe-area-inset-right)) + 48px);z-index:6;display:flex;gap:6px}
 #topbtns button{width:auto;padding:5px 10px;font-size:14px;margin:0;box-shadow:0 2px 0 #000}
 #rotate{position:fixed;inset:0;z-index:20;background:rgba(20,8,18,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:20px;font-weight:800}
 #rotate .ph{font-size:64px;animation:rot 1.6s ease-in-out infinite}
@@ -179,6 +180,7 @@ body.roundover #controls{display:none}
   <div class="cbtn" id="bGrab" data-k="grab">PAKDO<br><small>hold</small></div>
   <div class="cbtn" id="bPush" data-k="push">DHAKKA!<br><small>hold = power</small></div>
 </div>
+<button id="bFS" class="hidden" aria-label="Fullscreen" title="Fullscreen">⛶</button>
 <div id="topbtns" class="hidden"><button id="bMute" aria-label="Mute">🔊</button><button id="bQuit" aria-label="Quit">✕</button></div>
 
 <div id="menu" class="overlay hidden">
@@ -761,26 +763,41 @@ function tryGrab(ch) {
   return true;
 }
 
+// turn toward the most likely target so a deliberate shove/kick connects (players aim with the stick, the game helps a little)
+function aimAssist(ch, reach, cone) {
+  const tp = ch.parts.torso.position, f = facing(ch); let best = null, bs = -1;
+  for (const o of CHARS) {
+    if (o === ch || o.out) continue;
+    const op = o.parts.torso.position, dx = op.x - tp.x, dz = op.z - tp.z, d = Math.hypot(dx, dz) || 1;
+    if (d > reach || Math.abs(op.y - tp.y) > 1) continue;
+    const dot = (dx * f.x + dz * f.z) / d; if (dot < cone) continue;
+    const sc = dot * 1.4 - d / reach + (o.isNpc ? -0.35 : 0); if (sc > bs) { bs = sc; best = o; }
+  }
+  if (best) { const op = best.parts.torso.position; ch.yaw = Math.atan2(op.x - tp.x, op.z - tp.z); }
+  return best;
+}
 function hitChar(o, dir, power, by, cause, word) {
-  const k = o.heavy ? 0.45 : 1, up = (1.6 + power * 0.28) * k;
+  const brace = !!(o.brace && cause !== 'tc' && cause !== 'revenge'), k = (o.heavy ? 0.45 : 1) * (brace ? 0.5 : 1), up = (1.6 + power * 0.28) * k;
+  if (brace) { power *= 0.75; const hp0 = o.parts.torso.position; if (!o.isNpc) burst('SAMBHALA!', hp0.x, hp0.y + 0.9, hp0.z, '#6bf178'); }
   const strong = power >= 9, hp = o.parts.torso.position;
   puff(hp.x, hp.y, hp.z, strong ? 7 : 3, 0xfff3d6, strong ? 2.6 : 1.5);
   burst(word || (cause === 'tc' ? 'fine' : (strong ? 'big' : 'light')), hp.x, hp.y + 0.5, hp.z, strong ? '#ff5964' : null);
   if (strong) { hitstop(Math.min(0.12, 0.07 + (power - 9) * 0.01)); camKick(dir.x, dir.z, 0.22); if (Math.random() < 0.55 && loseSomething(o, dir)) { const bp = by && rosterOf(by); if (bp) bp.stats.props++; } }
-  vib(strong ? 45 : 15, o, by);
+  vib(strong ? 60 : 22, o); vib(strong ? [35, 25, 70] : 30, by);
   if (by) by.smugT = T_now;
   for (const b of o.list) { b.velocity.x = b.velocity.x * 0.3 + dir.x * power * k; b.velocity.z = b.velocity.z * 0.3 + dir.z * power * k; b.velocity.y += up; }
   o.parts.torso.angularVelocity.set(rnd(-4, 4), rnd(-4, 4), rnd(-4, 4));
-  o.stun = Math.max(o.stun, (0.45 + power * 0.1) * (o.heavy ? 0.5 : 1));
+  o.stun = Math.max(o.stun, (0.45 + power * 0.1) * (o.heavy ? 0.5 : 1) * (brace ? 0.5 : 1));
   if (o.grab && (power > 9 || Math.random() < 0.55)) releaseGrab(o);
   o.lastHitBy = by ? by.name : null; o.lastHitCh = by || null; o.lastHitT = T_now; o.lastCause = cause || (word === 'kick' ? 'kick' : (by && by.isNpc ? 'npc' : 'player'));
   if (Math.random() < .6) say(o, pick(o.isNpc ? NPC_HIT : HIT_LINES));
 }
 
 function doShove(ch) {
-  const f = facing(ch), tp = ch.parts.torso.position;
-  const p = (3.9 + ch.charge * 9.6) * (ch.power > 0 ? 1.6 : 1) * ch.basePower;
   const range = 1.15 + ch.charge * 0.4;
+  if (!ch.isNpc) aimAssist(ch, range + 0.45, 0.25);
+  const f = facing(ch), tp = ch.parts.torso.position;
+  const p = (3.4 + Math.pow(ch.charge, 1.25) * 11) * (ch.power > 0 ? 1.6 : 1) * ch.basePower;
   let hit = 0;
   for (const o of CHARS) {
     if (o === ch || o.out) continue;
@@ -790,8 +807,11 @@ function doShove(ch) {
       hitChar(o, {x: dx / d * 0.5 + f.x * 0.5, z: dz / d * 0.5 + f.z * 0.5}, p, ch); hit++;
     }
   }
-  ch.parts.torso.velocity.x += f.x * 2; ch.parts.torso.velocity.z += f.z * 2;
-  ch.pushAnim = 0.25; ch.pushCd = ch.isNpc ? 1.0 : (ch.isBot ? 0.75 : 0.4);
+  // a shove that hits recovers fast; a miss makes you stumble forward, so spamming is worse than timing
+  const lurch = hit ? 2 : 3.4;
+  ch.parts.torso.velocity.x += f.x * lurch; ch.parts.torso.velocity.z += f.z * lurch;
+  ch.pushAnim = 0.25; ch.pushCd = ch.isNpc ? 1.0 : (ch.isBot ? 1.1 : (hit ? 0.3 : 0.7));
+  if (!hit && !ch.isNpc && ch.charge > 0.6) { ch.stun = Math.max(ch.stun, 0.45); say(ch, pick(['Arre, hawa mein!', 'Miss!', 'Kahan gaya?!']), 1); }
   if (!ch.isNpc || hit) shockwave(tp.x + f.x * 0.55, tp.y - 0.05, tp.z + f.z * 0.55, 0.5 + ch.charge * 0.9, ch.charge > 0.6 ? 0xff5964 : 0xffffff);
   if (hit) { sfx(ch.charge > 0.6 ? 'bigthud' : 'thud'); shake(ch.charge > 0.6 ? 0.35 : 0.15); if (!ch.isNpc && Math.random() < .35) say(ch, pick(ch.charge > 0.6 ? ['SUPER DHAKKA!','Jaa Virar!','Bye bye!'] : ['DHAKKA!','Aage chalo!','Hatt!','Nikal!'])); }
   else sfx('whoosh');
@@ -799,6 +819,7 @@ function doShove(ch) {
 }
 
 function doKick(ch) {
+  if (!ch.isNpc) aimAssist(ch, 2.6, 0.35);
   const f = facing(ch);
   for (const b of ch.list) { b.velocity.x = f.x * 8.5; b.velocity.z = f.z * 8.5; b.velocity.y = Math.max(b.velocity.y, 2.5); }
   ch.parts.torso.angularVelocity.set(f.z * -6, 0, f.x * 6);
@@ -808,13 +829,19 @@ function doKick(ch) {
 
 function doThrow(ch) {
   const o = ch.grab.ch; releaseGrab(ch);
-  const f = facing(ch), p = 8.5 * (ch.power > 0 ? 1.4 : 1);
+  // throws bend toward the nearest open door if it is roughly ahead
+  const op0 = o.parts.torso.position, dd = nearestDoor(op0.x), sz0 = op0.z >= 0 ? 1 : -1, ff = facing(ch);
+  let dx = dd - op0.x, dz = sz0 * (HW + 1) - op0.z; const dl = Math.hypot(dx, dz) || 1; dx /= dl; dz /= dl;
+  const toward = dl < 3.2 && dx * ff.x + dz * ff.z > -0.2;
+  const f = toward ? (() => { const x = ff.x * 0.35 + dx * 0.65, z = ff.z * 0.35 + dz * 0.65, m = Math.hypot(x, z) || 1; return {x: x / m, z: z / m}; })() : ff;
+  if (toward) ch.yaw = Math.atan2(f.x, f.z);
+  const p = 9 * (ch.power > 0 ? 1.4 : 1);
   for (const b of o.list) { b.velocity.x = f.x * p; b.velocity.z = f.z * p; b.velocity.y = 4.5; }
   o.stun = Math.max(o.stun, 1.6); o.lastHitBy = ch.name; o.lastHitCh = ch; o.lastHitT = T_now; o.lastCause = 'throw';
   say(o, 'AAAAAA!', 1.2); say(ch, pick(['Utha ke phek diya!','Parcel delivered!','Ja, udd ja!']), 1.4);
   sfx('bigthud'); shake(0.3); ch.pushCd = 0.6; ch.charge = 0;
   const op = o.parts.torso.position; burst('throw', op.x, op.y + 0.5, op.z, '#ffe14d'); puff(op.x, op.y, op.z, 6, 0xfff3d6, 2.2); hitstop(0.07); camKick(f.x, f.z, 0.2); ch.smugT = T_now;
-  if (Math.random() < 0.6 && loseSomething(o, f)) { const bp = rosterOf(ch); if (bp) bp.stats.props++; } vib(40, o, ch);
+  if (Math.random() < 0.6 && loseSomething(o, f)) { const bp = rosterOf(ch); if (bp) bp.stats.props++; } vib(50, o); vib([30, 30, 60], ch);
 }
 
 let T_now = 0;
@@ -856,14 +883,21 @@ function controlChar(ch, dt) {
     if (c.grab && !stunned && ch.gripLock <= 0 && ch.grip > 0.15) tryGrab(ch);
   }
 
-  if (c.push && !ch.pushHeld && !stunned && ch.pushCd <= 0) {
+  ch.tired = Math.max(0, (ch.tired || 0) - dt);
+  if (c.push && !ch.pushHeld && !ch.isNpc) {
+    // mashing DHAKKA tires you out for a moment
+    ch.presses = (ch.presses || []).filter(t => T_now - t < 1.6); ch.presses.push(T_now);
+    if (ch.presses.length >= 5 && !ch.tired) { ch.tired = 1.3; ch.presses = []; say(ch, pick(['Saans to lene do! 😮‍💨', 'Thak gaya…', 'Haath dukh gaye!']), 1.2); if (ch.charging) { ch.charging = false; ch.charge = 0; } }
+  }
+  ch.brace = !!(c.grab && !ch.grab && ch.grounded && !stunned && !ch.charging);
+  if (c.push && !ch.pushHeld && !stunned && ch.pushCd <= 0 && !ch.tired) {
     if (ch.grab && ch.grab.type === 'ch') doThrow(ch);
     else if (!ch.grounded && !ch.grab) doKick(ch);
     else { ch.charging = true; ch.charge = 0; }
   }
   if (ch.charging) {
     if (stunned) { ch.charging = false; ch.charge = 0; }
-    else if (c.push) ch.charge = Math.min(1, ch.charge + dt * 1.3);
+    else if (c.push) ch.charge = Math.min(1, ch.charge + dt * (ch.isNpc ? 1.3 : 1.65));
     else { ch.charging = false; doShove(ch); }
   }
   ch.pushHeld = c.push;
@@ -918,7 +952,7 @@ function controlChar(ch, dt) {
     driveQ(P['fa' + s], yq.mult(qAx(X_AX, f)), 8, kA);
   }
 
-  const spd = (ch.isNpc ? 2.4 : 3.6) * (ch.speedT > 0 ? 1.45 : 1) * (ch.charging ? 0.45 : 1);
+  const spd = (ch.isNpc ? 2.4 : 3.6) * (ch.speedT > 0 ? 1.45 : 1) * (ch.charging ? 0.45 : 1) * (ch.tired ? 0.7 : 1);
   const acc = ch.grounded ? (MONSOON.on ? 3.5 : 9) : (holding ? 3 : 1.6);
   const v = t.velocity;
   if (mag > 0.15) {
@@ -941,7 +975,13 @@ function shake(a) { CAM.shake = Math.max(CAM.shake, a); netEv('k', +a.toFixed(2)
 const FX = {hitstop: 0, kick: {x: 0, z: 0}, bursts: [], parts: [], props: []};
 function hitstop(s) { if (GAME.state === 'play' && !GAME.result) { FX.hitstop = Math.max(FX.hitstop, s); netEv('h', +s.toFixed(3)); } }
 function camKick(dx, dz, a) { FX.kick.x += dx * a; FX.kick.z += dz * a; }
-function buzz(ms) { if (navigator.vibrate) try { navigator.vibrate(ms); } catch (e) {} }
+// haptics: Android vibrates; iPhone (no vibrate API) gets a tick from a hidden iOS switch control
+const IOS_TICK = (() => { if (navigator.vibrate || !/iP(hone|ad|od)/.test(navigator.userAgent)) return null; const l = document.createElement('label'); l.setAttribute('aria-hidden', 'true'); l.style.cssText = 'position:fixed;left:-200px;top:0;opacity:0;pointer-events:none'; const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1; l.appendChild(i); document.body.appendChild(l); return l; })();
+function buzz(ms) {
+  if (window.SET && SET.haptics === false) return;
+  if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} return; }
+  if (IOS_TICK) { const n = Array.isArray(ms) ? Math.ceil(ms.length / 2) : 1; for (let i = 0; i < n; i++) setTimeout(() => { try { IOS_TICK.click(); } catch (e) {} }, i * 90); }
+}
 // effects meant for one player only: run locally for the host's own player, send to that phone for an online player
 const YOU = {big: (a, b, t) => bigText(a, b, t), ban: (t, d) => banner(t, d), burst: (k, x, y, z, c, t) => burst(k, x, y, z, c, t), buzz: ms => buzz(ms)};
 function you(who, kind, ...a) {
@@ -1096,7 +1136,7 @@ function startRound() {
   GAME.roster.forEach((p, i) => {
     p.alive = true; p.target = null; p.think = 0; p.ctrl = p.isMe ? LOCAL : (p.netCtrl || makeCtrl());
     const [x, z] = sp[i];
-    p.ch = makeChar(x, z, {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, color: COLORS[(p.idx ?? i) % COLORS.length], pants: pick(PANTS), acc: p.acc ?? (i % 8), ctrl: p.ctrl, yaw: rnd(-3, 3)});
+    p.ch = makeChar(x, z, {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, power: p.isBot ? 0.88 : 1, color: COLORS[(p.idx ?? i) % COLORS.length], pants: pick(PANTS), acc: p.acc ?? (i % 8), ctrl: p.ctrl, yaw: rnd(-3, 3)});
   });
   const u = GAME.roster.length;
   spawnNpc('uncle', sp[u][0], sp[u][1], 'ride'); if (u > 4) spawnNpc('aunty', sp[u + 1][0], sp[u + 1][1], 'ride');
@@ -1188,7 +1228,7 @@ function botThink(p, dt) {
       for (const o of CHARS) { if (o === ch || o.out) continue; const taken = GAME.roster.filter(q => q !== p && q.alive && q.target === o).length; const d = Math.hypot(o.parts.torso.position.x - tp.x, o.parts.torso.position.z - tp.z) * (o.isNpc ? 2.6 : 1) * rnd(0.7, 1.3) * (o.isMe ? 1.15 : 1) * (1 + taken * 0.8); if (d < bd) { bd = d; best = o; } }
       p.target = best;
     }
-    p.chargeTo = rnd(0, sk);
+    p.chargeTo = rnd(0.3, 0.3 + 0.6 * sk);
   }
   c.grab = !!p.wantGrab; c.mx = c.mz = 0;
   if (c.grab && ch.grab && danger) { c.push = false; return; }
@@ -1225,9 +1265,9 @@ function botThink(p, dt) {
   }
   else {
     c.mx = ex * 0.25; c.mz = ez * 0.25;
-    c.push = fresh && T_now > 4 && ch.pushCd <= 0 && Math.random() < 0.11 + 0.2 * sk;
+    c.push = fresh && T_now > 4 && ch.pushCd <= 0 && Math.random() < 0.07 + 0.14 * sk;
     if (fresh && Math.random() < 0.03 * sk) c.grab = true;
-    if (fresh && Math.random() < 0.025 * sk && T_now > 5) { c.jump = true; p.kickNext = true; }
+    if (fresh && Math.random() < 0.015 * sk && T_now > 5) { c.jump = true; p.kickNext = true; }
   }
   if (p.kickNext && !ch.grounded && ch.jumpT < 0.15 && ch.pushCd <= 0) { c.push = true; p.kickNext = false; }
   const v = ch.parts.torso.velocity;
@@ -1318,7 +1358,7 @@ function trainUpdate(dt) {
     if (!T.announced && T.t > T.dur - 3.8) { T.announced = true; if (fast) { banner('Agla: ' + STATIONS[(T.station + 1) % STATIONS.length] + ' · Fast hai, rukegi nahi! 🚄', 2.4); sfx('chime'); } else announce(); }
     if (fast) { T.uncleT = (T.uncleT ?? 5) - dt; if (T.uncleT <= 0) { T.uncleT = rnd(6, 9); const e = pick([-1, 1]), ip = interiorPoint(); if (spawnNpc(pick(['uncle', 'uncle', 'dabba']), e * 6.5, rnd(-0.3, 0.3), 'board', {wps: [[ip[0], ip[1], 0.5]]})) banner(pick(['Agle dabbe se uncle aa gaye!', 'Aur ek uncle! Jagah do!']), 1.8); } }
     T.nextEvt -= dt;
-    if (T.nextEvt <= 0 && (fast || T.t < T.dur - 2) && T_now > 4) { T.nextEvt = rnd(2.4, 4.2) * Math.max(0.6, 1 - T.station * 0.03) * (fast ? 0.7 : 1); randomEvent(); }
+    if (T.nextEvt <= 0 && (fast || T.t < T.dur - 2) && T_now > 4) { T.nextEvt = rnd(3.6, 5.8) * Math.max(0.6, 1 - T.station * 0.03) * (fast ? 0.7 : 1); randomEvent(); }
     if (T.t >= T.dur && fast) { T.t = 0; T.station++; T.announced = false; T.dur = rnd(7, 9); const ns = STATIONS[T.station % STATIONS.length]; setTheme(THEME_OF[ns] || 'city'); banner(STATIONS[(T.station - 1) % STATIONS.length] + ' nikal gaya! Rukegi nahi! 🚄', 1.8); sfx('horn'); }
     else if (T.t >= T.dur) { T.phase = 'brake'; T.t = 0; T.dur = 2; T.v0 = T.speed; sfx('brake'); }
   } else if (T.phase === 'brake') {
@@ -1369,7 +1409,7 @@ function trainUpdate(dt) {
     if (k.x < -30) T.khamba = null;
   }
   if (MONSOON.on) { MONSOON.t -= dt; if (MONSOON.t <= 0) { MONSOON.on = false; banner('Baarish ruk gayi.', 1.4); } }
-  if (T.speed > 0.1) { gx += Math.sin(T_now * 13) * 0.25 * T.speed; gz += Math.sin(T_now * 9.3) * 0.35 * T.speed; }
+  if (T.speed > 0.1) { gx += Math.sin(T_now * 13) * 0.15 * T.speed; gz += Math.sin(T_now * 9.3) * 0.2 * T.speed; }
   T.gx = gx; T.gz = gz;
   T.scroll += T.speed * 22 * dt;
 }
@@ -1394,7 +1434,7 @@ function eliminate(p) {
     if (left === GAME.roster.length - 1) p.stats.first++;
     if (GAME.mode !== 'seat') { if (left === 1) award(p, 3, '2nd place'); else if (left === 2) award(p, 1, '3rd place'); }
     const kp = recent ? (o.lastCause === 'revenge' ? o.revBy : (o.lastHitCh ? rosterOf(o.lastHitCh) : null)) : null;
-    if (kp && kp !== p) { kp.stats.outs++; award(kp, 2, 'Dhakka out'); if (o.lastCause === 'throw') award(kp, 1, 'Throw style'); else if (o.lastCause === 'kick') award(kp, 1, 'Dropkick style'); else if (o.lastCause === 'revenge') award(kp, 1, 'Platform revenge'); }
+    if (kp && kp !== p) { kp.stats.outs++; award(kp, 2, 'Dhakka out'); you(kp, 'buzz', [40, 40, 120]); if (o.lastCause === 'throw') award(kp, 1, 'Throw style'); else if (o.lastCause === 'kick') award(kp, 1, 'Dropkick style'); else if (o.lastCause === 'revenge') award(kp, 1, 'Platform revenge'); }
   }
   let sub;
   if (recent && o.lastCause === 'khamba') sub = 'Khamba 1, ' + p.name + ' 0.';
@@ -1735,7 +1775,7 @@ const stickEnd = e => { if (e.pointerId !== STICK.id) return; STICK.id = null; S
 stickEl.addEventListener('pointerup', stickEnd); stickEl.addEventListener('pointercancel', stickEnd);
 document.querySelectorAll('.cbtn').forEach(el => {
   const k = el.dataset.k;
-  const on = e => { e.preventDefault(); audioInit(); LOCAL[k] = true; el.classList.add('on'); if (navigator.vibrate && k === 'push') try { navigator.vibrate(12); } catch (_) {} };
+  const on = e => { e.preventDefault(); audioInit(); LOCAL[k] = true; el.classList.add('on'); if (k === 'push') buzz(10); };
   const off = e => { e.preventDefault(); LOCAL[k] = false; el.classList.remove('on'); };
   el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointercancel', off); el.addEventListener('pointerleave', off);
 });
@@ -1755,12 +1795,26 @@ $('bPlay').onclick = () => {
   for (let i = 1; i < GAME.botN; i++) GAME.roster.push(newPlayer({id: 'bot' + i, name: names[i - 1], isBot: true}, i));
   GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0;
   $('menu').classList.add('hidden'); $('hud').classList.remove('hidden'); $('controls').classList.remove('hidden'); $('topbtns').classList.remove('hidden');
-  try { if (document.documentElement.requestFullscreen && matchMedia('(pointer:coarse)').matches) document.documentElement.requestFullscreen().then(() => screen.orientation?.lock?.('landscape').catch(() => {})).catch(() => {}); } catch (e) {}
+  if (matchMedia('(pointer:coarse)').matches) goFull(true);
   startRound(); checkRotate();
 };
 $('bQuit').onclick = () => { netLeave(); document.body.classList.remove('roundover'); GAME.state = 'menu'; clearPodium(); $('podium').classList.add('hidden'); GAME.big = GAME.banner = null; clearBursts(); document.body.classList.remove('slowmo'); $('hud').classList.add('hidden'); $('controls').classList.add('hidden'); $('topbtns').classList.add('hidden'); $('score').classList.add('hidden'); $('menu').classList.remove('hidden'); if (window.speechSynthesis) speechSynthesis.cancel(); startDemo(); };
 $('bMute').onclick = () => { AU.muted = !AU.muted; $('bMute').textContent = AU.muted ? '🔇' : '🔊'; if (AU.muted && window.speechSynthesis) speechSynthesis.cancel(); };
 let rotDismissed = false;
+// fullscreen: a button on every screen, plus automatic on phones when a match starts
+const FS_OK = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+function isFull() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function goFull(on) {
+  try {
+    const d = document.documentElement;
+    if (on && !isFull()) { const p = d.requestFullscreen ? d.requestFullscreen({navigationUI: 'hide'}) : d.webkitRequestFullscreen && d.webkitRequestFullscreen(); if (p && p.then) p.then(() => screen.orientation?.lock?.('landscape').catch(() => {})).catch(() => {}); }
+    else if (!on && isFull()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); }
+  } catch (e) {}
+}
+function fsIcon() { $('bFS').textContent = isFull() ? '🗗' : '⛶'; $('bFS').title = isFull() ? 'Exit fullscreen' : 'Fullscreen'; }
+if (FS_OK) $('bFS').classList.remove('hidden');
+$('bFS').onclick = () => { goFull(!isFull()); };
+document.addEventListener('fullscreenchange', () => { fsIcon(); resize(); }); document.addEventListener('webkitfullscreenchange', () => { fsIcon(); resize(); });
 function checkRotate() { const show = GAME.state === 'play' && !rotDismissed && innerHeight > innerWidth * 1.05 && matchMedia('(pointer:coarse)').matches; $('rotate').classList.toggle('hidden', !show); }
 $('bRotOk').onclick = () => { rotDismissed = true; checkRotate(); };
 
@@ -1890,7 +1944,7 @@ function renderLobby() {
 }
 function enterPlayUI() {
   $('menu').classList.add('hidden'); $('lobby').classList.add('hidden'); $('hud').classList.remove('hidden'); $('controls').classList.remove('hidden'); $('topbtns').classList.remove('hidden');
-  try { if (document.documentElement.requestFullscreen && matchMedia('(pointer:coarse)').matches) document.documentElement.requestFullscreen().then(() => screen.orientation?.lock?.('landscape').catch(() => {})).catch(() => {}); } catch (e) {}
+  if (matchMedia('(pointer:coarse)').matches) goFull(true);
   checkRotate();
 }
 function hostStart() {
@@ -1932,7 +1986,7 @@ function hostSnapshot() {
   const list = CHARS.filter(c => !c.removed), full = NET.n % 40 === 0;
   const st = list.map(ch => {
     const w = ch.wear || {}, sh = ch.shoes || [];
-    const fl = (ch.out ? 1 : 0) | (ch.power > 0 ? 2 : 0) | (ch.speedT > 0 ? 4 : 0) | (ch.ticket ? 8 : 0) | (w.glasses && !w.glasses.visible ? 16 : 0) | (w.cap && !w.cap.visible ? 32 : 0) | (sh[0] && !sh[0].visible ? 64 : 0) | (sh[1] && !sh[1].visible ? 128 : 0) | (ch.grounded ? 256 : 0);
+    const fl = (ch.out ? 1 : 0) | (ch.power > 0 ? 2 : 0) | (ch.speedT > 0 ? 4 : 0) | (ch.ticket ? 8 : 0) | (w.glasses && !w.glasses.visible ? 16 : 0) | (w.cap && !w.cap.visible ? 32 : 0) | (sh[0] && !sh[0].visible ? 64 : 0) | (sh[1] && !sh[1].visible ? 128 : 0) | (ch.grounded ? 256 : 0) | (ch.tired ? 512 : 0);
     return [ch.cid, fl, r2(ch.stun), ch.charging ? r2(ch.charge) : -1, r2(ch.grip), r2(ch.yaw), FACES.indexOf(ch.face), ch.bubble ? ch.bubble.text : 0];
   });
   const m = {ht: Math.round(performance.now()), st};
@@ -2050,7 +2104,7 @@ function clientSnap(m, b) {
       NET.byCid.set(cid, ch);
     }
     const fl = s[1];
-    ch.out = !!(fl & 1); ch.power = fl & 2 ? 1 : 0; ch.speedT = fl & 4 ? 1 : 0; ch.ticket = !!(fl & 8); ch.grounded = !!(fl & 256);
+    ch.out = !!(fl & 1); ch.power = fl & 2 ? 1 : 0; ch.speedT = fl & 4 ? 1 : 0; ch.ticket = !!(fl & 8); ch.grounded = !!(fl & 256); ch.tired = fl & 512 ? 1 : 0;
     if (ch.wear.glasses) ch.wear.glasses.visible = !(fl & 16); if (ch.wear.cap) ch.wear.cap.visible = !(fl & 32);
     if (ch.shoes[0]) ch.shoes[0].visible = !(fl & 64); if (ch.shoes[1]) ch.shoes[1].visible = !(fl & 128);
     ch.stun = s[2]; ch.charging = s[3] >= 0; ch.charge = Math.max(0, s[3]); ch.grip = s[4]; ch.yaw = s[5]; ch.netFace = FACES[s[6]] || 'normal';
@@ -2190,7 +2244,7 @@ function updateHUD(dt) {
     const bt = ch.bubble ? ch.bubble.text : '';
     if (ch.elB.textContent !== bt) ch.elB.textContent = bt;
     ch.elB.classList.toggle('hidden', !bt);
-    const pw = (ch.power > 0 ? '🍔' : '') + (ch.speedT > 0 ? '☕' : '') + (ch.ticket ? '🎫' : '');
+    const pw = (ch.tired ? '😮‍💨' : '') + (ch.power > 0 ? '🍔' : '') + (ch.speedT > 0 ? '☕' : '') + (ch.ticket ? '🎫' : '');
     if (ch.elPw.textContent !== pw) ch.elPw.textContent = pw;
     const showGrip = !ch.isNpc && ch.grip < 0.99 && !ch.out;
     ch.elGr.classList.toggle('hidden', !showGrip);
