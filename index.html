@@ -4,6 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Dhakka Local</title>
+<meta name="description" content="A 3D ragdoll party game in a packed Mumbai local train. Push everyone out of the coach. Last one inside wins.">
+<meta name="theme-color" content="#7a1f3d">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dhakka Local 🚃">
+<meta property="og:description" content="Push everyone out of the Mumbai local. Last one inside wins. Play free on your phone, with bots or friends.">
+<meta property="og:image" content="https://yousufkhn.github.io/dhakka-local/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:url" content="https://yousufkhn.github.io/dhakka-local/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dhakka Local">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
@@ -33,6 +45,22 @@ details summary{cursor:pointer;color:var(--ink);font-weight:700}
 details li{margin:3px 0}
 .kbd{font-size:12px;color:var(--muted);margin-top:6px}
 #hud{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+#tut{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(255,244,214,.97);color:#3a1d0e;border:3px solid #3a1d0e;border-radius:12px;padding:6px 14px;width:max-content;max-width:min(520px,78vw);text-align:center;pointer-events:auto;box-shadow:0 4px 0 #000a;z-index:3}
+#tut .tstep{font-size:11px;font-weight:900;color:#e8456b;text-transform:uppercase;letter-spacing:.5px}
+#tut .ttxt{font-weight:800;font-size:15px;line-height:1.25}
+#tut.tip{top:auto;bottom:calc(12px + env(safe-area-inset-bottom));max-width:min(360px,40vw);padding:4px 10px;pointer-events:none;background:rgba(20,8,18,.78);color:#fff;border-color:#ffd23f}
+#tut.tip .tstep{color:#ffd23f}
+#tut.tip .ttxt{font-size:13px}
+#tut button{width:auto;margin:6px 4px 0;padding:3px 12px;font-size:13px}
+.cbtn.hint{animation:hintp .9s ease-in-out infinite;box-shadow:0 0 0 5px #ffd23f,0 0 22px #ffd23f}
+@keyframes hintp{50%{transform:scale(1.12)}}
+#bTrain.new{position:relative;background:#ffd23f}
+#bTrain.new::after{content:'NEW';position:absolute;top:-8px;right:-6px;background:#e8456b;color:#fff;font-size:9px;padding:1px 4px;border-radius:6px}
+body.vet .cbtn small{display:none}
+.shotrow{display:flex;align-items:center;gap:8px;justify-content:center;margin:6px 0;pointer-events:auto}
+.shotimg{height:52px;border-radius:6px;border:2px solid #3a1d0e;cursor:pointer}
+button.shotb{width:auto;margin:0;padding:4px 12px;font-size:16px}
+
 #labels{position:absolute;inset:0}
 .lab{position:absolute;left:0;top:0;text-align:center;white-space:nowrap;will-change:transform}
 .lab .nm{font-weight:800;font-size:12px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,1px 1px 0 #000}
@@ -224,6 +252,7 @@ body.roundover #controls{display:none}
   <div id="big" class="hidden"><div class="a"></div><div class="b"></div></div>
   <div id="score" class="hidden"></div>
   <div id="podium" class="hidden"></div>
+  <div id="tut" class="hidden"><div class="tstep"></div><div class="ttxt"></div><button id="bTutSkip" class="alt">Skip tutorial</button><div id="tutBtns" class="hidden"><button id="bTutPlay">Play a match!</button><button id="bTutMenu" class="alt">Menu</button></div></div>
 </div>
 
 <div id="controls" class="hidden">
@@ -834,7 +863,15 @@ function removeChar(ch) {
   CHARS = CHARS.filter(c => c !== ch);
 }
 
-function say(ch, text, dur) { ch.bubble = {text, t: dur || 1.7}; }
+// speech bubbles are rationed: at most two on screen, a gap between lines, and each person needs a breather.
+// Long lines (falls, wins) are the important ones and always get through.
+const SAY = {last: -9};
+function say(ch, text, dur) {
+  if (!ch) return;
+  const pri = (dur || 0) >= 2, human = ch.isMe || (rosterOf(ch) || {}).isRemote, shown = CHARS.filter(c => c.bubble && c.bubble.t > 0).length;
+  if (!pri && (shown >= 2 || T_now - SAY.last < (human ? 0.5 : 1.3) || T_now - (ch.sayT ?? -9) < (human ? 2 : 4))) return;
+  SAY.last = T_now; ch.sayT = T_now; ch.bubble = {text, t: dur || 1.7};
+}
 
 function driveQ(b, tq, k, damp) {
   const q = b.quaternion, ix = -q.x, iy = -q.y, iz = -q.z, iw = q.w;
@@ -903,10 +940,13 @@ function aimAssist(ch, reach, cone) {
 }
 function hitChar(o, dir, power, by, cause, word) {
   const brace = !!(o.brace && cause !== 'tc' && cause !== 'revenge'), k = (o.heavy ? 0.45 : 1) * (brace ? 0.5 : 1), up = (1.6 + power * 0.28) * k;
-  if (brace) { power *= 0.75; const hp0 = o.parts.torso.position; if (!o.isNpc) burst('BRACED!', hp0.x, hp0.y + 0.9, hp0.z, '#6bf178'); }
+  const humanO = o.isMe || (rosterOf(o) || {}).isRemote, humanBy = by && (by.isMe || (rosterOf(by) || {}).isRemote);
+  if (brace) { power *= 0.75; const hp0 = o.parts.torso.position; if (humanO) burst('BRACED!', hp0.x, hp0.y + 0.9, hp0.z, '#6bf178'); }
   const strong = power >= 9, hp = o.parts.torso.position;
   puff(hp.x, hp.y, hp.z, strong ? 7 : 3, 0xfff3d6, strong ? 2.6 : 1.5);
-  burst(word || (cause === 'tc' ? 'fine' : (strong ? 'big' : 'light')), hp.x, hp.y + 0.5, hp.z, strong ? '#ff5964' : null);
+  // small hits only get a word when a human is involved; big ones always do
+  if (strong || word || cause === 'tc' || humanBy || humanO) burst(word || (cause === 'tc' ? 'fine' : (strong ? 'big' : 'light')), hp.x, hp.y + 0.5, hp.z, strong ? '#ff5964' : null);
+  if (!word) hitSfx(power);
   if (strong) { hitstop(Math.min(0.12, 0.07 + (power - 9) * 0.01)); camKick(dir.x, dir.z, 0.22); if (Math.random() < 0.55 && loseSomething(o, dir)) { const bp = by && rosterOf(by); if (bp) bp.stats.props++; } }
   vib(strong ? 60 : 22, o); vib(strong ? [35, 25, 70] : 30, by);
   if (by) by.smugT = T_now;
@@ -915,7 +955,7 @@ function hitChar(o, dir, power, by, cause, word) {
   o.stun = Math.max(o.stun, (0.45 + power * 0.1) * (o.heavy ? 0.5 : 1) * (brace ? 0.5 : 1));
   if (o.grab && (power > 9 || Math.random() < 0.55)) releaseGrab(o);
   o.lastHitBy = by ? by.name : null; o.lastHitCh = by || null; o.lastHitT = T_now; o.lastCause = cause || (word === 'kick' ? 'kick' : (by && by.isNpc ? 'npc' : 'player'));
-  if (Math.random() < .6) say(o, pick(o.isNpc ? NPC_HIT : HIT_LINES));
+  if (Math.random() < (strong ? .5 : .2)) say(o, pick(o.isNpc ? NPC_HIT : HIT_LINES));
 }
 
 function doShove(ch) {
@@ -938,8 +978,9 @@ function doShove(ch) {
   ch.pushAnim = 0.25; ch.pushCd = ch.isNpc ? 1.0 : (ch.isBot ? 1.1 : (hit ? 0.3 : 0.7));
   if (!hit && !ch.isNpc && ch.charge > 0.6) { ch.stun = Math.max(ch.stun, 0.45); say(ch, pick(['Whoa, missed!', 'Miss!', 'Where did he go?!']), 1); }
   if (!ch.isNpc || hit) shockwave(tp.x + f.x * 0.55, tp.y - 0.05, tp.z + f.z * 0.55, 0.5 + ch.charge * 0.9, ch.charge > 0.6 ? 0xff5964 : 0xffffff);
-  if (hit) { sfx(ch.charge > 0.6 ? 'bigthud' : 'thud'); shake(ch.charge > 0.6 ? 0.35 : 0.15); if (!ch.isNpc && Math.random() < .35) say(ch, pick(ch.charge > 0.6 ? ['SUPER PUSH!','Go to Virar!','Bye bye!'] : ['PUSH!','Keep moving!','Move!','Out!'])); }
+  if (hit) { shake(ch.charge > 0.6 ? 0.35 : 0.15); if (!ch.isNpc && Math.random() < .35) say(ch, pick(ch.charge > 0.6 ? ['SUPER PUSH!','Go to Virar!','Bye bye!'] : ['PUSH!','Keep moving!','Move!','Out!'])); }
   else sfx('whoosh');
+  if (hit && GAME.tutorial && ch.isMe) tutEv(ch.charge > 0.6 ? 'super' : 'push');
   ch.charge = 0;
 }
 
@@ -1012,7 +1053,7 @@ function controlChar(ch, dt) {
   if (c.push && !ch.pushHeld && !ch.isNpc) {
     // mashing DHAKKA tires you out for a moment
     ch.presses = (ch.presses || []).filter(t => T_now - t < 1.6); ch.presses.push(T_now);
-    if (ch.presses.length >= 5 && !ch.tired) { ch.tired = 1.3; ch.presses = []; say(ch, pick(['Let me breathe! 😮‍💨', 'So tired…', 'My arms hurt!']), 1.2); if (ch.charging) { ch.charging = false; ch.charge = 0; } }
+    if (ch.presses.length >= 5 && !ch.tired) { ch.tired = 1.3; ch.presses = []; if (!ch.isNpc) sfx('tired'); say(ch, pick(['Let me breathe! 😮‍💨', 'So tired…', 'My arms hurt!']), 1.2); if (ch.charging) { ch.charging = false; ch.charge = 0; } }
   }
   ch.brace = !!(c.grab && !ch.grab && ch.grounded && !stunned && !ch.charging);
   if (c.push && !ch.pushHeld && !stunned && ch.pushCd <= 0 && !ch.tired) {
@@ -1149,7 +1190,7 @@ function burst(kind, x, y, z, color, text) {
   if (GAME.state !== 'play') return;
   text = text || pick(WORDS[kind] || [kind]);
   netEv('b', kind, r2(x), r2(y), r2(z), color || '', text);
-  if (FX.bursts.length >= 6) { const o = FX.bursts.shift(); o.el.remove(); }
+  if (FX.bursts.length >= 4) { const o = FX.bursts.shift(); o.el.remove(); }
   const el = document.createElement('div'); el.className = 'burst'; el.textContent = text;
   if (color) el.style.color = color;
   $('bursts').appendChild(el);
@@ -1271,7 +1312,7 @@ function startRound() {
   const u = GAME.roster.length;
   spawnNpc('uncle', sp[u][0], sp[u][1], 'ride'); if (u > 4) spawnNpc('aunty', sp[u + 1][0], sp[u + 1][1], 'ride');
   if (GAME.mode === 'monsoon') { MONSOON.on = true; MONSOON.t = 1e9; }
-  if (GAME.state === 'play') { bigText('ROUND ' + GAME.round + '/' + MATCH_N + ': ' + MODE_INFO[GAME.mode][0], LIGHT.tod.label + ' local. ' + MODE_INFO[GAME.mode][1], 2.6); banner(pick(['Peak hour. Coach is packed.', 'Hold on to a strap!', 'Move inside, inside!']), 2.5); sfx('horn'); }
+  if (GAME.state === 'play') { bigText('ROUND ' + GAME.round + '/' + MATCH_N + ': ' + MODE_INFO[GAME.mode][0], LIGHT.tod.label + ' local. ' + MODE_INFO[GAME.mode][1], 2.6); sfx('horn'); sfx('whistle'); }
 }
 
 // ================= NPCs =================
@@ -1310,7 +1351,7 @@ function npcUpdate(n, dt) {
   }
   if (n.state === 'vend') {
     if (n.shoutT <= 0) { say(ch, pick(VENDOR_LINES), 1.8); n.shoutT = rnd(1.8, 3); sfx('vendor'); if (Math.random() < 0.35 && GAME.pickups.length < 4) spawnPickup(pick(['vadapav', 'chai']), tp.x, tp.z); }
-    if (!n.wps.length) { n.dead = true; feed(ch.name + ' moved to the next coach'); }
+    if (!n.wps.length) { n.dead = true;  }
   }
   if (n.state === 'tc') {
     if (n.shoutT <= 0) { say(ch, pick(['Ticket please!','Show your pass!','Ticket? Hmm?']), 1.4); n.shoutT = rnd(1.5, 2.5); }
@@ -1327,7 +1368,7 @@ function npcUpdate(n, dt) {
         }
       }
     }
-    if (!n.wps.length) { n.dead = true; for (const p of GAME.roster) if (p.ch) p.ch.ticket = false; feed('The ticket checker moved on. Tickets used up!'); }
+    if (!n.wps.length) { n.dead = true; for (const p of GAME.roster) if (p.ch) p.ch.ticket = false;  }
   }
   if (Math.hypot(c.mx, c.mz) > 0.1) {
     const v = ch.parts.torso.velocity;
@@ -1341,7 +1382,7 @@ function npcUpdate(n, dt) {
 
 // ================= bots =================
 function botThink(p, dt) {
-  const ch = p.ch, c = p.ctrl, tp = ch.parts.torso.position, sk = GAME.skill;
+  const ch = p.ch, c = p.ctrl, tp = ch.parts.torso.position, sk = GAME.skillEff ?? GAME.skill;
   p.think -= dt; c.jump = false;
   const fresh = p.think <= 0;
   const danger = !!(TR.curve || TR.jerk || TR.phase === 'brake' || TR.phase === 'accel');
@@ -1442,7 +1483,7 @@ function updatePickups(dt) {
 // ================= train & events =================
 function banner(text, t) { if (GAME.state === 'play') { GAME.banner = {text, t: t || 2.5}; netEv('N', text, t || 2.5); } }
 function bigText(a, b, t) { if (GAME.state === 'play') { GAME.big = {a, b, t: t || 2.2, fresh: true}; netEv('B', a, b, t || 2.2); } }
-function feed(text) { GAME.feed.push({text, t: 6}); if (GAME.feed.length > 4) GAME.feed.shift(); netEv('F', text); }
+function feed(text) { GAME.feed.push({text, t: 4.5}); if (GAME.feed.length > 3) GAME.feed.shift(); netEv('F', text); }
 
 function setPlatform(on, side) {
   for (const b of GAME.platBodies) world.removeBody(b);
@@ -1459,7 +1500,7 @@ function announce() {
   LED.text = 'NEXT STATION: ' + nm.toUpperCase() + '   DOORS OPEN ON THE ' + sideTxt.toUpperCase() + '   ';
   sfx('chime');
   sfx('say', 'Next station, ' + nm + '. Doors will open on the ' + sideTxt + ' side.');
-  banner('Next station: ' + nm + (RUSH.has(nm) ? '  ⚠ RUSH ALERT' : '') + ' · Doors on the ' + sideTxt, 3.2);
+  banner((RUSH.has(nm) ? '⚠ ' : '') + nm + ' · doors on the ' + sideTxt, 2.6);
   drawBoard(nm);
 }
 function randomEvent() {
@@ -1467,7 +1508,7 @@ function randomEvent() {
   if (r < 0.27) { TR.curve = {t: 0, dur: rnd(2.4, 3.4), dir: pick([-1, 1]), mag: rnd(4, 6.5) * (GAME.mode === 'virar' ? 1.2 : 1)}; banner(pick(['CURVE! Hold on!','Mahim bend! Grab a strap!','The train is swaying!']), 2); sfx('screech'); }
   else if (r < 0.42) { const lat = Math.random() < 0.5; TR.jerk = {t: 0, dur: 0.3, ax: lat ? 'z' : 'x', dir: pick([-1, 1]), mag: rnd(9, 13)}; banner(pick(['JOLT!','Red signal! Emergency brake!','The motorman dozed off!']), 1.6); sfx('screech'); }
   else if (r < 0.58) { TR.khamba = {x: 30, side: pick([-1, 1]), warned: false}; banner('Get off the door! POLE coming!', 2.2); sfx('horn'); }
-  else if (r < 0.7 && !hasVendor) { const e = pick([-1, 1]); spawnNpc('vendor', e * 6.4, 0, 'vend', {wps: [[-e * 6.4, rnd(-0.3, 0.3), 0.4]]}); banner('Vendor coming through! ' + pick(VENDOR_LINES), 2.2); }
+  else if (r < 0.7 && !hasVendor) { const e = pick([-1, 1]); spawnNpc('vendor', e * 6.4, 0, 'vend', {wps: [[-e * 6.4, rnd(-0.3, 0.3), 0.4]]}); sfx('vendor'); }
   else if (r < 0.82 && !hasTC && !TR.tcWarn && T_now - TR.tcDone > 25) {
     TR.tcWarn = 4.5; banner('Ticket checker coming! GRAB A TICKET! 🎫', 3); sfx('whistle');
     const alive = GAME.roster.filter(p => p.alive).length;
@@ -1498,7 +1539,7 @@ function trainUpdate(dt) {
       T.phase = 'stop'; T.t = 0; T.speed = 0; T.platX = 0;
       const nm = STATIONS[T.station % STATIONS.length]; T.rush = RUSH.has(nm); T.dur = T.rush ? 7 : 5.5; T.did = {};
       setPlatform(true, T.platSide);
-      if (T.rush) { bigText(nm.toUpperCase() + '!!', 'Everyone off, everyone on. Full rush!', 2.4); sfx('crowd'); } else banner(nm + ': doors open', 2);
+      if (T.rush) { bigText(nm.toUpperCase() + '!!', 'Everyone off, everyone on. Full rush!', 2.4); sfx('crowd'); } 
     }
   } else if (T.phase === 'stop') {
     T.speed = 0;
@@ -1512,9 +1553,9 @@ function trainUpdate(dt) {
       const kinds = ['uncle','aunty','student','uncle','dabba','student','aunty'];
       for (let i = 0; i < k; i++) { const dd = pick(DOORX), ip = interiorPoint(); spawnNpc(pick(kinds), dd + rnd(-1.2, 1.2), T.platSide * (HW + rnd(1.4, 3.2)), 'board', {wps: [[dd + rnd(-0.3, 0.3), T.platSide * (HW + 0.3), 0.45], [dd, T.platSide * (HW - 0.7), 0.5], [ip[0], ip[1], 0.5]]}); }
       sfx('crowd');
-      if (Math.random() < 0.7) { spawnPickup(pick(['vadapav', 'chai'])); feed('Someone threw a vada pav from the platform!'); }
+      if (Math.random() < 0.7) { spawnPickup(pick(['vadapav', 'chai']));  }
     }
-    if (T.t >= T.dur) { T.phase = 'accel'; T.t = 0; T.dur = 1.8; setPlatform(false); sfx('horn'); banner('Train is moving! Door hangers, careful', 1.8); }
+    if (T.t >= T.dur) { T.phase = 'accel'; T.t = 0; T.dur = 1.8; setPlatform(false); sfx('horn'); }
   } else if (T.phase === 'accel') {
     T.speed = T.t / T.dur; gx -= 4;
     if (T.t >= T.dur) { T.phase = 'run'; T.t = 0; T.station++; T.dur = Math.max(6.5, 10 - T.station * 0.3); T.announced = false; T.nextEvt = rnd(1.5, 2.5); const ns = STATIONS[T.station % STATIONS.length]; setTheme(THEME_OF[ns] || 'city'); LED.text = 'DHAKKA LOCAL  ›  ' + LIGHT.tod.label.toUpperCase() + '  ›  ' + ns.toUpperCase() + '  ›  '; }
@@ -1538,7 +1579,7 @@ function trainUpdate(dt) {
     }
     if (k.x < -30) T.khamba = null;
   }
-  if (MONSOON.on) { MONSOON.t -= dt; if (MONSOON.t <= 0) { MONSOON.on = false; banner('The rain stopped.', 1.4); } }
+  if (MONSOON.on) { MONSOON.t -= dt; if (MONSOON.t <= 0) { MONSOON.on = false;  } }
   if (T.speed > 0.1) { gx += Math.sin(T_now * 13) * 0.15 * T.speed; gz += Math.sin(T_now * 9.3) * 0.2 * T.speed; }
   T.gx = gx; T.gz = gz;
   T.scroll += T.speed * 22 * dt;
@@ -1577,8 +1618,10 @@ function eliminate(p) {
   else if (MONSOON.on) sub = 'Slipped on the wet floor. 🌧';
   else if (TR.phase === 'stop') sub = 'Got off at the platform. Not their station.';
   else sub = 'Fell out all alone. Well done. 👏';
-  bigText(p.name + ' IS OUT!', sub, 2.4);
-  feed('🚪 ' + p.name + ': ' + sub);
+  // big headline only when you are part of it (or it decides the round); everything else is one small feed line
+  const meIn = p.isMe || (o.lastHitCh && o.lastHitCh.isMe && recent), lastOne = GAME.roster.filter(q => q.alive).length <= 1;
+  sfx('out');
+  if (meIn || lastOne) bigText(p.name + ' IS OUT!', sub, 2.2); else feed('🚪 ' + p.name + ' is out' + (recent && o.lastHitBy ? ' · ' + o.lastHitBy : ''));
   const shoe = o.shoes.find(s => s.visible);
   if (shoe) { shoe.visible = false; dropProp(o, 'chappal', {x: rnd(-0.5, 0.5), z: -Math.sign(tp.z) * 0.8}, {x: clamp(tp.x, -6.6, 6.6), y: 0.6, z: clamp(tp.z, -HW + 0.25, HW - 0.25)}); }
   puff(clamp(tp.x, -HL, HL), Math.max(0.1, tp.y), tp.z, 6, 0xfff3d6, 2);
@@ -1596,6 +1639,7 @@ function checkOut(dt) {
     const vOut = o.parts.torso.velocity.z * Math.sign(tp.z);
     if (!o.grab && Math.abs(tp.z) > HW + 0.1 && vOut > 4 && T_now - (o.ejectT ?? -9) > 3 && GAME.state === 'play' && !GAME.result) {
       o.ejectT = T_now; o.flying = true; o.trail = 0.9;
+      { const kp0 = o.lastHitCh && T_now - (o.lastHitT ?? -9) < 3 ? rosterOf(o.lastHitCh) : null; if (p.isMe) wantShot(p.name + ' is flying out!'); else if (kp0 && kp0.isMe) wantShot(kp0.name + ' sent ' + p.name + ' flying!'); }
       GAME.slow = Math.max(GAME.slow, 0.9); camFocus(tp.x, Math.sign(tp.z) * (HW + 0.6), 1.4);
       burst('out', tp.x, tp.y + 0.7, tp.z, '#ffcc00'); sfx('whoosh');
       if (Math.random() < 0.5) say(o, pick(['AAAAAA!', 'Noooo!', 'Mummyyy!']), 1.2);
@@ -1792,7 +1836,7 @@ function podiumVisual(ranked, canRestart) {
   const tbl = document.createElement('div'); tbl.className = 'fin'; tbl.textContent = ranked.map((p, i) => (i + 1) + '. ' + p.name + ' ' + p.score).join('   '); el.appendChild(tbl);
   const again = document.createElement('button'); again.textContent = canRestart ? 'Play again!' : 'Host will restart…'; again.disabled = !canRestart; again.onclick = () => { if (!canRestart) return; audioInit(); newMatch(); };
   const menu = document.createElement('button'); menu.className = 'alt'; menu.textContent = 'Menu'; menu.onclick = () => $('bQuit').onclick();
-  const row = document.createElement('div'); row.className = 'btns'; row.append(again, menu); el.appendChild(row);
+  const row = document.createElement('div'); row.className = 'btns'; row.append(again, menu); shotButton(el); el.appendChild(row);
   setTimeout(() => { if (GAME.phase === 'podium') el.classList.remove('hidden'); }, 1800);
 }
 function podiumUpdate(dt) {
@@ -1812,135 +1856,201 @@ function newMatch() {
 }
 
 // ================= audio =================
-const AU = {ctx: null, muted: false, noise: null, clackT: 0};
+// Everything is synthesized. Phone speakers barely play anything under ~300 Hz, so every sound carries
+// its punch in the 400 Hz - 4 kHz range (clicks, slaps, crackles) and keeps any low end only as a bonus for headphones.
+// Mixer: sfx / music / ambience buses -> compressor -> master. Music ducks under announcements and big moments.
+// lead: schedule a hair ahead of 'now'. Envelopes that start in the past get skipped on some phones and short hits vanish.
+const AU = {ctx: null, muted: false, noise: null, clackT: 0, unlocked: false, duckT: 0, lead: 0.03};
+const SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
 function audioInit() {
-  if (AU.ctx) { if (AU.ctx.state === 'suspended') AU.ctx.resume(); return; }
+  if (AU.ctx) { if (AU.ctx.state !== 'running') AU.ctx.resume().catch(() => {}); return; }
   try {
-    AU.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const len = AU.ctx.sampleRate, buf = AU.ctx.createBuffer(1, len, AU.ctx.sampleRate), d = buf.getChannelData(0);
+    // iPhone: play through the silent switch like a game, not like a ringtone
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+    try { const a = new Audio(SILENT_WAV); a.loop = true; a.setAttribute('playsinline', ''); a.volume = 0.01; a.play().catch(() => {}); AU.keep = a; } catch (e) {}
+    const C = AU.ctx = new (window.AudioContext || window.webkitAudioContext)({latencyHint: 'interactive'});
+    AU.lead = Math.min(0.08, Math.max(0.02, (C.baseLatency || 0) * 1.5 + 0.015));
+    const len = C.sampleRate * 2, buf = C.createBuffer(1, len, C.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    AU.noise = buf; AU.master = AU.ctx.createGain(); AU.master.gain.value = 0.5; AU.master.connect(AU.ctx.destination);
-    for (const k of ['sfxG', 'musG', 'ambG']) { AU[k] = AU.ctx.createGain(); AU[k].connect(AU.master); }
+    AU.noise = buf;
+    AU.master = C.createGain(); AU.master.gain.value = 0.9;
+    const comp = C.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 8; comp.ratio.value = 5; comp.attack.value = 0.002; comp.release.value = 0.18;
+    AU.bus = C.createGain(); AU.bus.connect(comp); comp.connect(AU.master); AU.master.connect(C.destination);
+    for (const k of ['sfxG', 'musG', 'ambG']) { AU[k] = C.createGain(); AU[k].connect(AU.bus); }
+    AU.duck = C.createGain(); AU.duck.connect(AU.musG); // music goes through a ducker
+    // short room reverb send for sfx and music, makes it sound like a steel coach instead of a dry beep
+    const ir = C.createBuffer(2, C.sampleRate * 0.6 | 0, C.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const x = ir.getChannelData(ch); for (let i = 0; i < x.length; i++) x[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / x.length, 3.2); }
+    AU.verb = C.createConvolver(); AU.verb.buffer = ir; AU.verbG = C.createGain(); AU.verbG.gain.value = 0.22; AU.verb.connect(AU.verbG); AU.verbG.connect(AU.bus);
+    C.onstatechange = () => { if (C.state === 'interrupted' || C.state === 'suspended') AU.wasStopped = true; };
     audioLevels(); ambInit();
   } catch (e) { AU.ctx = null; }
 }
-function tone(type, f0, f1, dur, vol, delay) {
+// unlock on the very first touch anywhere, and wake audio back up after switching apps (WhatsApp, calls)
+for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) addEventListener(ev, () => audioInit(), {capture: true, passive: true});
+addEventListener('click', e => { if (e.target.closest && e.target.closest('button')) sfx('ui'); }, true);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && AU.ctx) { AU.ctx.resume().catch(() => {}); if (AU.keep) AU.keep.play().catch(() => {}); } });
+function out(node, bus, wet) { node.connect(bus || AU.sfxG); if (wet && AU.verb) { const g = AU.ctx.createGain(); g.gain.value = wet; node.connect(g); g.connect(AU.verb); } }
+// one oscillator voice with a pitch sweep and an attack/decay envelope
+function tone(type, f0, f1, dur, vol, delay, o) {
   const c = AU.ctx; if (!c || AU.muted) return;
-  const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
-  o.type = type; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g); g.connect(AU.sfxG); o.start(t); o.stop(t + dur + 0.05);
+  o = o || {}; const t = (o.at ?? c.currentTime + AU.lead) + (delay || 0), osc = c.createOscillator(), g = c.createGain();
+  osc.type = type; osc.frequency.setValueAtTime(f0, t); if (f1) osc.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur * (o.bend || 1));
+  if (o.det) osc.detune.value = o.det;
+  if (o.vib) { const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = o.vib; lg.gain.value = f0 * 0.04; l.connect(lg); lg.connect(osc.frequency); l.start(t); l.stop(t + dur + 0.05); }
+  const a = o.a || 0.004;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + a);
+  if (o.hold) g.gain.setValueAtTime(vol, t + a + o.hold);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  let n = osc;
+  if (o.lp) { const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(o.lp, t); if (o.lp1) f.frequency.exponentialRampToValueAtTime(o.lp1, t + dur); f.Q.value = o.q || 1; osc.connect(f); n = f; }
+  n.connect(g); out(g, o.bus, o.wet ?? 0.25); osc.start(t); osc.stop(t + dur + 0.05);
 }
-function noise(dur, freq, q, vol, delay, type) {
+// filtered noise burst, optionally with a filter sweep
+function noise(dur, freq, q, vol, delay, type, o) {
   const c = AU.ctx; if (!c || AU.muted) return;
-  const t = c.currentTime + (delay || 0), s = c.createBufferSource(); s.buffer = AU.noise;
-  const f = c.createBiquadFilter(); f.type = type || 'bandpass'; f.frequency.value = freq; f.Q.value = q;
-  const g = c.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  s.connect(f); f.connect(g); g.connect(AU.sfxG); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05);
+  o = o || {}; const t = (o.at ?? c.currentTime + AU.lead) + (delay || 0), s = c.createBufferSource(); s.buffer = AU.noise;
+  const f = c.createBiquadFilter(); f.type = type || 'bandpass'; f.frequency.setValueAtTime(freq, t); if (o.f1) f.frequency.exponentialRampToValueAtTime(o.f1, t + dur); f.Q.value = q;
+  const g = c.createGain(), a = o.a || 0.002; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); out(g, o.bus, o.wet ?? 0.25); s.start(t, Math.random() * 1.5); s.stop(t + dur + 0.05);
 }
-let lastSay = 0;
+function duck(amt, t) { if (!AU.duck) return; const c = AU.ctx.currentTime; AU.duck.gain.cancelScheduledValues(c); AU.duck.gain.setTargetAtTime(amt, c, 0.04); AU.duck.gain.setTargetAtTime(1, c + t, 0.35); }
+let lastSay = 0, lastHitSfx = 0;
 function sfx(name, arg) {
   netEv('s', name, typeof arg === 'number' ? r2(arg) : (arg ?? null));
-  if (AU.muted || (GAME.state !== 'play' && !GAME.preview)) return;
+  if (AU.muted || (GAME.state !== 'play' && !GAME.preview && name !== 'ui')) return;
+  if (!AU.ctx) return;
+  const r = 0.94 + Math.random() * 0.12; // small pitch variation so repeats do not sound robotic
   switch (name) {
-    case 'thud': tone('sine', 170, 55, 0.18, 0.5); noise(0.08, 400, 1, 0.3); break;
-    case 'bigthud': tone('sine', 120, 35, 0.35, 0.7); noise(0.18, 300, 0.8, 0.45); tone('square', 80, 40, 0.2, 0.1); break;
-    case 'whoosh': noise(0.18, 1200, 0.8, 0.12); break;
-    case 'land': { const v = clamp(((arg || 6) - 5) / 6, 0, 1); tone('sine', 140 - v * 40, 45, 0.2 + v * 0.1, 0.25 + v * 0.35); noise(0.1, 250, 0.9, 0.18 + v * 0.2); break; }
-    case 'bump': tone('sine', 220, 120, 0.1, 0.16); break;
-    case 'save': [392, 523, 784].forEach((f, i) => tone('square', f, 0, 0.1, 0.07, i * 0.05)); tone('triangle', 1046, 0, 0.3, 0.15, 0.15); break;
-    case 'ptrain': noise(2.2, 500, 0.4, 0.35, 0, 'lowpass'); for (const f of [349, 415]) tone('sawtooth', f, f * 0.85, 1.6, 0.06); break;
-    case 'grab': tone('square', 500, 700, 0.05, 0.06); break;
-    case 'jump': tone('triangle', 300, 600, 0.15, 0.15); break;
-    case 'pickup': [660, 880, 1320].forEach((f, i) => tone('triangle', f, 0, 0.12, 0.15, i * 0.06)); break;
-    case 'clang': tone('square', 220, 180, 0.4, 0.2); tone('sine', 660, 640, 0.6, 0.12); noise(0.2, 2500, 2, 0.25); break;
-    case 'fall': tone('triangle', 700, 90, 0.9, 0.3); tone('sine', 1200, 300, 0.6, 0.08, 0.1); break;
-    case 'chime': tone('sine', 880, 0, 0.5, 0.25); tone('sine', 698, 0, 0.5, 0.25, 0.32); tone('sine', 587, 0, 0.9, 0.25, 0.64); break;
-    case 'horn': for (const f of [311, 370]) tone('sawtooth', f, f * 0.98, 0.9, 0.08); break;
-    case 'whistle': tone('sine', 2200, 2100, 0.25, 0.12); tone('sine', 2200, 2000, 0.5, 0.12, 0.3); break;
-    case 'thunder': noise(1.8, 120, 0.5, 0.5, 0, 'lowpass'); break;
-    case 'brake': noise(1.6, 3200, 8, 0.12); tone('sawtooth', 2400, 1800, 1.5, 0.03); break;
-    case 'screech': noise(0.9, 2800, 10, 0.12); break;
-    case 'crowd': for (let i = 0; i < 6; i++) tone('sawtooth', rnd(160, 320), rnd(140, 300), rnd(0.2, 0.4), 0.03, i * 0.09); noise(1.2, 700, 0.5, 0.08); break;
-    case 'vendor': tone('square', 520, 480, 0.12, 0.05); tone('square', 620, 560, 0.18, 0.05, 0.14); break;
-    case 'win': [523, 659, 784, 1046].forEach((f, i) => tone('triangle', f, 0, 0.3, 0.2, i * 0.13)); break;
+    case 'thud': { // quick shove landing: cloth slap + body thump
+      noise(0.07, 1500 * r, 1.0, 2.4); noise(0.12, 650 * r, 1.0, 1.4, 0.004); tone('square', 1100 * r, 500, 0.03, 0.4, 0, {lp: 3000});
+      tone('triangle', 440 * r, 160, 0.15, 1.0); tone('sine', 140, 60, 0.18, 0.4); break; }
+    case 'bigthud': { // super push / throw: crack + punchy body + rumble
+      noise(0.03, 3200, 0.8, 0.6, 0, 'highpass'); noise(0.22, 900 * r, 0.9, 0.6, 0.003, 'bandpass', {f1: 300});
+      tone('sawtooth', 300 * r, 90, 0.26, 0.28, 0, {lp: 2200, lp1: 300}); tone('square', 160, 70, 0.2, 0.12); tone('sine', 110, 40, 0.4, 0.45);
+      duck(0.55, 0.25); break; }
+    case 'whoosh': noise(0.2, 500, 1.6, 0.32, 0, 'bandpass', {f1: 2600, a: 0.05}); break;
+    case 'land': { const v = clamp(((arg || 6) - 5) / 6, 0, 1); noise(0.1, 800 - v * 200, 1, 0.5 + v * 0.5); tone('triangle', 330 - v * 80, 120, 0.16, 0.4 + v * 0.3); tone('sine', 120, 45, 0.25, 0.3 + v * 0.2); break; }
+    case 'bump': noise(0.05, 1100 * r, 1.4, 0.18); tone('triangle', 340 * r, 200, 0.08, 0.12); break;
+    case 'grab': noise(0.06, 2600 * r, 2, 0.3); tone('triangle', 760 * r, 980, 0.06, 0.14); break;
+    case 'jump': tone('triangle', 330 * r, 760, 0.16, 0.3, 0, {bend: 0.8}); tone('sine', 660 * r, 1500, 0.12, 0.08); break;
+    case 'fall': // comic slide whistle down + a wobble
+      tone('triangle', 1500, 260, 1.0, 0.32, 0, {vib: 9, a: 0.02, bend: 1}); tone('sine', 3000, 520, 0.9, 0.05, 0, {vib: 9}); duck(0.6, 0.8); break;
+    case 'save': [523, 659, 784].forEach((f, i) => tone('square', f, 0, 0.12, 0.14, i * 0.06, {lp: 3000})); tone('triangle', 1046, 0, 0.35, 0.25, 0.18); noise(0.25, 6000, 0.5, 0.1, 0.18, 'highpass'); break;
+    case 'pickup': [880, 1175, 1568].forEach((f, i) => tone('triangle', f, 0, 0.14, 0.24, i * 0.06)); tone('sine', 2093, 0, 0.3, 0.08, 0.18); break;
+    case 'clang': // trackside pole: inharmonic metal ring
+      noise(0.05, 2500, 1, 0.5); for (const [f, v, d] of [[523, 0.3, 1.1], [1347, 0.18, 0.8], [2211, 0.12, 0.6], [3389, 0.06, 0.4]]) tone('sine', f, f * 0.995, d, v, 0, {wet: 0.5});
+      duck(0.5, 0.6); break;
+    case 'ptrain': noise(2.2, 700, 0.5, 0.35, 0, 'bandpass', {a: 0.4, f1: 300}); for (const f of [349, 415]) tone('sawtooth', f, f * 0.85, 1.6, 0.08, 0, {lp: 1800, a: 0.2}); break;
+    case 'chime': // station chime, three falling notes
+      for (const [f, d] of [[988, 0], [784, 0.3], [659, 0.6]]) { tone('sine', f, 0, 0.7, 0.3, d, {wet: 0.5}); tone('sine', f * 2, 0, 0.3, 0.06, d); }
+      duck(0.45, 1.4); break;
+    case 'horn': for (const f of [311, 370, 466]) tone('sawtooth', f, f * 0.985, 1.0, 0.09, 0, {lp: 2400, a: 0.05, hold: 0.6, wet: 0.4}); duck(0.6, 1); break;
+    case 'whistle': tone('sine', 2400, 2300, 0.22, 0.22, 0, {vib: 30}); tone('sine', 2400, 2250, 0.5, 0.22, 0.28, {vib: 30}); break;
+    case 'thunder': noise(2.0, 400, 0.4, 0.5, 0, 'lowpass', {a: 0.05, f1: 120}); noise(0.3, 1800, 0.6, 0.25); break;
+    case 'brake': noise(1.6, 3600, 9, 0.16, 0, 'bandpass', {a: 0.1}); tone('sawtooth', 2600, 1900, 1.5, 0.035, 0, {a: 0.1}); noise(1.5, 300, 0.7, 0.2, 0, 'lowpass'); break;
+    case 'screech': noise(0.9, 3000, 10, 0.16, 0, 'bandpass', {a: 0.05}); tone('sawtooth', 2900, 2600, 0.8, 0.03); break;
+    case 'crowd': for (let i = 0; i < 7; i++) tone('sawtooth', rnd(180, 330), rnd(160, 300), rnd(0.25, 0.45), 0.045, i * 0.08, {lp: 1400}); noise(1.2, 800, 0.6, 0.12, 0, 'bandpass', {a: 0.2}); break;
+    case 'vendor': tone('square', 620, 560, 0.14, 0.08, 0, {lp: 2500}); tone('square', 740, 660, 0.2, 0.08, 0.16, {lp: 2500}); break;
+    case 'out': // crowd "ohhh" + a cartoon pop when someone is out
+      for (let i = 0; i < 5; i++) tone('sawtooth', rnd(260, 360), rnd(150, 200), 0.9, 0.05, i * 0.03, {lp: 1200, a: 0.08});
+      tone('sine', 900, 180, 0.12, 0.3); duck(0.5, 1); break;
+    case 'tired': noise(0.35, 900, 0.8, 0.16, 0, 'bandpass', {a: 0.06, f1: 500}); break;
+    case 'ui': noise(0.03, 3000, 1, 0.2); tone('triangle', 880, 1200, 0.06, 0.16); break;
+    case 'win': [523, 659, 784, 1046].forEach((f, i) => { tone('sawtooth', f, 0, 0.32, 0.12, i * 0.13, {lp: 3200, wet: 0.4}); tone('triangle', f * 2, 0, 0.25, 0.06, i * 0.13); }); duck(0.3, 1.2); break;
     case 'say':
       if (!window.speechSynthesis || SET.voice <= 0.02 || performance.now() - lastSay < 1500) break;
-      lastSay = performance.now();
-      try { const u = new SpeechSynthesisUtterance(arg); u.lang = 'en-IN'; u.rate = 1.05; u.volume = SET.voice; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+      lastSay = performance.now(); duck(0.4, 3.5);
+      try { const u = new SpeechSynthesisUtterance(arg); u.lang = 'en-IN'; u.rate = 1.02; u.volume = SET.voice; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
       break;
   }
 }
+// a hit sound scaled by how hard it was, rate-limited so a pile-up does not turn into noise
+function hitSfx(power) { const t = performance.now(); if (t - lastHitSfx < 60) return; lastHitSfx = t; sfx(power > 9 ? 'bigthud' : 'thud'); }
 function ambient(dt) {
   if (!AU.ctx || AU.muted) return;
-  if (TR.speed > 0.08) { AU.clackT -= dt; if (AU.clackT <= 0) { AU.clackT = 0.55 / Math.max(0.25, TR.speed); noise(0.05, 900, 2, 0.09); noise(0.05, 700, 2, 0.08, 0.12); } }
-  if (MONSOON.on && Math.random() < dt * 8) noise(0.3, rnd(2000, 5000), 0.5, 0.03, 0, 'highpass');
+  // wheel clack-clack over rail joints, in the mid range so phones play it
+  if (TR.speed > 0.08) { AU.clackT -= dt; if (AU.clackT <= 0) { AU.clackT = 0.62 / Math.max(0.25, TR.speed); const v = 0.08 + TR.speed * 0.1; noise(0.04, 1300, 3, v, 0, 'bandpass', {bus: AU.ambG, wet: 0.1}); noise(0.05, 900, 3, v * 0.9, 0.11, 'bandpass', {bus: AU.ambG, wet: 0.1}); } }
 }
-
-// ---- music: synthesized dhol + brass band, three moods ----
-// dhol: low "dha" (dagga) and sharp "tilli" (stick). brass: detuned saw stabs through a lowpass, Bhairav-ish scale.
-const MUS = {next: 0, step: 0, mood: '', bpm: 112, bar: 0, fill: false};
-const SCALE = [0, 1, 4, 5, 7, 8, 11, 12]; // Bhairav: Sa re Ga ma Pa dha Ni Sa
-const MOODS = {
-  menu:   {bpm: 100, dha: 'x..x..x.x.......', tik: '..x..x...xx.x.xx', brass: [[0, 0], [6, 2], [8, 4], [12, 3]], bass: 0.7, lead: 0.5},
-  game:   {bpm: 112, dha: 'x..x..x.x..x..x.', tik: '.xx.x.xx.xx.x.xx', brass: [[0, 4], [3, 4], [6, 5], [10, 4], [12, 2]], bass: 0.8, lead: 0.6},
-  final:  {bpm: 138, dha: 'x.xx.xx.x.xx.xxx', tik: 'xxxxxxxxxxxxxxxx', brass: [[0, 4], [2, 5], [4, 6], [6, 7], [8, 6], [10, 5], [12, 4], [14, 7]], bass: 1, lead: 0.75},
-  podium: {bpm: 120, dha: 'x...x.x.x...x.x.', tik: '..x...x...x.xxxx', brass: [[0, 0], [4, 2], [8, 4], [10, 5], [12, 7]], bass: 0.8, lead: 0.8}
+// ---- music: synthesized dhol, shaker, bass and brass band in D mixolydian (Khamaj), four moods ----
+const MUS = {next: 0, step: 0, mood: '', bar: 0, fill: false};
+const KH = [0, 2, 4, 5, 7, 9, 10]; // Sa Re Ga ma Pa Dha ni
+const hz = (deg, oct) => { const o = Math.floor(deg / 7), d = ((deg % 7) + 7) % 7; return 146.83 * Math.pow(2, (KH[d] + 12 * (o + (oct || 0))) / 12); };
+// melodies: [step in 32-step (2 bar) phrase, scale degree, length in 16ths]; null = rest phrase
+const PHRASES = {
+  call: [[0, 4, 2], [2, 5, 2], [4, 7, 3], [8, 6, 2], [10, 5, 2], [12, 4, 4], [20, 2, 2], [22, 4, 2], [24, 2, 2], [26, 1, 2], [28, 0, 4]],
+  answer: [[0, 7, 2], [2, 7, 2], [4, 9, 2], [6, 7, 2], [8, 6, 4], [16, 4, 2], [18, 5, 2], [20, 4, 2], [22, 2, 2], [24, 4, 6]],
+  riff: [[0, 7, 1], [2, 7, 1], [3, 6, 1], [4, 7, 2], [8, 9, 1], [10, 9, 1], [11, 8, 1], [12, 9, 2], [16, 10, 1], [18, 9, 1], [20, 7, 2], [24, 6, 1], [26, 5, 1], [28, 4, 3]],
+  fan: [[0, 0, 2], [2, 4, 2], [4, 7, 4], [12, 7, 2], [14, 9, 2], [16, 11, 6], [24, 9, 2], [26, 7, 6]]
 };
-const BARS = [0, 0, 5, 4]; // chord roots in scale steps: Sa Sa ma Pa
+const MOODS = {
+  menu:   {bpm: 98, swing: 0.18, dag: 'X.....x.X.....x.', til: '..x...x...x.x.x.', shk: 0, bass: [0, 0, 3, 4], mel: ['call', null, 'answer', null], lead: 'reed', vol: 0.8},
+  game:   {bpm: 116, swing: 0.2, dag: 'X..x..x.X..x..x.', til: '.xx.x.xx.xx.x.xx', shk: 1, bass: [0, 0, 3, 4], mel: [null, 'call', null, 'answer'], lead: 'brass', vol: 0.9},
+  final:  {bpm: 138, swing: 0.12, dag: 'X.xX.xx.X.xX.xxx', til: 'xxxxxxxxxxxxxxxx', shk: 2, bass: [0, 3, 4, 3], mel: ['riff', 'riff', 'riff', 'riff'], lead: 'brass', vol: 1},
+  podium: {bpm: 120, swing: 0.15, dag: 'X...x.x.X...x.x.', til: '..x...x...x.xxxx', shk: 1, bass: [0, 3, 4, 0], mel: ['fan', 'call', 'fan', 'answer'], lead: 'brass', vol: 0.95}
+};
 function mood() {
-  if (GAME.preview) return 'menu';
-  if (GAME.state !== 'play') return 'menu';
+  if (GAME.preview || GAME.state !== 'play') return 'menu';
   if (GAME.phase === 'podium') return 'podium';
-  if (GAME.phase === 'round' && GAME.roster.filter(p => p.alive).length <= 2 && GAME.roster.length > 2) return 'final';
+  if (GAME.tutorial) return 'menu';
+  if (GAME.phase === 'round' && !GAME.result && GAME.roster.length > 2 && GAME.roster.filter(p => p.alive).length <= 2) return 'final';
   return 'game';
 }
-function hz(st, oct) { return 146.83 * Math.pow(2, (st + 12 * (oct || 0)) / 12); } // D3 as Sa
-function mOsc(type, f, t, dur, vol, cut, det) {
-  const c = AU.ctx, g = c.createGain(), fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(cut || 2400, t); fl.frequency.exponentialRampToValueAtTime(Math.max(200, (cut || 2400) * 0.4), t + dur);
-  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.015); g.gain.setValueAtTime(vol * 0.8, t + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  for (const d of det ? [-det, det] : [0]) { const o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + 0.05); }
-  fl.connect(g); g.connect(AU.musG);
-}
-function mDha(t, v) { const c = AU.ctx, o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(115, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.22); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.55 * v, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3); o.connect(g); g.connect(AU.musG); o.start(t); o.stop(t + 0.35); mNoise(t, 0.04, 260, 1, 0.25 * v); }
-function mTik(t, v) { mNoise(t, 0.05, 2600, 3, 0.22 * v); const c = AU.ctx, o = c.createOscillator(), g = c.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(300, t + 0.05); g.gain.setValueAtTime(0.12 * v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07); o.connect(g); g.connect(AU.musG); o.start(t); o.stop(t + 0.1); }
-function mNoise(t, dur, f, q, vol) { const c = AU.ctx, s = c.createBufferSource(); s.buffer = AU.noise; const fl = c.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = f; fl.Q.value = q; const g = c.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(fl); fl.connect(g); g.connect(AU.musG); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05); }
+const M = (fn) => (t, ...a) => { if (AU.ctx) fn(t, ...a); };
+const mDag = M((t, v) => { // dhol bass head: low boom for headphones + a 220 Hz slap that phones can play
+  tone('sine', 150, 62, 0.32, 0.5 * v, 0, {at: t, bus: AU.duck, wet: 0.15}); tone('triangle', 240, 150, 0.12, 0.32 * v, 0, {at: t, bus: AU.duck, wet: 0.15});
+  noise(0.05, 520, 1.2, 0.3 * v, 0, 'bandpass', {at: t, bus: AU.duck, wet: 0.1}); });
+const mTil = M((t, v) => { // dhol treble stick: sharp crack
+  noise(0.045, 3400, 2.2, 0.32 * v, 0, 'bandpass', {at: t, bus: AU.duck, wet: 0.2}); tone('triangle', 820, 520, 0.05, 0.12 * v, 0, {at: t, bus: AU.duck, wet: 0}); });
+const mShk = M((t, v) => noise(0.035, 7500, 0.8, 0.09 * v, 0, 'highpass', {at: t, bus: AU.duck, wet: 0}));
+const mBass = M((t, deg, d) => { tone('sawtooth', hz(deg, -1), 0, d, 0.16, 0, {at: t, bus: AU.duck, lp: 1100, lp1: 400, a: 0.006, wet: 0}); tone('triangle', hz(deg, 0), 0, d * 0.8, 0.08, 0, {at: t, bus: AU.duck, wet: 0}); });
+const mLead = M((t, deg, d, kind, v) => {
+  const f = hz(deg, 1);
+  if (kind === 'reed') { // harmonium-ish: two squares a hair apart through a soft filter
+    tone('square', f, 0, d, 0.05 * v, 0, {at: t, bus: AU.duck, lp: 1800, a: 0.03, hold: d * 0.5, det: -6, wet: 0.35}); tone('square', f, 0, d, 0.05 * v, 0, {at: t, bus: AU.duck, lp: 1800, a: 0.03, hold: d * 0.5, det: 6, wet: 0.35});
+  } else { // wedding-band brass: detuned saws with a "blat" filter opening at the start of each note
+    for (const dt of [-8, 8]) tone('sawtooth', f, 0, d, 0.055 * v, 0, {at: t, bus: AU.duck, lp: 3200, lp1: 1200, a: 0.012, hold: d * 0.45, det: dt, wet: 0.3});
+    tone('square', f / 2, 0, d, 0.025 * v, 0, {at: t, bus: AU.duck, lp: 1500, a: 0.012, hold: d * 0.4, wet: 0.2});
+  }
+});
+const mStab = M((t, root, d) => { for (const k of [0, 2, 4]) for (const dt of [-7, 7]) tone('sawtooth', hz(root + k, 0), 0, d, 0.028, 0, {at: t, bus: AU.duck, lp: 2400, lp1: 900, det: dt, wet: 0.3}); });
 function musicTick() {
-  const c = AU.ctx; if (!c || !AU.musG || SET.music <= 0.001 || AU.muted || c.state !== 'running') { MUS.next = 0; return; }
+  const c = AU.ctx; if (!c || !AU.duck || SET.music <= 0.001 || AU.muted || c.state !== 'running') { MUS.next = 0; return; }
   const m = mood();
-  if (m !== MUS.mood) { MUS.mood = m; MUS.fill = !!MUS.next; }
-  const M = MOODS[m], s16 = 60 / M.bpm / 4;
-  if (!MUS.next || MUS.next < c.currentTime - 0.3) MUS.next = c.currentTime + 0.05;
-  while (MUS.next < c.currentTime + 0.18) {
-    const t = MUS.next, i = MUS.step % 16, root = BARS[MUS.bar % 4];
-    if (MUS.fill && i >= 12) { mTik(t, 1.1); if (i % 2 === 0) mDha(t, 0.9); }
+  if (m !== MUS.mood) { const was = MUS.mood; MUS.mood = m; if (was) { MUS.fill = true; MUS.step = MUS.step - (MUS.step % 16) + 8; } }
+  const Mo = MOODS[m], s16 = 60 / Mo.bpm / 4;
+  if (!MUS.next || MUS.next < c.currentTime - 0.25) { MUS.next = c.currentTime + 0.06; MUS.step = 0; MUS.bar = 0; }
+  while (MUS.next < c.currentTime + 0.2) {
+    const i = MUS.step % 16, bar = MUS.bar % 4, t = MUS.next + (i % 2 ? Mo.swing * s16 : 0), root = Mo.bass[bar], v = Mo.vol;
+    if (MUS.fill && i >= 8) { mTil(t, 1); if (i % 2 === 0) mDag(t, 0.8); }
     else {
-      if (M.dha[i] === 'x') mDha(t, i === 0 ? 1 : 0.8);
-      if (M.tik[i] === 'x') mTik(t, i % 4 === 0 ? 1 : 0.65);
+      if (Mo.dag[i] !== '.') mDag(t, (Mo.dag[i] === 'X' ? 1 : 0.7) * v);
+      if (Mo.til[i] === 'x') mTil(t, (i % 4 === 2 ? 1 : 0.7) * v);
     }
-    // bass on the beat
-    if (i % 4 === 0) mOsc('triangle', hz(SCALE[root], -1), t, s16 * 3, 0.22 * M.bass, 900);
-    // brass stabs: chord on the off-beats, melody from the mood's pattern
-    if (i === 2 || i === 10) for (const k of [0, 2, 4]) mOsc('sawtooth', hz(SCALE[(root + k) % 7] + (root + k >= 7 ? 12 : 0)), t, s16 * 1.6, 0.035, 1800, 8);
-    for (const [at, deg] of M.brass) if (at === i && (MUS.bar % 2 === 1 || m === 'final')) mOsc('sawtooth', hz(SCALE[(deg + root) % 8], 1), t, s16 * (m === 'final' ? 1.8 : 2.6), 0.05 * M.lead, 2800, 6);
+    if (Mo.shk && (Mo.shk > 1 || i % 2 === 0)) mShk(t, i % 4 === 0 ? 1 : 0.6);
+    if (i === 0 || i === 8) mBass(t, root, s16 * 3); else if (i === 6 || i === 14) mBass(t, root + (i === 6 ? 4 : 7), s16 * 1.5);
+    if (Mo.lead === 'brass' && (i === 4 || i === 12) && m !== 'final') mStab(t, root, s16 * 1.5);
+    // melody phrases span two bars; pick by bar pair
+    const ph = Mo.mel[Math.floor(MUS.bar / 2) % 4], P = ph && PHRASES[ph], pos = (MUS.bar % 2) * 16 + i;
+    if (P) for (const [at, deg, len] of P) if (at === pos) mLead(t, deg, s16 * len * 0.95, Mo.lead, v);
     MUS.next += s16; MUS.step++;
     if (MUS.step % 16 === 0) { MUS.bar++; MUS.fill = false; }
   }
 }
 // ---- ambience loops: train rumble, crowd murmur, rain ----
 function ambLoop(f, q, type) { const c = AU.ctx, s = c.createBufferSource(); s.buffer = AU.noise; s.loop = true; const fl = c.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const g = c.createGain(); g.gain.value = 0; s.connect(fl); fl.connect(g); g.connect(AU.ambG); s.start(); return g; }
-function ambInit() { if (AU.rumble) return; AU.rumble = ambLoop(140, 0.7, 'lowpass'); AU.murmur = ambLoop(520, 1.4, 'bandpass'); AU.rain = ambLoop(4200, 0.3, 'highpass'); }
-function ambLevels(dt) {
+function ambInit() { if (AU.rumble) return; AU.rumble = ambLoop(380, 0.9, 'lowpass'); AU.murmur = ambLoop(700, 1.6, 'bandpass'); AU.rain = ambLoop(5000, 0.4, 'highpass'); }
+function ambLevels() {
   if (!AU.rumble) return; const t = AU.ctx.currentTime, on = GAME.state === 'play' || GAME.preview;
-  const crowd = GAME.npcs.filter(n => !n.dead).length + (TR.phase === 'stop' ? 4 : 0);
-  AU.rumble.gain.setTargetAtTime(on ? 0.05 + TR.speed * 0.32 : 0.06, t, 0.3);
-  AU.murmur.gain.setTargetAtTime(on ? Math.min(0.12, 0.025 + crowd * 0.012) * (0.75 + 0.25 * Math.sin(t * 1.7)) : 0.02, t, 0.4);
-  AU.rain.gain.setTargetAtTime(MONSOON.on && on ? 0.09 : 0, t, 0.6);
+  const crowd = GAME.npcs.filter(n => !n.dead).length + (TR.phase === 'stop' ? 3 : 0);
+  AU.rumble.gain.setTargetAtTime(on ? 0.04 + TR.speed * 0.16 : 0.03, t, 0.3);
+  AU.murmur.gain.setTargetAtTime(on ? Math.min(0.08, 0.015 + crowd * 0.01) * (0.75 + 0.25 * Math.sin(t * 1.7)) : 0.01, t, 0.4);
+  AU.rain.gain.setTargetAtTime(MONSOON.on && on ? 0.07 : 0, t, 0.6);
 }
 function audioLevels() {
   if (!AU.ctx || !AU.musG) return; const t = AU.ctx.currentTime;
-  AU.master.gain.setTargetAtTime(AU.muted ? 0 : 0.5, t, 0.03);
-  AU.musG.gain.setTargetAtTime(SET.music * 0.55, t, 0.05); AU.sfxG.gain.setTargetAtTime(SET.sfx, t, 0.05); AU.ambG.gain.setTargetAtTime(SET.sfx, t, 0.05);
+  AU.master.gain.setTargetAtTime(AU.muted ? 0 : 0.9, t, 0.03);
+  AU.musG.gain.setTargetAtTime(SET.music * 0.6, t, 0.05); AU.sfxG.gain.setTargetAtTime(SET.sfx, t, 0.05); AU.ambG.gain.setTargetAtTime(SET.sfx * 0.8, t, 0.05);
 }
 
 // ================= input =================
@@ -1992,12 +2102,12 @@ $('bPlay').onclick = () => {
   GAME.roster = [newPlayer({id: 'me', name: nm, isMe: true, isBot: false, look: cleanLook(PROF.look)}, 0)];
   const names = [...BOT_NAMES].filter(n => n.toLowerCase() !== nm.toLowerCase()).sort(() => Math.random() - 0.5);
   for (let i = 1; i < GAME.botN; i++) GAME.roster.push(newPlayer({id: 'bot' + i, name: names[i - 1], isBot: true}, i));
-  GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0;
+  GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0; GAME.skillEff = botSkill(); SHOT.blob = null;
   $('menu').classList.add('hidden'); $('hud').classList.remove('hidden'); $('controls').classList.remove('hidden'); $('topbtns').classList.remove('hidden');
   if (matchMedia('(pointer:coarse)').matches) goFull(true);
   startRound(); checkRotate();
 };
-$('bQuit').onclick = () => { netLeave(); document.body.classList.remove('roundover'); GAME.state = 'menu'; clearPodium(); $('podium').classList.add('hidden'); GAME.big = GAME.banner = null; clearBursts(); document.body.classList.remove('slowmo'); $('hud').classList.add('hidden'); $('controls').classList.add('hidden'); $('topbtns').classList.add('hidden'); $('score').classList.add('hidden'); $('menu').classList.remove('hidden'); if (window.speechSynthesis) speechSynthesis.cancel(); startDemo(); };
+$('bQuit').onclick = () => { tutCleanup(); netLeave(); document.body.classList.remove('roundover'); GAME.state = 'menu'; clearPodium(); $('podium').classList.add('hidden'); GAME.big = GAME.banner = null; clearBursts(); document.body.classList.remove('slowmo'); $('hud').classList.add('hidden'); $('controls').classList.add('hidden'); $('topbtns').classList.add('hidden'); $('score').classList.add('hidden'); $('menu').classList.remove('hidden'); if (window.speechSynthesis) speechSynthesis.cancel(); startDemo(); };
 $('bMute').onclick = () => { AU.muted = !AU.muted; $('bMute').textContent = AU.muted ? '🔇' : '🔊'; audioLevels(); if (AU.muted && window.speechSynthesis) speechSynthesis.cancel(); };
 let rotDismissed = false;
 // fullscreen: a button on every screen, plus automatic on phones when a match starts
@@ -2153,7 +2263,7 @@ function hostStart() {
   for (const h of humans()) { const p = newPlayer({id: h.id, name: h.name, look: h.look, isRemote: true, isBot: false, netCtrl: makeCtrl()}, GAME.roster.length); h.p = p; GAME.roster.push(p); }
   const taken = new Set(GAME.roster.map(p => p.name.toLowerCase())), names = BOT_NAMES.filter(n => !taken.has(n.toLowerCase())).sort(() => Math.random() - 0.5);
   while (GAME.roster.length < Math.max(GAME.botN, 2)) GAME.roster.push(newPlayer({id: 'bot' + GAME.roster.length, name: names.pop(), isBot: true}, GAME.roster.length));
-  GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0; NET.lastR = NET.lastSp = NET.lastLed = '';
+  GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0; NET.lastR = NET.lastSp = NET.lastLed = ''; GAME.skillEff = botSkill(); SHOT.blob = null;
   for (const h of humans()) try { h.conn.send({t: 'go'}); } catch (e) {}
   enterPlayUI(); startRound();
 }
@@ -2436,7 +2546,7 @@ function progTick() {
     PROG.podiumDone = true;
     const ranked = [...GAME.roster].sort((a, b2) => b2.score - a.score), rank = ranked.indexOf(me) + 1;
     const before = stampsOf(PROF.km), gain = 30 + me.score * 8 + (rank === 1 ? 60 : 0);
-    PROF.km += gain; PROF.matches++; if (rank === 1) PROF.mwins++; addLife('matches', 1);
+    PROF.km += gain; PROF.matches++; if (rank === 1) PROF.mwins++; PROF.recent = [...(PROF.recent || []), rank].slice(-5); addLife('matches', 1); vetCheck();
     const after = stampsOf(PROF.km), news = PASS.slice(before, after).map(itemName);
     const titlesNow = Object.keys(TITLE_REQ).filter(t => isUnlocked('title', t) && !(PROF.seenTitles || []).includes(t));
     PROF.seenTitles = [...(PROF.seenTitles || []), ...titlesNow];
@@ -2536,6 +2646,148 @@ $('tCalm').onclick = () => { SET.calm = !SET.calm; applySettings(); };
 $('tLefty').onclick = () => { SET.lefty = !SET.lefty; applySettings(); };
 document.querySelectorAll('[data-bs]').forEach(b => b.onclick = () => { SET.btn = b.dataset.bs; applySettings(); });
 
+
+// ================= Phase 5: tutorial, tips, adaptive bots, share a moment =================
+const TUT = {step: 0, t: 0, ok: 0, dummy: null, ring: null, ev: {}, wait: 0};
+const TUT_STEPS = [
+  {k: 'walk', b: '', txt: 'Use the joystick (or WASD) to walk into the glowing ring.'},
+  {k: 'push', b: 'bPush', txt: 'Walk up to the dummy and tap PUSH to shove it.'},
+  {k: 'super', b: 'bPush', txt: 'Now HOLD PUSH until the bar fills, then let go. Super push!'},
+  {k: 'grab', b: 'bGrab', txt: 'Hold GRAB near a strap or the door pole. Holding on saves you on curves.'},
+  {k: 'kick', b: 'bJump', txt: 'Tap JUMP, then PUSH in the air. Flying dropkick the dummy!'},
+  {k: 'throw', b: 'bGrab', txt: 'Hold GRAB on the dummy to pick it up, then tap PUSH to throw it out of the door.'}
+];
+function tutEv(k) { TUT.ev[k] = true; }
+function tutDummy(x, z) {
+  if (TUT.dummy) removeChar(TUT.dummy);
+  TUT.dummy = makeChar(x, z, {name: 'Dummy Uncle', kind: 'uncle', color: 0xe8e2d0, pants: 0x4a4a4a, isNpc: true, ctrl: makeCtrl(), power: 0.6, yaw: Math.PI / 2});
+}
+function startTutorial() {
+  audioInit(); netLeave(); tutCleanup();
+  TUT.prevMode = GAME.mode; GAME.mode = 'classic'; GAME.tutorial = true;
+  GAME.roster = [newPlayer({id: 'me', name: myNameSoft(), isMe: true, isBot: false, look: cleanLook(PROF.look)}, 0)];
+  GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0;
+  $('menu').classList.add('hidden'); $('hud').classList.remove('hidden'); $('controls').classList.remove('hidden'); $('topbtns').classList.remove('hidden');
+  if (matchMedia('(pointer:coarse)').matches) goFull(true);
+  startRound();
+  for (const n of GAME.npcs) removeChar(n.ch); GAME.npcs = [];
+  const me = GAME.roster[0]; removeChar(me.ch); me.ch = makeChar(-3, 0, {id: 'me', name: me.name, isMe: true, look: me.look, color: COLORS[0], pants: PANTS[0], ctrl: LOCAL, yaw: Math.PI / 2});
+  Object.assign(TR, {phase: 'stop', t: 0, dur: 1e9, speed: 0, gx: 0, gz: 0, platSide: 1, platX: 0, did: {alight: true, board: true}, nextEvt: 1e9, curve: null, jerk: null, khamba: null});
+  setPlatform(true, 1); LIGHT.tod = TODS[0]; applyLight(Infinity); LED.text = 'TUTORIAL  ›  EMPTY MORNING TRAIN  ›  NO PUSHING REAL UNCLES YET  ›  ';
+  GAME.big = GAME.banner = null; $('big').classList.add('hidden'); $('banner').classList.add('hidden');
+  TUT.ring = new THREE.Mesh(new THREE.RingGeometry(0.38, 0.55, 32), new THREE.MeshBasicMaterial({color: 0xffd23f, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false}));
+  TUT.ring.rotation.x = -Math.PI / 2; TUT.ring.position.set(0, 0.03, 0); scene.add(TUT.ring);
+  TUT.step = 0; TUT.t = 0; TUT.ok = 0; TUT.wait = 0; TUT.ev = {}; tutShow();
+}
+function tutShow() {
+  const el = $('tut'); el.classList.remove('hidden', 'tip');
+  document.querySelectorAll('.cbtn').forEach(b => b.classList.remove('hint'));
+  if (TUT.step >= TUT_STEPS.length) {
+    el.querySelector('.tstep').textContent = 'Tutorial complete';
+    el.querySelector('.ttxt').textContent = 'You are ready for the real local. Be gentle with the uncles.';
+    $('tutBtns').classList.remove('hidden'); $('bTutSkip').classList.add('hidden'); return;
+  }
+  const S = TUT_STEPS[TUT.step];
+  el.querySelector('.tstep').textContent = 'Step ' + (TUT.step + 1) + ' of ' + TUT_STEPS.length;
+  el.querySelector('.ttxt').textContent = S.txt; $('tutBtns').classList.add('hidden'); $('bTutSkip').classList.remove('hidden');
+  if (S.b) $(S.b).classList.add('hint');
+  TUT.ev = {}; TUT.ok = 0;
+  if (S.k === 'walk') TUT.ring.visible = true; else TUT.ring.visible = false;
+  if (S.k === 'push') tutDummy(1.6, 0);
+  if (S.k === 'throw') tutDummy(3.6, 0.7);
+}
+function tutNext() {
+  TUT.step++; TUT.wait = 0; sfx('pickup'); buzz(25);
+  const me = GAME.roster[0]; if (me && me.ch) { const h = me.ch.parts.head.position; confetti(h.x, h.y + 0.5, h.z, 16); }
+  if (TUT.step >= TUT_STEPS.length) { PROF.trained = true; saveProf(true); sfx('win'); $('bTrain').classList.remove('new'); }
+  tutShow();
+}
+function tutTick(dt) {
+  if (!GAME.tutorial || TUT.step >= TUT_STEPS.length) return;
+  TUT.t += dt; if (TUT.ring) TUT.ring.material.opacity = 0.6 + 0.35 * Math.sin(TUT.t * 5);
+  const me = GAME.roster[0], ch = me && me.ch; if (!ch) return;
+  const tp = ch.parts.torso.position;
+  // fell out of the train: put them back inside
+  if (Math.abs(tp.z) > HW + 1.2 || tp.y < -1.5) { removeChar(ch); me.ch = makeChar(-1, 0, {id: 'me', name: me.name, isMe: true, look: me.look, color: COLORS[0], pants: PANTS[0], ctrl: LOCAL, yaw: Math.PI / 2}); return; }
+  const D = TUT.dummy, dp = D && D.parts.torso.position, k = TUT_STEPS[TUT.step].k;
+  if (D && k !== 'throw' && (Math.abs(dp.z) > HW + 0.8 || dp.y < -1)) tutDummy(1.6, 0);
+  if (TUT.wait > 0) { TUT.wait -= dt; if (TUT.wait <= 0) tutNext(); return; }
+  let done = false;
+  if (k === 'walk') done = Math.hypot(tp.x - TUT.ring.position.x, tp.z - TUT.ring.position.z) < 0.6;
+  else if (k === 'push') done = TUT.ev.push || TUT.ev.super;
+  else if (k === 'super') done = TUT.ev.super;
+  else if (k === 'grab') { TUT.ok = ch.grab && ch.grab.type !== 'ch' ? TUT.ok + dt : 0; done = TUT.ok > 0.7; }
+  else if (k === 'kick') done = !!(D && ch.kickHit && ch.kickHit.has(D));
+  else if (k === 'throw') done = !!(D && Math.abs(dp.z) > HW + 0.5);
+  if (done) { TUT.wait = 0.9; const h = ch.parts.head.position; burst(pick(['NICE!', 'PERFECT!', 'GREAT!']), h.x, h.y + 0.9, h.z, '#6bf178'); }
+}
+function tutCleanup() {
+  GAME.tutorial = false; $('tut').classList.add('hidden'); document.querySelectorAll('.cbtn').forEach(b => b.classList.remove('hint'));
+  if (TUT.ring) { scene.remove(TUT.ring); TUT.ring = null; } TUT.dummy = null;
+  if (TUT.prevMode) { GAME.mode = TUT.prevMode; TUT.prevMode = null; }
+}
+$('bTrain').onclick = startTutorial;
+$('bTutSkip').onclick = () => { TUT.step = TUT_STEPS.length; PROF.trained = true; saveProf(true); $('bTrain').classList.remove('new'); tutShow(); };
+$('bTutPlay').onclick = () => { tutCleanup(); $('bPlay').onclick(); };
+$('bTutMenu').onclick = () => $('bQuit').onclick();
+if (!PROF.trained) $('bTrain').classList.add('new');
+
+// ---- fading tips for the first few matches ----
+const TIPS = ['Tap PUSH when someone is close. Missing makes you stumble.', 'Hold PUSH, then let go: a charged push sends people flying.', 'Hold GRAB on a strap when the train curves or brakes.', 'Holding GRAB also braces you: pushes hit you half as hard.', 'JUMP, then PUSH in the air = flying dropkick.', 'GRAB someone, then PUSH to throw them toward the door.', 'Spamming PUSH tires you out. Time your shoves.'];
+const TIP = {t: 0, i: 0};
+function tipTick(dt) {
+  const el = $('tut');
+  if (GAME.tutorial) return;
+  const lvl = Math.max(0, 1 - PROF.matches / 3);
+  if (lvl <= 0 || GAME.state !== 'play' || GAME.phase !== 'round' || GAME.result || T_now > 40) { if (el.classList.contains('tip')) el.classList.add('hidden'); return; }
+  TIP.t -= dt;
+  if (TIP.t <= 0) { TIP.t = 7; TIP.i = (TIP.i + 1) % TIPS.length; el.classList.remove('hidden'); el.classList.add('tip'); el.querySelector('.tstep').textContent = '💡 Tip'; el.querySelector('.ttxt').textContent = TIPS[TIP.i]; $('tutBtns').classList.add('hidden'); $('bTutSkip').classList.add('hidden'); }
+  el.style.opacity = (0.45 + 0.55 * lvl) * Math.min(1, TIP.t * 1.5, (7 - TIP.t) * 2);
+}
+function vetCheck() { document.body.classList.toggle('vet', PROF.matches >= 3); }
+
+// ---- bots go easier on new players and after a losing streak ----
+function botSkill() {
+  let s = GAME.skill; const m = PROF.matches, r = (PROF.recent || []).slice(-3);
+  if (m < 4) s = Math.min(s, 0.4 + m * 0.1);
+  if (r.length === 3 && r.every(x => x > 2)) s -= 0.12;
+  if (r.length === 3 && r.every(x => x === 1)) s += 0.08;
+  return clamp(s, 0.3, 1);
+}
+
+// ---- share a moment: grab the frame when you send someone flying (or get sent flying) ----
+const SHOT = {at: 0, cap: '', blob: null, url: ''};
+function wantShot(cap) { if (!SHOT.at) { SHOT.at = performance.now() + 380; SHOT.cap = cap; } }
+function takeShot() {
+  SHOT.at = 0;
+  try {
+    const w = Math.min(960, canvas.width), h = Math.round(w * canvas.height / canvas.width), c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); x.drawImage(canvas, 0, 0, w, h);
+    x.fillStyle = 'rgba(20,8,18,.78)'; x.fillRect(0, h - 54, w, 54);
+    x.fillStyle = '#ffd23f'; x.font = '900 26px system-ui,sans-serif'; x.textBaseline = 'middle'; x.fillText('DHAKKA LOCAL', 16, h - 27);
+    x.fillStyle = '#fff'; x.font = '700 20px system-ui,sans-serif'; x.textAlign = 'right'; x.fillText(SHOT.cap.slice(0, 48), w - 16, h - 27);
+    c.toBlob(b => { if (!b) return; SHOT.blob = b; if (SHOT.url) URL.revokeObjectURL(SHOT.url); SHOT.url = URL.createObjectURL(b); }, 'image/jpeg', 0.86);
+  } catch (e) {}
+}
+async function shareShot() {
+  if (!SHOT.blob) return;
+  const f = new File([SHOT.blob], 'dhakka-local-moment.jpg', {type: 'image/jpeg'});
+  try { if (navigator.canShare && navigator.canShare({files: [f]})) { await navigator.share({files: [f], text: 'Dhakka Local 🚃 ' + SHOT.cap + ' ' + (onlineBlocked() ? '' : shareUrl().split('?')[0])}); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a'); a.href = SHOT.url; a.download = 'dhakka-local-moment.jpg'; document.body.appendChild(a); a.click(); a.remove();
+}
+function shotButton(parent, before) {
+  if (!SHOT.blob) return;
+  const b = document.createElement('button'); b.className = 'shotb'; b.textContent = '📸 Share moment'; b.onclick = e => { e.stopPropagation(); shareShot(); };
+  const img = document.createElement('img'); img.src = SHOT.url; img.className = 'shotimg'; img.alt = ''; img.onclick = shareShot;
+  const w = document.createElement('div'); w.className = 'shotrow'; w.append(img, b);
+  if (before) parent.insertBefore(w, before); else parent.appendChild(w);
+}
+
+// ---- install (PWA) and service worker, only on the hosted site ----
+if (!onlineBlocked() && location.protocol === 'https:' && 'serviceWorker' in navigator) {
+  const l = document.createElement('link'); l.rel = 'manifest'; l.href = 'manifest.webmanifest'; document.head.appendChild(l);
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
 
 // ================= HUD =================
 const v3 = new THREE.Vector3();
@@ -2705,6 +2957,7 @@ function step() {
   world.step(dt);
   updatePickups(dt);
   updateProps(dt);
+  if (GAME.tutorial) { tutTick(dt); return; }
   if (!pod) { revengeUpdate(dt); seatUpdate(dt); }
   if (!pod) checkOut(dt);
   if (GAME.state === 'play' && !pod) checkRound(dt);
@@ -2729,9 +2982,9 @@ function frame(now) {
   for (const ch of CHARS) syncChar(ch, dt);
   syncWorld(dt);
   updateCamera(dt);
-  if (GAME.state === 'play') { updateHUD(dt); updateBursts(vdt); ambient(dt); progTick(); }
+  if (GAME.state === 'play') { updateHUD(dt); updateBursts(vdt); ambient(dt); progTick(); tipTick(dt); }
   if (AU.ctx) { musicTick(); ambLevels(dt); }
-  if (!window.__noRender) renderer.render(scene, camera);
+  if (!window.__noRender) { renderer.render(scene, camera); if (SHOT.at && performance.now() >= SHOT.at) takeShot(); }
   perf(dt);
 }
 let pf = {t: 0, n: 0, low: false};
@@ -2739,11 +2992,11 @@ function perf(dt) { pf.t += dt; pf.n++; if (pf.t > 3) { const fps = pf.n / pf.t;
 
 buildPhysics(); buildCoach(); buildOutside(); drawBoard(STATIONS[0]);
 resize();
-applySettings(); kmBadge();
+applySettings(); kmBadge(); vetCheck();
 startDemo();
 $('loading').remove(); $('menu').classList.remove('hidden');
 requestAnimationFrame(frame);
-window.__GAME = GAME; window.__CHARS = () => CHARS; window.__TR = TR; window.__LOCAL = LOCAL; window.__NET = NET; window.__podium = () => startPodium(); window.__newMatch = () => newMatch();
+window.__sfx = sfx; window.__AU = AU; window.__GAME = GAME; window.__CHARS = () => CHARS; window.__TR = TR; window.__LOCAL = LOCAL; window.__NET = NET; window.__podium = () => startPodium(); window.__newMatch = () => newMatch();
 window.__lamp = v => { LAMP_I = v; applyLight(Infinity); };
 window.__look = (tod, theme, rain) => { if (tod != null) LIGHT.tod = TODS[tod]; if (theme) setTheme(theme, true); if (rain != null) MONSOON.on = rain; applyLight(Infinity); };
 </script>
