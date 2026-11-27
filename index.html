@@ -109,9 +109,17 @@ button.shotb{width:auto;margin:0;padding:4px 12px;font-size:16px}
 .cbtn{position:absolute;pointer-events:auto;border-radius:50%;flex-direction:column;border:3px solid #000c;color:#2a1300;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.05;touch-action:none;box-shadow:0 4px 0 #0008}
 .cbtn.on{filter:brightness(1.4);transform:translateY(2px)}
 #bPush.throw{background:rgba(255,159,28,.95);box-shadow:0 0 0 4px #ffd23f,0 4px 0 #0008}
-#bGrab.carry{box-shadow:0 0 0 4px #fff,0 4px 0 #0008}
+#bGrab.carry{opacity:.35}
+#slide{position:fixed;left:0;top:0;height:0;pointer-events:none;transform-origin:0 0;opacity:0;transition:opacity .12s;z-index:2}
+#slide.show{opacity:1}
+#slide .sl-track{position:absolute;left:-32px;right:-8px;top:-27px;height:54px;border-radius:27px;background:linear-gradient(90deg,#ffffff26,#ff9f1caa);border:3px solid #fff;box-shadow:0 0 0 2px #0006,0 0 14px #ff9f1c88;display:flex;align-items:center;justify-content:flex-end;gap:1px;padding-right:14px}
+#slide .sl-track i{width:11px;height:11px;border-top:4px solid #fff;border-right:4px solid #fff;filter:drop-shadow(1px -1px 0 #0009);transform:rotate(45deg);opacity:.25;animation:slch 0.9s infinite}
+#slide .sl-track i:nth-child(2){animation-delay:.15s}#slide .sl-track i:nth-child(3){animation-delay:.3s}
+@keyframes slch{0%,100%{opacity:.2}40%{opacity:1}}
+#slide .sl-knob{position:absolute;top:-30px;left:calc(var(--t,0) * 100% - 30px);width:60px;height:60px;border-radius:50%;background:#8cff96;border:3px solid #000c;box-shadow:0 4px 0 #0008;display:grid;place-items:center}
+#slide .sl-knob span{font-size:26px;transform:rotate(calc(-1 * var(--a,0deg)))}
 #bJump{right:calc(max(14px,env(safe-area-inset-right)) + 176px);bottom:14px;width:64px;height:64px;background:rgba(120,220,255,.8)}
-#bGrab{right:calc(max(14px,env(safe-area-inset-right)) + 92px);bottom:62px;width:76px;height:76px;background:rgba(140,255,150,.8)}
+#bGrab{right:calc(max(14px,env(safe-area-inset-right)) + 106px);bottom:80px;width:76px;height:76px;background:rgba(140,255,150,.8)}
 #bPush{right:max(14px,env(safe-area-inset-right));bottom:14px;width:90px;height:90px;background:rgba(255,80,110,.88);color:#fff;font-size:15px}
 #bFS{position:fixed;top:8px;right:max(10px,env(safe-area-inset-right));z-index:26;width:40px;height:34px;padding:0;margin:0;font-size:19px;line-height:1;box-shadow:0 2px 0 #000;background:#fff4d6;color:#3a1d0e}
 #topbtns{position:fixed;top:8px;right:calc(max(10px,env(safe-area-inset-right)) + 48px);z-index:6;display:flex;gap:6px}
@@ -186,7 +194,7 @@ button.shotb{width:auto;margin:0;padding:4px 12px;font-size:16px}
 body.lefty #stick{left:auto;right:0}
 body.lefty #stickBase{left:auto;right:calc(max(20px,env(safe-area-inset-right)) + 10px)}
 body.lefty #bJump{right:auto;left:calc(max(14px,env(safe-area-inset-left)) + 176px)}
-body.lefty #bGrab{right:auto;left:calc(max(14px,env(safe-area-inset-left)) + 92px)}
+body.lefty #bGrab{right:auto;left:calc(max(14px,env(safe-area-inset-left)) + 106px)}
 body.lefty #bPush{right:auto;left:max(14px,env(safe-area-inset-left))}
 body.btn-s .cbtn{scale:.85} body.btn-l .cbtn{scale:1.2}
 .cbtn{transform-origin:50% 100%}
@@ -368,6 +376,7 @@ body.vet #keys{opacity:.75}
   <div class="cbtn" id="bJump" data-k="jump">JUMP</div>
   <div class="cbtn" id="bGrab" data-k="grab">GRAB<br><small>hold</small></div>
   <div class="cbtn" id="bPush" data-k="push">PUSH!<br><small>hold = power</small></div>
+  <div id="slide" aria-hidden="true"><div class="sl-track"><i></i><i></i><i></i></div><div class="sl-knob"><span>✊</span></div></div>
 </div>
 <button id="bFS" class="hidden" aria-label="Fullscreen" title="Fullscreen">⛶</button>
 <div id="topbtns" class="hidden"><button id="bSet2" aria-label="Settings">⚙️</button><button id="bMute" aria-label="Mute">🔊</button><button id="bQuit" aria-label="Quit">✕</button></div>
@@ -2263,11 +2272,12 @@ function tbMove(id, x, y) {
 }
 tbEls.forEach(el => el.addEventListener('pointerdown', e => {
   e.preventDefault(); audioInit(); try { el.releasePointerCapture(e.pointerId); } catch (er) {}
-  TB.ptr.set(e.pointerId, el); tbSet(el.dataset.k); if (el.dataset.k === 'push') buzz(10);
+  TB.ptr.set(e.pointerId, el); TB.pos.set(e.pointerId, [e.clientX, e.clientY]); tbSet(el.dataset.k); if (el.dataset.k === 'push') buzz(10);
 }));
-addEventListener('pointermove', e => { if (TB.ptr.has(e.pointerId)) tbMove(e.pointerId, e.clientX, e.clientY); }, {passive: true});
+TB.pos = new Map();
+addEventListener('pointermove', e => { if (TB.ptr.has(e.pointerId)) { TB.pos.set(e.pointerId, [e.clientX, e.clientY]); tbMove(e.pointerId, e.clientX, e.clientY); } }, {passive: true});
 const tbUp = e => {
-  if (!TB.ptr.has(e.pointerId)) return; const el = TB.ptr.get(e.pointerId); TB.ptr.delete(e.pointerId);
+  if (!TB.ptr.has(e.pointerId)) return; const el = TB.ptr.get(e.pointerId); TB.ptr.delete(e.pointerId); TB.pos.delete(e.pointerId);
   if (TB.latch === e.pointerId) TB.latch = null;
   if (el) tbSet(el.dataset.k); tbSet('grab');
 };
@@ -2281,12 +2291,31 @@ function kt(t) {
     .replace(/the joystick \(or WASD\)/g, 'WASD or the arrow keys').replace(/\bTap\b/g, 'Press').replace(/\btap\b/g, 'press')
     .replace(/\bPUSH\b/g, 'PUSH (J)').replace(/\bGRAB\b/g, 'GRAB (K)').replace(/\bJUMP\b/g, 'JUMP (Space)');
 }
+// while you carry someone, a diagonal slide track runs from GRAB to THROW and the knob follows your thumb
+function slideTick(carry) {
+  const sl = $('slide'); if (!sl) return;
+  const on = carry && !$('controls').classList.contains('hidden') && !IS_PC;
+  if (sl.classList.contains('show') !== on) sl.classList.toggle('show', on);
+  if (!on) return;
+  const g = $('bGrab').getBoundingClientRect(), p = $('bPush').getBoundingClientRect();
+  const gx = g.left + g.width / 2, gy = g.top + g.height / 2, px = p.left + p.width / 2, py = p.top + p.height / 2;
+  const dx = px - gx, dy = py - gy, L = Math.hypot(dx, dy) || 1, ex = dx / L, ey = dy / L;
+  // the track starts behind GRAB and ends just short of the THROW label
+  const back = 34, len = L + back - p.width * 0.5 - 2, sx = gx - ex * back, sy = gy - ey * back, ang = Math.atan2(dy, dx) * 180 / Math.PI;
+  const key = sx.toFixed(0) + ',' + sy.toFixed(0) + ',' + len.toFixed(0);
+  if (sl.dataset.k !== key) { sl.dataset.k = key; sl.style.width = len + 'px'; sl.style.transform = `translate(${sx}px,${sy}px) rotate(${ang}deg)`; sl.style.setProperty('--a', ang + 'deg'); }
+  let t = back / len;
+  for (const [id, el] of TB.ptr) { const q = TB.pos.get(id); if (!q || !(el && (el.dataset.k === 'grab' || el.dataset.k === 'push') || TB.latch === id)) continue;
+    t = Math.max(back / len, Math.min(1, ((q[0] - sx) * ex + (q[1] - sy) * ey) / len)); }
+  sl.style.setProperty('--t', t.toFixed(3));
+}
 function tbTick() {
   const kd = $('keys'); if (kd) { const show = !$('controls').classList.contains('hidden'); if (kd.classList.contains('hidden') === show) kd.classList.toggle('hidden', !show);
     if (show) { const mv = KEYS.KeyW || KEYS.KeyA || KEYS.KeyS || KEYS.KeyD || KEYS.ArrowUp || KEYS.ArrowDown || KEYS.ArrowLeft || KEYS.ArrowRight;
       $('kMove').classList.toggle('on', !!mv); $('kPush').classList.toggle('on', !!LOCAL.push); $('kGrab').classList.toggle('on', !!LOCAL.grab); $('kJump').classList.toggle('on', !!LOCAL.jump); } }
   const carry = tbCarry(), pb = $('bPush');
   if (carry !== TB.carry) { TB.carry = carry; pb.classList.toggle('throw', carry); pb.innerHTML = carry ? 'THROW!<br><small>slide here</small>' : 'PUSH!<br><small>hold = power</small>'; $('bGrab').classList.toggle('carry', carry); $('kPush').classList.toggle('throw', carry); $('kPushL').textContent = carry ? 'Throw!' : 'Push'; $('kPushS').textContent = carry ? 'they fly' : 'hold = power'; }
+  slideTick(carry);
   if (TB.latch != null && !carry && !tbHeld('grab')) { const id = TB.latch; TB.latch = null; tbSet('grab'); TB.latchGone = id; }
 }
 document.addEventListener('contextmenu', e => e.preventDefault());
