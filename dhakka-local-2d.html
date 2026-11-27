@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#7a1f3d">
+<title>Dhakka Local</title>
+<style>
+:root{
+  --bg:#1b0f1a; --ink:#fff7e6; --card:#2b1626; --accent:#ffcc00; --accent2:#e8456b; --muted:#c9b9c4; --btn:#ffcc00; --btnInk:#2a1300;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#1b0f1a; } }
+:root[data-theme="dark"]{ --bg:#1b0f1a; }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(20,8,18,.72);z-index:10;overflow:auto}
+.hidden{display:none!important}
+.card{background:var(--card);border:3px solid var(--accent);border-radius:18px;padding:18px 20px;max-width:560px;width:100%;box-shadow:0 10px 0 #000a;text-align:center}
+h1{margin:0;font-size:clamp(30px,7vw,54px);letter-spacing:2px;color:var(--accent);text-shadow:3px 3px 0 var(--accent2),6px 6px 0 #000}
+.tag{margin:6px 0 14px;color:var(--muted);font-size:15px;line-height:1.35}
+input{font:inherit;font-size:17px;padding:10px 12px;border-radius:10px;border:2px solid #000;background:#fff7e6;color:#2a1300;width:100%;margin:5px 0;text-align:center;user-select:text;-webkit-user-select:text}
+button{font:inherit;font-weight:800;font-size:17px;padding:11px 14px;border-radius:12px;border:2px solid #000;background:var(--btn);color:var(--btnInk);width:100%;margin:5px 0;box-shadow:0 4px 0 #000;cursor:pointer}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+button.alt{background:var(--accent2);color:#fff}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1}.row button{width:auto;min-width:110px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#msg{min-height:20px;color:#ff9db3;font-size:14px;margin-top:4px}
+details{margin-top:8px;text-align:left;color:var(--muted);font-size:14px}
+details summary{cursor:pointer;color:var(--ink);font-weight:700}
+details li{margin:3px 0}
+.code{font-size:44px;font-weight:900;letter-spacing:8px;color:var(--accent);margin:4px 0}
+#plist{list-style:none;padding:0;margin:8px 0;text-align:left}
+#plist li{padding:7px 10px;background:#0003;border-radius:8px;margin:4px 0;font-weight:700}
+#controls{position:fixed;inset:0;pointer-events:none;z-index:5}
+.cbtn{position:absolute;pointer-events:auto;border-radius:50%;border:3px solid #000c;background:rgba(255,204,0,.55);color:#2a1300;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;line-height:1.05;touch-action:none;box-shadow:0 4px 0 #0008}
+.cbtn.on{background:rgba(255,255,255,.85);transform:translateY(2px)}
+#bL{left:max(14px,env(safe-area-inset-left));bottom:18px;width:72px;height:72px;font-size:30px}
+#bR{left:calc(max(14px,env(safe-area-inset-left)) + 84px);bottom:18px;width:72px;height:72px;font-size:30px}
+#bJump{right:calc(max(14px,env(safe-area-inset-right)) + 172px);bottom:16px;width:66px;height:66px;background:rgba(120,220,255,.6)}
+#bGrab{right:calc(max(14px,env(safe-area-inset-right)) + 88px);bottom:52px;width:76px;height:76px;font-size:13px;background:rgba(140,255,150,.6)}
+#bPush{right:max(14px,env(safe-area-inset-right));bottom:16px;width:82px;height:82px;background:rgba(255,90,120,.7);color:#fff}
+#topbtns{position:fixed;top:8px;right:max(10px,env(safe-area-inset-right));z-index:6;display:flex;gap:6px}
+#topbtns button{width:auto;padding:6px 10px;font-size:14px;margin:0;box-shadow:0 2px 0 #000}
+#rotate{position:fixed;inset:0;z-index:20;background:rgba(20,8,18,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:20px;font-weight:800}
+#rotate .ph{font-size:64px;animation:rot 1.6s ease-in-out infinite}
+@keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
+.kbd{font-size:12px;color:var(--muted);margin-top:6px}
+@media (hover:hover) and (pointer:fine){ #controls{display:none} }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="controls" class="hidden">
+  <div class="cbtn" id="bL" data-k="l">◀</div>
+  <div class="cbtn" id="bR" data-k="r">▶</div>
+  <div class="cbtn" id="bJump" data-k="jump">KOODO</div>
+  <div class="cbtn" id="bGrab" data-k="grab">PAKDO<br><small>(hold)</small></div>
+  <div class="cbtn" id="bPush" data-k="push">DHAKKA!</div>
+</div>
+<div id="topbtns" class="hidden"><button id="bMute">🔊</button><button id="bQuit">✕</button></div>
+
+<div id="menu" class="overlay">
+  <div class="card">
+    <h1>DHAKKA LOCAL</h1>
+    <p class="tag">Peak hour. Ek dabba. Sab andar ghusna chahte hain.<br><b>Push everyone out of the Mumbai local. Last one inside wins.</b></p>
+    <input id="name" maxlength="12" placeholder="Apna naam likho">
+    <button id="bPractice">🚃 Practice vs bots</button>
+    <div class="grid2">
+      <button id="bHost" class="alt">Create room</button>
+      <div class="row" style="gap:6px"><input id="code" maxlength="4" placeholder="CODE" style="text-transform:uppercase;margin:5px 0"><button id="bJoin" class="alt" style="min-width:72px">Join</button></div>
+    </div>
+    <div id="msg"></div>
+    <details>
+      <summary>Kaise khelna hai (how to play)</summary>
+      <ul>
+        <li><b>◀ ▶</b> walk. <b>KOODO</b> jump.</li>
+        <li><b>DHAKKA!</b> shoves whoever is in front of you. Aim them at a door.</li>
+        <li><b>PAKDO</b> (hold) grabs a strap, the door pole, or another person. Hold on during curves and brakes!</li>
+        <li>Out of the train for more than a second = <b>BAHAR</b>. Hanging on the door pole is allowed. Watch out for the khamba.</li>
+        <li>Station pe bheed aati hai. Dadar, Andheri, Borivali: full rush.</li>
+      </ul>
+      <div class="kbd">Keyboard: A/D or arrows to move, W/Space jump, J dhakka, K hold to pakdo.</div>
+    </details>
+  </div>
+</div>
+
+<div id="lobby" class="overlay hidden">
+  <div class="card">
+    <div style="color:var(--muted);font-weight:700">ROOM CODE</div>
+    <div class="code" id="lcode">----</div>
+    <div class="tag" id="lhint">Share this code with friends. Empty spots get bots.</div>
+    <ul id="plist"></ul>
+    <button id="bStart">Train chalao! (start)</button>
+    <button id="bLeave" class="alt">Leave</button>
+  </div>
+</div>
+
+<div id="rotate" class="hidden"><div class="ph">📱</div><div>Phone ghumao!<br><small style="font-weight:500">Rotate to landscape for the full dabba</small></div><button style="width:auto;margin-top:16px" id="bRotOk">Theek hai, aise hi khelunga</button></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+'use strict';
+const {Engine, Bodies, Body, Composite, Constraint, Events} = Matter;
+
+// ---------- constants ----------
+const W = 1150, FLOOR = 500, CEIL = 140, POLE_L = 24, POLE_R = W - 24;
+const CAT = {WORLD: 1, RAG: 2};
+const STEP = 1000 / 60;
+const PEER_PREFIX = 'dhakka-local-v1-';
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.random() * a.length | 0];
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const wrap = a => a - 2 * Math.PI * Math.round(a / (2 * Math.PI));
+const lerp = (a, b, t) => a + (b - a) * t;
+
+const STATIONS = ['Lower Parel','Prabhadevi','Dadar','Matunga Road','Mahim','Bandra','Khar Road','Santacruz','Vile Parle','Andheri','Jogeshwari','Goregaon','Malad','Kandivali','Borivali','Dahisar','Mira Road','Bhayandar','Vasai Road','Virar'];
+const DEVA = {'Dadar':'दादर','Bandra':'वांद्रे','Andheri':'अंधेरी','Borivali':'बोरीवली','Virar':'विरार','Mahim':'माहीम','Malad':'मालाड','Goregaon':'गोरेगाव','Santacruz':'सांताक्रूझ','Lower Parel':'लोअर परळ','Prabhadevi':'प्रभादेवी','Vile Parle':'विले पार्ले','Kandivali':'कांदिवली','Jogeshwari':'जोगेश्वरी','Khar Road':'खार रोड','Matunga Road':'माटुंगा रोड','Dahisar':'दहिसर','Mira Road':'मीरा रोड','Bhayandar':'भाईंदर','Vasai Road':'वसई रोड'};
+const RUSH = new Set(['Dadar','Andheri','Borivali','Virar']);
+
+const HIT_LINES = ['Arre bhai!','Dhakka mat do!','Oye!','Abey!','Mera tiffin!','Mera chashma!','Aaiyo!','Kya kar raha hai?!','Bhai mera phone!','Aai ga!','Dekh ke!'];
+const NPC_HIT = ['Tameez nahi hai?','Aajkal ke bachche!','Main complaint karunga!','Arre baba!','Ghar pe maa-baap nahi?'];
+const BOARD_LINES = ['Andar chalo!','Aage badho!','Thoda adjust karo','Side do na!','Andar jagah hai!','Chalo chalo!'];
+const ALIGHT_LINES = ['Utarna hai!','Bhaiya utarna hai!','Hato hato!','Jagah do!','Dadar utarna hai!','Side, side!'];
+const VENDOR_LINES = ['Chana jor garam!','Vada pav! Bees rupaye!','Chikki lo chikki!','Earphone pachaas rupaye!','Pen le lo pen!','Mobile cover! Sasta!','Kaanta-chamach!'];
+const OUT_SUBS = ['Next train 3 minute mein hai.','Chappal yahin reh gayi.','Ab platform pe cutting chai pi.','Office late. Boss naraz.','Monthly pass waste ho gaya.','Mumbai ki speed, bhai!','Mummy ko kya bolega?','Yeh toh Virar fast tha.','Seat ka sapna toot gaya.'];
+const POSTERS = [['EK PHONE CALL','Har samasya ka hal!'],['ENGLISH BOLO','Sirf 30 din mein'],['JADOO TONA?','Baba se milo'],['SEASON PASS','Line mein lago'],['GHAR BAITHE','Kamaao lakhon']];
+const BOT_NAMES = ['Pappu','Chintu','Bunty','Golu','Pinky','Tinku','Munna','Sonu','Guddu','Dolly'];
+const COLORS = ['#ff5964','#35a7ff','#ffd23f','#6bf178','#c77dff','#ff9f1c','#2ec4b6','#f15bb5'];
+const SKINS = ['#c68642','#8d5524','#e0ac69','#a0663c','#d9a066'];
+
+// ---------- game state ----------
+let engine = null;
+const G = {
+  role: 'none', running: false, time: 0, roster: [], rags: [], npcs: [], straps: [], chappals: [],
+  feed: [], big: null, banner: null, result: null, sfxQ: [], shake: 0, slowT: 0, netN: 0, ragSeq: 0, round: 0,
+  train: null, platBodies: [], myId: 'me'
+};
+window.__G = G;
+
+// ---------- world ----------
+function buildWorld() {
+  if (engine) { Events.off(engine); Composite.clear(engine.world, false); Engine.clear(engine); }
+  engine = Engine.create();
+  engine.gravity.y = 1; engine.gravity.x = 0;
+  engine.positionIterations = 8; engine.velocityIterations = 6; engine.constraintIterations = 3;
+  const st = {isStatic: true, friction: 0.9, collisionFilter: {category: CAT.WORLD, mask: CAT.RAG}};
+  Composite.add(engine.world, [
+    Bodies.rectangle(W / 2, FLOOR + 20, W, 40, {...st, label: 'floor'}),
+    Bodies.rectangle(W / 2, CEIL - 20, W + 60, 40, {...st, label: 'ceil'}),
+    Bodies.rectangle(4, FLOOR - 2, 8, 8, {...st, label: 'lip', chamfer: {radius: 3}}),
+    Bodies.rectangle(W - 4, FLOOR - 2, 8, 8, {...st, label: 'lip', chamfer: {radius: 3}})
+  ]);
+  G.straps = [];
+  for (let x = 140; x <= W - 140; x += 93) {
+    const h = Bodies.circle(x, CEIL + 66, 9, {collisionFilter: {category: 0, mask: 0}, density: 0.03, frictionAir: 0.06});
+    const c = Constraint.create({pointA: {x, y: CEIL + 6}, bodyB: h, length: 60, stiffness: 0.95, damping: 0.05});
+    Composite.add(engine.world, [h, c]);
+    G.straps.push({ax: x, h});
+  }
+  G.platBodies = [];
+  Events.on(engine, 'collisionStart', e => { for (const p of e.pairs) { col(p.bodyA, p.bodyB, true); col(p.bodyB, p.bodyA, true); } });
+  Events.on(engine, 'collisionActive', e => { for (const p of e.pairs) { col(p.bodyA, p.bodyB, false); col(p.bodyB, p.bodyA, false); } });
+}
+
+function col(a, b, start) {
+  const r = a.ragRef; if (!r) return;
+  if ((a.label === 'shB' || a.label === 'shF') && b.ragRef !== r) r.groundT = G.time;
+  if (start && a.label === 'head' && b.isStatic && !r.out) {
+    const v = Math.hypot(a.velocity.x, a.velocity.y);
+    if (v > 6.5) {
+      r.stun = Math.max(r.stun, 1.1); r.stars = 1.4; sfx('bonk');
+      if (Math.random() < .6) say(r, pick(['Aaiyo!','Sir phoot gaya!','Taare dikh gaye!','Mummy!']));
+    }
+  }
+}
+
+function setPlatforms(on) {
+  for (const b of G.platBodies) Composite.remove(engine.world, b);
+  G.platBodies = [];
+  if (on) {
+    const st = {isStatic: true, friction: 0.9, label: 'platform', collisionFilter: {category: CAT.WORLD, mask: CAT.RAG}};
+    G.platBodies = [Bodies.rectangle(-500, FLOOR + 30, 1000, 60, st), Bodies.rectangle(W + 500, FLOOR + 30, 1000, 60, st)];
+    Composite.add(engine.world, G.platBodies);
+  }
+  G.train.platform = on;
+}
+
+// ---------- ragdolls ----------
+const PARTS = ['head','torso','uaB','laB','uaF','laF','thB','shB','thF','shF'];
+function makeRag(x, o) {
+  const y = FLOOR - 82;
+  const g = Body.nextGroup(true);
+  const den = o.heavy ? 0.0038 : 0.002;
+  const cf = {group: g, category: CAT.RAG, mask: CAT.WORLD | CAT.RAG};
+  const base = {collisionFilter: cf, friction: 0.5, frictionAir: 0.012, restitution: 0.05, density: den};
+  const R = (cx, cy, w, h, ex) => Bodies.rectangle(cx, cy, w, h, {...base, chamfer: {radius: w / 2 - 0.5}, ...ex});
+  const P = {
+    head: Bodies.circle(x, y - 40, 15, {...base}),
+    torso: R(x, y, 26, 50, {density: den * 1.5}),
+    uaB: R(x, y - 7, 9, 26), laB: R(x, y + 18, 8, 24),
+    uaF: R(x, y - 7, 9, 26), laF: R(x, y + 18, 8, 24),
+    thB: R(x, y + 37, 12, 30), shB: R(x, y + 66, 10, 28, {friction: 1}),
+    thF: R(x, y + 37, 12, 30), shF: R(x, y + 66, 10, 28, {friction: 1})
+  };
+  const J = (a, pa, b, pb) => Constraint.create({bodyA: a, pointA: pa, bodyB: b, pointB: pb, stiffness: 0.95, length: 0, damping: 0.05});
+  const cons = [
+    J(P.head, {x: 0, y: 14}, P.torso, {x: 0, y: -26}),
+    J(P.uaB, {x: 0, y: -12}, P.torso, {x: 0, y: -20}), J(P.laB, {x: 0, y: -11}, P.uaB, {x: 0, y: 12}),
+    J(P.uaF, {x: 0, y: -12}, P.torso, {x: 0, y: -20}), J(P.laF, {x: 0, y: -11}, P.uaF, {x: 0, y: 12}),
+    J(P.thB, {x: 0, y: -14}, P.torso, {x: 0, y: 22}), J(P.shB, {x: 0, y: -13}, P.thB, {x: 0, y: 14}),
+    J(P.thF, {x: 0, y: -14}, P.torso, {x: 0, y: 22}), J(P.shF, {x: 0, y: -13}, P.thF, {x: 0, y: 14})
+  ];
+  const r = {
+    id: o.id || ('n' + (++G.ragSeq)), name: o.name, kind: o.kind || 'player', color: o.color, pants: o.pants || '#2b3a67',
+    skin: o.skin || pick(SKINS), acc: o.acc || 0, heavy: !!o.heavy, isNpc: !!o.isNpc,
+    parts: P, list: PARTS.map(k => P[k]), cons, dir: o.dir || 1, stun: 0, groundT: -1, pushCd: 0, pushT: 0, pushHeld: false, jumpHeld: false,
+    grab: null, grabCd: 0, phase: Math.random() * 6, outT: 0, out: false, bubble: null, stars: 0, lastHitBy: null, lastHitT: -99, lastCause: null,
+    ctrl: o.ctrl || {l: false, r: false, jump: false, push: false, grab: false}, power: o.power || 8.5, isBot: !!o.isBot
+  };
+  for (const k of PARTS) { P[k].label = k; P[k].ragRef = r; }
+  Composite.add(engine.world, [...r.list, ...cons]);
+  G.rags.push(r);
+  return r;
+}
+
+function removeRag(r) {
+  if (r.removed) return;
+  releaseGrab(r);
+  for (const o of G.rags) if (o.grab && o.grab.rag === r) releaseGrab(o);
+  Composite.remove(engine.world, r.list); Composite.remove(engine.world, r.cons);
+  r.removed = true;
+  G.rags = G.rags.filter(x => x !== r);
+}
+
+function say(r, text, dur) { r.bubble = {text, t: dur || 1.6}; }
+
+function handPt(b) { const a = b.angle; return {x: b.position.x - Math.sin(a) * 12, y: b.position.y + Math.cos(a) * 12, ox: -Math.sin(a) * 12, oy: Math.cos(a) * 12}; }
+
+function releaseGrab(r) { if (r.grab) { Composite.remove(engine.world, r.grab.c); r.grab = null; r.grabCd = 0.25; } }
+
+function tryGrab(r) {
+  const hb = r.parts.laF, h = handPt(hb);
+  let best = null, bd = 1e9;
+  for (const s of G.straps) { const d = Math.hypot(h.x - s.h.position.x, h.y - s.h.position.y); if (d < 42 && d < bd) { bd = d; best = {type: 'strap', body: s.h, pb: {x: 0, y: 0}}; } }
+  for (const px of [POLE_L, POLE_R]) {
+    const yy = clamp(h.y, FLOOR - 260, FLOOR - 30);
+    const d = Math.hypot(h.x - px, h.y - yy);
+    if (d < 34 && d < bd) { bd = d; best = {type: 'pole', body: null, pb: {x: px, y: yy}}; }
+  }
+  for (const o of G.rags) {
+    if (o === r || o.out) continue;
+    for (const b of o.list) {
+      const d = Math.hypot(h.x - b.position.x, h.y - b.position.y);
+      if (d < 26 && d < bd) { bd = d; best = {type: 'rag', body: b, rag: o, pb: {x: h.x - b.position.x, y: h.y - b.position.y}}; }
+    }
+  }
+  if (!best) return false;
+  const c = Constraint.create({bodyA: hb, pointA: {x: h.ox, y: h.oy}, bodyB: best.body || undefined, pointB: best.pb, length: 0, stiffness: best.type === 'rag' ? 0.5 : 0.7, damping: 0.1});
+  Composite.add(engine.world, c);
+  r.grab = {c, type: best.type, rag: best.rag || null, t: 0};
+  if (best.rag) {
+    best.rag.lastHitBy = r.name; best.rag.lastHitT = G.time; best.rag.lastCause = r.isNpc ? 'npc' : 'player';
+    if (Math.random() < .7) say(best.rag, pick(['Chhod mujhe!','Kurta mat kheench!','Bhai chhod!','Haath hata!']));
+  }
+  sfx('grab');
+  return true;
+}
+
+function doPush(r) {
+  r.pushCd = r.isNpc ? 1.1 : (r.isBot ? 0.9 : 0.6); r.pushT = 0.22;
+  const P = r.parts, tp = P.torso.position, d = r.dir;
+  let hit = false;
+  for (const o of G.rags) {
+    if (o === r || o.out) continue;
+    if (o.grab && o.grab.rag === r) releaseGrab(o); // break free from someone grabbing me
+    const op = o.parts.torso.position, dx = (op.x - tp.x) * d, dy = op.y - tp.y;
+    if (dx > -12 && dx < 90 && Math.abs(dy) < 80) {
+      const pw = r.power * (o.heavy ? 0.4 : 1) * (o.grab && o.grab.type !== 'rag' ? 0.55 : 1);
+      for (const b of o.list) Body.setVelocity(b, {x: b.velocity.x * 0.3 + d * pw, y: b.velocity.y - pw * 0.33});
+      o.stun = Math.max(o.stun, o.heavy ? 0.35 : 0.9);
+      if (o.grab && Math.random() < (o.grab.type === 'pole' ? 0.35 : 0.55)) releaseGrab(o);
+      o.lastHitBy = r.name; o.lastHitT = G.time; o.lastCause = r.isNpc ? 'npc' : 'player'; o.lastHitKind = r.kind;
+      if (Math.random() < .55) say(o, pick(o.isNpc ? NPC_HIT : HIT_LINES));
+      hit = true;
+    }
+  }
+  for (const b of [P.uaF, P.laF, P.uaB, P.laB]) Body.setAngularVelocity(b, -d * 0.55);
+  Body.setVelocity(P.torso, {x: P.torso.velocity.x + d * 1.2, y: P.torso.velocity.y});
+  if (hit) { sfx('thud'); G.shake = Math.max(G.shake, 7); if (!r.isNpc && Math.random() < .3) say(r, pick(['DHAKKA!','Aage chalo!','Hatt!','Nikal!'])); }
+  else sfx('whoosh');
+}
+
+function drive(b, target, k) {
+  const d = wrap(target - b.angle);
+  Body.setAngularVelocity(b, b.angularVelocity * (1 - k) + d * k * 0.45);
+}
+
+function controlRag(r, dt) {
+  if (r.out) return;
+  const c = r.ctrl, P = r.parts;
+  r.stun = Math.max(0, r.stun - dt); r.pushCd -= dt; r.pushT -= dt; r.grabCd -= dt; r.stars = Math.max(0, r.stars - dt);
+  if (r.bubble) { r.bubble.t -= dt; if (r.bubble.t <= 0) r.bubble = null; }
+  const stunned = r.stun > 0;
+  const grounded = G.time - r.groundT < 0.12;
+  const mv = (c.r ? 1 : 0) - (c.l ? 1 : 0);
+  if (mv) r.dir = mv;
+  const d = r.dir;
+
+  // grab logic
+  if (r.grab) {
+    r.grab.t += dt;
+    if (!c.grab || (r.grab.type === 'rag' && (r.grab.t > 2.6 || r.grab.rag.out || r.grab.rag.removed))) releaseGrab(r);
+  } else if (c.grab && !stunned && r.grabCd <= 0) tryGrab(r);
+
+  if (c.push && !r.pushHeld && r.pushCd <= 0 && !stunned) doPush(r);
+  r.pushHeld = c.push;
+  if (c.jump && !r.jumpHeld && !stunned && (grounded || (r.grab && r.grab.type !== 'rag'))) {
+    if (r.grab) releaseGrab(r);
+    for (const b of r.list) Body.setVelocity(b, {x: b.velocity.x + mv * 2, y: -9});
+    sfx('jump');
+  }
+  r.jumpHeld = c.jump;
+
+  if (stunned) return; // full floppy
+
+  // upright + support
+  drive(P.torso, mv ? d * 0.14 : 0, grounded ? 0.3 : 0.18);
+  drive(P.head, 0, 0.1);
+  if (grounded) {
+    Body.applyForce(P.torso, P.torso.position, {x: 0, y: -P.torso.mass * 0.0011});
+    Body.applyForce(P.head, P.head.position, {x: 0, y: -P.head.mass * 0.0016});
+  } else if (r.grab && r.grab.type !== 'rag') {
+    Body.applyForce(P.head, P.head.position, {x: 0, y: -P.head.mass * 0.0006});
+  }
+
+  // legs
+  const kL = grounded ? 0.4 : 0.15;
+  if (mv && grounded) {
+    r.phase += dt * 11;
+    const s = Math.sin(r.phase);
+    drive(P.thF, -d * 0.55 * s, kL); drive(P.thB, d * 0.55 * s, kL);
+    drive(P.shF, -d * 0.55 * s + d * 0.35 * Math.max(0, Math.cos(r.phase)), kL);
+    drive(P.shB, d * 0.55 * s + d * 0.35 * Math.max(0, -Math.cos(r.phase)), kL);
+  } else {
+    drive(P.thF, -d * 0.12, kL); drive(P.thB, d * 0.14, kL); drive(P.shF, -d * 0.08, kL); drive(P.shB, d * 0.1, kL);
+  }
+
+  // arms
+  const holding = !!r.grab;
+  if (r.pushT > 0) {
+    drive(P.uaF, -d * 1.6, 0.8); drive(P.laF, -d * 1.6, 0.8); drive(P.uaB, -d * 1.5, 0.6); drive(P.laB, -d * 1.5, 0.6);
+  } else if (c.grab && !holding) {
+    drive(P.uaF, -d * 2.6, 0.45); drive(P.laF, -d * 2.7, 0.45); drive(P.uaB, -d * 2.3, 0.3); drive(P.laB, -d * 2.4, 0.3);
+  } else if (!holding) {
+    const sw = Math.sin(G.time * 3 + r.phase) * 0.15;
+    drive(P.uaF, -d * 0.25 + sw, 0.08); drive(P.laF, -d * 0.6, 0.08); drive(P.uaB, d * 0.15 - sw, 0.08); drive(P.laB, -d * 0.3, 0.08);
+  } else {
+    drive(P.uaB, -d * 2.3, 0.2); drive(P.laB, -d * 2.4, 0.2);
+  }
+
+  // move
+  if (mv) {
+    const vx = P.torso.velocity.x;
+    const max = r.isNpc ? 2.4 : 3.3;
+    if (vx * mv < max) Body.applyForce(P.torso, P.torso.position, {x: mv * P.torso.mass * (grounded ? 0.0026 : (holding ? 0.0018 : 0.0009)), y: 0});
+  }
+}
+
+// ---------- roster & round ----------
+function makeCtrl() { return {l: false, r: false, jump: false, push: false, grab: false}; }
+
+function fillBots(target) {
+  let i = 0;
+  const used = new Set(G.roster.map(p => p.name));
+  while (G.roster.length < target) {
+    let nm = BOT_NAMES[i++ % BOT_NAMES.length]; if (used.has(nm)) { if (i > 20) nm += i; else continue; }
+    used.add(nm);
+    G.roster.push({id: 'bot' + G.roster.length + '_' + nm, name: nm, isBot: true, ctrl: makeCtrl(), wins: 0, skill: rnd(0.45, 0.85)});
+  }
+}
+
+function startRound() {
+  buildWorld();
+  G.rags = []; G.npcs = []; G.chappals = []; G.feed = []; G.result = null; G.time = 0; G.slowT = 0; G.round++;
+  G.train = {phase: 'run', t: 0, dur: 9, speed: 0.6, scroll: 0, gx: 0, station: 0, ss: null, platform: false, nextEvt: 3.5, curve: null, jerk: null, khamba: null, led: 'DHAKKA LOCAL  >>  ' + STATIONS[1].toUpperCase() + ' FAST  >>  ', announced: false, did: {}};
+  const n = G.roster.length;
+  const slots = [];
+  for (let i = 0; i < n; i++) slots.push(200 + (W - 400) * (n === 1 ? 0.5 : i / (n - 1)));
+  slots.sort(() => Math.random() - 0.5);
+  G.roster.forEach((p, i) => {
+    p.alive = true; p.ctrl = p.ctrl || makeCtrl(); p.target = null; p.think = 0;
+    p.rag = makeRag(slots[i], {id: p.id, isBot: p.isBot, name: p.name, color: COLORS[i % COLORS.length], pants: pick(['#2b3a67','#3d2c1e','#1d1d1d','#5b6b7a','#7a5c2e']), acc: i % 5, ctrl: p.ctrl, dir: slots[i] < W / 2 ? 1 : -1});
+  });
+  // a couple of uncles already inside, standing between players
+  const ss = [...slots].sort((a, b) => a - b);
+  if (ss.length > 2) { const k = ss.length >> 1; spawnNpc('uncle', (ss[0] + ss[1]) / 2, 'ride'); spawnNpc('aunty', (ss[k] + ss[k + 1]) / 2, 'ride'); }
+  G.big = {text: 'AAGE CHALO!', sub: 'Last one inside wins', t: 2.4};
+  G.banner = {text: 'Peak hour. Dabba full. Hold the straps!', t: 3};
+  sfx('horn');
+}
+
+// ---------- NPCs ----------
+const NPC_KINDS = {
+  uncle: {names: ['Uncle','Sharma ji','Kaka','Joshi kaka'], color: '#e8e2d0', pants: '#4a4a4a'},
+  aunty: {names: ['Aunty','Tai','Bhabhi ji'], color: '#d93a8c', pants: '#d93a8c'},
+  student: {names: ['College boy','Engg student','Intern'], color: '#3a7d44', pants: '#25324a'},
+  dabba: {names: ['Dabbawala'], color: '#f4f4f4', pants: '#f4f4f4'},
+  vendor: {names: ['Chana-wala','Vada pav bhaiya','Chikki-wala'], color: '#f2a33a', pants: '#6b4b2a'}
+};
+function spawnNpc(kind, x, state, exitDir) {
+  if (G.npcs.length >= 10) return null;
+  const K = NPC_KINDS[kind];
+  const ctrl = makeCtrl();
+  const r = makeRag(x, {name: pick(K.names), kind, color: K.color, pants: K.pants, heavy: true, isNpc: true, ctrl, power: kind === 'vendor' ? 9 : 7, dir: x < W / 2 ? 1 : -1});
+  const n = {rag: r, ctrl, kind, state, life: 0, tx: rnd(180, W - 180), exit: exitDir || (x < W / 2 ? -1 : 1), stuckT: 0, shoutT: rnd(1, 3)};
+  G.npcs.push(n);
+  return n;
+}
+
+function npcUpdate(n, dt) {
+  const r = n.rag, c = n.ctrl, P = r.parts, tx = P.torso.position.x, T = G.train;
+  c.l = c.r = c.push = c.jump = false; c.grab = false;
+  n.life += dt; n.shoutT -= dt;
+  let want = 0;
+  if (n.state === 'board') {
+    if (Math.abs(tx - n.tx) > 35) want = tx < n.tx ? 1 : -1; else n.state = 'ride';
+    if (n.life > 7 && tx > 30 && tx < W - 30) n.state = 'ride';
+    if (n.shoutT <= 0) { say(r, pick(BOARD_LINES)); n.shoutT = rnd(1.5, 3); }
+  } else if (n.state === 'ride') {
+    if (T.curve || T.jerk || T.phase === 'brake' || T.phase === 'accel') c.grab = true;
+    if (n.shoutT <= 0 && Math.random() < .3) { say(r, pick(['Kitni bheed hai!','Bhai thoda khisko','Mera station kab aayega','Andar chalo na']), 1.4); n.shoutT = rnd(4, 8); }
+    else if (n.shoutT <= 0) n.shoutT = rnd(3, 6);
+  } else if (n.state === 'alight') {
+    want = n.exit;
+    if (n.shoutT <= 0) { say(r, pick(ALIGHT_LINES)); n.shoutT = rnd(1.2, 2.5); }
+  } else if (n.state === 'vend') {
+    want = n.exit;
+    if (n.shoutT <= 0) { say(r, pick(VENDOR_LINES), 1.8); n.shoutT = rnd(1.8, 3); sfx('vendor'); }
+    if ((n.exit > 0 && tx > W - 40) || (n.exit < 0 && tx < 40)) { removeRag(r); n.dead = true; G.feed.push({text: r.name + ' agle dabbe mein chala gaya', t: 3}); return; }
+  }
+  if (want) {
+    c[want > 0 ? 'r' : 'l'] = true;
+    if (Math.abs(P.torso.velocity.x) < 0.6) n.stuckT += dt; else n.stuckT = Math.max(0, n.stuckT - dt);
+    if (n.stuckT > 0.35 && r.pushCd <= 0) { c.push = true; n.stuckT = 0; }
+  }
+  if (P.torso.position.y > FLOOR + 220 || tx < -700 || tx > W + 700 || (n.state === 'alight' && (tx < -200 || tx > W + 200))) { removeRag(r); n.dead = true; }
+}
+
+// ---------- bots ----------
+function botThink(p, dt) {
+  const r = p.rag, c = p.ctrl, P = r.parts, tp = P.torso.position, T = G.train;
+  p.think -= dt;
+  c.push = false; c.jump = false;
+  const fresh = p.think <= 0;
+  const danger = !!(T.curve || T.jerk || T.phase === 'brake' || T.phase === 'accel' || (T.khamba && T.khamba.x > -200));
+  if (p.think <= 0) {
+    p.think = rnd(0.15, 0.4);
+    const nearDoor = tp.x < 170 || tp.x > W - 170;
+    p.wantGrab = (danger && Math.random() < p.skill) || (nearDoor && Math.random() < p.skill * 0.6) || (r.stun > 0 && Math.random() < 0.5);
+    if (T.khamba && (tp.x < 30 || tp.x > W - 30)) p.wantGrab = false; // let go and step in
+    if (!p.target || p.target.out || p.target.removed || Math.random() < 0.15) {
+      let best = null, bd = 1e9;
+      for (const o of G.rags) {
+        if (o === r || o.out) continue;
+        const dd = Math.abs(o.parts.torso.position.x - tp.x) * (o.isNpc ? 2.5 : 1) * rnd(0.7, 1.3);
+        if (dd < bd) { bd = dd; best = o; }
+      }
+      p.target = best;
+    }
+  }
+  c.grab = p.wantGrab;
+  c.l = c.r = false;
+  const t = p.target; if (!t) return;
+  if (c.grab && r.grab && danger) return; // hold on
+  const op = t.parts.torso.position;
+  const doorDir = op.x < W / 2 ? -1 : 1;
+  const desired = clamp(op.x - doorDir * 58, 60, W - 60);
+  const dx = desired - tp.x;
+  if (Math.abs(dx) > 26) { if (dx > 0) c.r = true; else c.l = true; if (r.grab && r.grab.type !== 'rag') c.grab = Math.random() < 0.3; }
+  else {
+    if (r.dir !== doorDir) c[doorDir > 0 ? 'r' : 'l'] = true;
+    else if (fresh && G.time > 2.5 && r.pushCd <= 0 && Math.random() < 0.25 + 0.3 * p.skill) c.push = true;
+    else if (fresh && Math.random() < 0.1) c.grab = true;
+  }
+  if (Math.random() < 0.002) c.jump = true;
+}
+
+// ---------- train ----------
+function banner(text, t) { G.banner = {text, t: t || 2.5}; }
+function announce() {
+  const T = G.train, nm = STATIONS[T.station % STATIONS.length];
+  T.led = 'AGLA STATION: ' + nm.toUpperCase() + '   ' + (DEVA[nm] || '') + '   NEXT STATION ' + nm.toUpperCase() + '   ';
+  sfx('chime');
+  sfx('say', 'Agla station, ' + nm + '. Pudhil station, ' + nm + '. Next station, ' + nm + '.');
+  banner('Agla station: ' + nm + (RUSH.has(nm) ? '  ⚠ BHEED ALERT!' : ''), 3);
+}
+function randomEvent() {
+  const T = G.train;
+  const r = Math.random();
+  const hasVendor = G.npcs.some(n => n.kind === 'vendor');
+  if (r < 0.32) { T.curve = {t: 0, dur: rnd(2.4, 3.4), dir: pick([-1, 1]), mag: rnd(0.32, 0.5)}; banner(pick(['CURVE! Pakad ke rakho!','Mahim ka mod! Strap pakdo!','Train jhool rahi hai!']), 2); sfx('screech'); }
+  else if (r < 0.52) { T.jerk = {t: 0, dur: 0.32, dir: pick([-1, 1, 1]), mag: rnd(0.8, 1.1)}; banner(pick(['JHATKA!','Signal laal! Emergency brake!','Driver ko neend aa gayi!']), 1.6); sfx('screech'); }
+  else if (r < 0.72) { T.khamba = {x: W + 900, warned: false}; banner('Door pe mat latko! KHAMBA aa raha hai!', 2); sfx('horn'); }
+  else if (r < 0.88 && !hasVendor) {
+    const side = pick([-1, 1]);
+    const n = spawnNpc('vendor', side < 0 ? 60 : W - 60, 'vend', -side);
+    if (n) { banner(n.rag.name + ' aa gaya! ' + pick(VENDOR_LINES), 2.2); }
+  } else { sfx('horn'); banner(pick(['Poooon! Horn suno!','Gate pe bheed, andar jagah hai!','Fast train overtake kar rahi hai!']), 1.8); }
+}
+
+function trainUpdate(dt) {
+  const T = G.train; T.t += dt;
+  let gx = 0;
+  if (T.phase === 'run') {
+    T.speed = Math.min(1, T.speed + dt * 0.7);
+    if (!T.announced && T.t > T.dur - 3.6) { T.announced = true; announce(); }
+    T.nextEvt -= dt;
+    if (T.nextEvt <= 0 && T.t < T.dur - 2.2 && G.time > 4) { T.nextEvt = rnd(2.4, 4.2) * Math.max(0.6, 1 - T.station * 0.04); randomEvent(); }
+    if (T.t >= T.dur) { T.phase = 'brake'; T.t = 0; T.dur = 1.8; T.ss = T.scroll + 0.5 * T.speed * 900 * T.dur; T.v0 = T.speed; sfx('brake'); }
+  } else if (T.phase === 'brake') {
+    T.speed = T.v0 * (1 - T.t / T.dur);
+    gx += 0.5;
+    if (T.t >= T.dur) { T.phase = 'stop'; T.t = 0; T.speed = 0; const nm = STATIONS[T.station % STATIONS.length]; T.rush = RUSH.has(nm); T.dur = T.rush ? 7 : 5.5; T.did = {}; setPlatforms(true);
+      if (T.rush) { G.big = {text: nm.toUpperCase() + '!!', sub: 'Sab utro, sab chado. Full rush!', t: 2.4}; sfx('crowd'); } else banner(nm + ': darwaze dono taraf khulenge', 2.2); }
+  } else if (T.phase === 'stop') {
+    T.speed = 0;
+    if (!T.did.alight && T.t > 0.3) {
+      T.did.alight = true;
+      for (const n of G.npcs) if (n.state === 'ride' && (T.rush || Math.random() < 0.6)) { n.state = 'alight'; n.exit = n.rag.parts.torso.position.x < W / 2 ? -1 : 1; n.shoutT = 0; }
+    }
+    if (!T.did.board && T.t > 1.3) {
+      T.did.board = true;
+      const k = T.rush ? 7 : 3 + (Math.random() * 2 | 0);
+      const kinds = ['uncle','aunty','student','uncle','dabba','student','aunty'];
+      for (let i = 0; i < k; i++) { const side = i % 2 ? 1 : -1; spawnNpc(pick(kinds), side < 0 ? rnd(-420, -90) : rnd(W + 90, W + 420), 'board'); }
+      sfx('crowd');
+    }
+    if (T.t >= T.dur) { T.phase = 'accel'; T.t = 0; T.dur = 1.8; setPlatforms(false); sfx('horn'); banner('Train chal padi! Latakne wale sambhal ke', 1.8); }
+  } else if (T.phase === 'accel') {
+    T.speed = T.t / T.dur;
+    gx -= 0.38;
+    if (T.t >= T.dur) { T.phase = 'run'; T.t = 0; T.station++; T.dur = Math.max(6.5, 10 - T.station * 0.35); T.announced = false; T.nextEvt = rnd(1.5, 2.5); T.led = 'DHAKKA LOCAL  >>  ' + STATIONS[T.station % STATIONS.length].toUpperCase() + '  >>  '; }
+  }
+  if (T.curve) { const cv = T.curve; cv.t += dt; gx += cv.dir * cv.mag * Math.sin(Math.PI * Math.min(1, cv.t / cv.dur)); if (cv.t > cv.dur) T.curve = null; }
+  if (T.jerk) { const j = T.jerk; j.t += dt; gx += j.dir * j.mag; if (j.t > j.dur) T.jerk = null; }
+  if (T.khamba) {
+    const k = T.khamba, prev = k.x; k.x -= 1900 * dt;
+    if (!k.warned && k.x < W + 300) { k.warned = true; sfx('whoosh'); }
+    for (const r of G.rags) {
+      if (r.out) continue;
+      for (const b of [r.parts.torso, r.parts.head]) {
+        const bx = b.position.x;
+        if ((bx < -6 || bx > W + 6) && prev >= bx && k.x < bx) {
+          releaseGrab(r);
+          for (const q of r.list) Body.setVelocity(q, {x: -15, y: -4});
+          r.stun = 1.6; r.lastCause = 'khamba'; r.lastHitT = G.time; r.lastHitBy = null; say(r, 'AAAAAA!', 1.2); sfx('clang'); G.shake = 12;
+          break;
+        }
+      }
+    }
+    if (k.x < -900) T.khamba = null;
+  }
+  if (T.speed > 0.1) gx += Math.sin(G.time * 13) * 0.03 * T.speed;
+  T.gx = gx;
+  T.scroll += T.speed * 900 * dt;
+  if (T.ss !== null && T.phase === 'run' && W / 2 + (T.ss - T.scroll) < -3200) T.ss = null;
+}
+
+function windForces() {
+  const sp = G.train.speed; if (sp < 0.05) return;
+  for (const r of G.rags) for (const b of r.list) {
+    const x = b.position.x;
+    if (x < 0 || x > W || b.position.y > FLOOR + 5) Body.applyForce(b, b.position, {x: -sp * b.mass * 0.0005, y: 0});
+  }
+}
+
+// ---------- elimination ----------
+function eliminate(p) {
+  const r = p.rag, tp = r.parts.torso.position, T = G.train;
+  p.alive = false; r.out = true; r.outAt = G.time;
+  releaseGrab(r); for (const o of G.rags) if (o.grab && o.grab.rag === r) releaseGrab(o);
+  Body.setAngularVelocity(r.parts.torso, rnd(-0.35, 0.35));
+  const recent = G.time - r.lastHitT < 4;
+  let sub;
+  if (recent && r.lastCause === 'khamba') sub = 'Khamba 1, ' + p.name + ' 0.';
+  else if (recent && r.lastCause === 'npc') sub = r.lastHitBy + ' ne utaar diya. ' + pick(OUT_SUBS);
+  else if (recent && r.lastHitBy) sub = r.lastHitBy + ' ka dhakka. ' + pick(OUT_SUBS);
+  else if (T.curve || T.jerk) sub = 'Curve ne nikaal diya. Strap pakadna tha!';
+  else if (T.platform) sub = 'Platform pe utar gaya. Yeh uska station nahi tha.';
+  else sub = 'Khud hi gir gaya. Shabaash. 👏';
+  G.big = {text: p.name + ' BAHAR!', sub, t: 2.4};
+  G.feed.push({text: '🚪 ' + p.name + ': ' + sub, t: 6});
+  G.chappals.push([Math.round(clamp(tp.x, 30, W - 30)), FLOOR - 4, +(rnd(-0.4, 0.4)).toFixed(2)]);
+  G.slowT = 1.2; G.shake = 14;
+  sfx('fall');
+  if (Math.random() < 0.5) setTimeout(() => sfx('say', pick(['Gaya!','Bahar!','Arre re re'])), 300);
+  say(r, pick(['Nahiiiii!','Mera station nahi hai!','Bachaooo!','Chappaaal!','Mummyyy!']), 2);
+}
+
+function checkOut(dt) {
+  for (const p of G.roster) {
+    if (!p.alive || !p.rag) continue;
+    const r = p.rag, tp = r.parts.torso.position;
+    if (tp.y > FLOOR + 140) { eliminate(p); continue; }
+    const outside = tp.x < -30 || tp.x > W + 30;
+    if (outside && !(r.grab && r.grab.type === 'pole')) r.outT += dt; else r.outT = Math.max(0, r.outT - dt * 2);
+    if (r.outT > 1.0) eliminate(p);
+  }
+  for (const r of [...G.rags]) if (r.out && G.time - r.outAt > 3.2) removeRag(r);
+  G.npcs = G.npcs.filter(n => !n.dead && !n.rag.removed);
+}
+
+function checkRound(dt) {
+  const alive = G.roster.filter(p => p.alive);
+  if (!G.result && G.roster.length > 1 && alive.length <= 1) {
+    const w = alive[0];
+    if (w) w.wins++;
+    G.result = {w: w ? w.name : null, t: 0, sc: G.roster.map(p => [p.name, p.wins, p.isBot ? 1 : 0]).sort((a, b) => b[1] - a[1])};
+    G.big = {text: w ? w.name + ' JEET GAYA!' : 'SAB BAHAR!', sub: w ? pick(['Window seat pakki! 🪟','Andar wala hi asli Mumbaikar!','Dabba tera, bhai.']) : 'Train khali gayi.', t: 5};
+    sfx('win');
+  }
+  if (G.result) { G.result.t += dt; if (G.result.t > 6.5) startRound(); }
+}
+
+// ---------- step ----------
+function step() {
+  const dt = STEP / 1000 * engine.timing.timeScale;
+  G.time += dt;
+  trainUpdate(dt);
+  engine.gravity.x = G.train.gx;
+  for (const p of G.roster) if (p.isBot && p.alive && p.rag) botThink(p, dt);
+  for (const n of [...G.npcs]) if (!n.dead) npcUpdate(n, dt);
+  for (const r of G.rags) controlRag(r, dt);
+  windForces();
+  Engine.update(engine, STEP);
+  checkOut(dt);
+  checkRound(dt);
+  for (const f of G.feed) f.t -= dt; G.feed = G.feed.filter(f => f.t > 0).slice(-4);
+  if (G.big) { G.big.t -= dt; if (G.big.t <= 0) G.big = null; }
+  if (G.banner) { G.banner.t -= dt; if (G.banner.t <= 0) G.banner = null; }
+  if (G.role === 'host' && (++G.netN % 3 === 0)) netBroadcast();
+}
+
+// ---------- state for rendering / network ----------
+function encRag(r) {
+  const p = [];
+  for (const b of r.list) p.push(Math.round(b.position.x), Math.round(b.position.y), Math.round(b.angle * 100));
+  return {id: r.id, n: r.name, k: r.kind, c: r.color, pc: r.pants, sk: r.skin, ac: r.acc, d: r.dir, p, st: r.stun > 0 ? 1 : 0, sr: r.stars > 0 ? 1 : 0, o: r.out ? 1 : 0, b: r.bubble ? r.bubble.text : null, g: r.grab ? 1 : 0, gp: r.ctrl && r.ctrl.grab ? 1 : 0};
+}
+function getState() {
+  const T = G.train;
+  return {
+    t: Math.round(G.time * 100) / 100,
+    tr: {sp: Math.round(T.speed * 100) / 100, sc: Math.round(T.scroll), ph: T.phase, nx: STATIONS[T.station % STATIONS.length], ss: T.ss === null ? null : Math.round(W / 2 + (T.ss - T.scroll)), pl: T.platform ? 1 : 0, kh: T.khamba ? Math.round(T.khamba.x) : null, led: T.led, cv: T.curve ? T.curve.dir : 0},
+    r: G.rags.map(encRag),
+    s: G.straps.map(s => [Math.round(s.h.position.x), Math.round(s.h.position.y)]),
+    ch: G.chappals,
+    fe: G.feed.map(f => f.text),
+    bg: G.big ? [G.big.text, G.big.sub, Math.round(G.big.t * 10) / 10] : null,
+    bn: G.banner ? G.banner.text : null,
+    res: G.result ? {w: G.result.w, sc: G.result.sc, t: G.result.t} : null,
+    al: G.roster.filter(p => p.alive).length, tot: G.roster.length, sh: Math.round(G.shake)
+  };
+}
+
+// ---------- audio ----------
+const AU = {ctx: null, muted: false, noiseBuf: null, clackT: 0};
+function audioInit() {
+  if (AU.ctx) { if (AU.ctx.state === 'suspended') AU.ctx.resume(); return; }
+  try {
+    AU.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const len = AU.ctx.sampleRate * 1; const buf = AU.ctx.createBuffer(1, len, AU.ctx.sampleRate); const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    AU.noiseBuf = buf;
+    AU.master = AU.ctx.createGain(); AU.master.gain.value = 0.5; AU.master.connect(AU.ctx.destination);
+  } catch (e) { AU.ctx = null; }
+}
+function tone(type, f0, f1, dur, vol, delay) {
+  const c = AU.ctx; if (!c || AU.muted) return;
+  const t = c.currentTime + (delay || 0);
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(AU.master); o.start(t); o.stop(t + dur + 0.05);
+}
+function noise(dur, freq, q, vol, delay, type) {
+  const c = AU.ctx; if (!c || AU.muted) return;
+  const t = c.currentTime + (delay || 0);
+  const s = c.createBufferSource(); s.buffer = AU.noiseBuf;
+  const f = c.createBiquadFilter(); f.type = type || 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+  const g = c.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(AU.master); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05);
+}
+let lastSay = 0;
+function playSfx(name, arg) {
+  if (AU.muted || G.role === 'none') return;
+  switch (name) {
+    case 'thud': tone('sine', 160, 50, 0.18, 0.5); noise(0.08, 400, 1, 0.3); break;
+    case 'whoosh': noise(0.18, 1200, 0.8, 0.12); break;
+    case 'grab': tone('square', 500, 700, 0.05, 0.06); break;
+    case 'jump': tone('triangle', 300, 600, 0.15, 0.15); break;
+    case 'bonk': tone('square', 900, 200, 0.12, 0.18); tone('sine', 1400, 1350, 0.25, 0.08, 0.05); break;
+    case 'clang': tone('square', 220, 180, 0.4, 0.2); tone('sine', 660, 640, 0.6, 0.12); noise(0.2, 2500, 2, 0.25); break;
+    case 'fall': tone('triangle', 700, 90, 0.9, 0.3); tone('sine', 1200, 300, 0.6, 0.08, 0.1); break;
+    case 'chime': tone('sine', 880, 0, 0.5, 0.25); tone('sine', 698, 0, 0.5, 0.25, 0.32); tone('sine', 587, 0, 0.9, 0.25, 0.64); break;
+    case 'horn': for (const f of [311, 370]) { tone('sawtooth', f, f * 0.98, 0.9, 0.08); } break;
+    case 'brake': noise(1.6, 3200, 8, 0.12); tone('sawtooth', 2400, 1800, 1.5, 0.03); break;
+    case 'screech': noise(0.9, 2800, 10, 0.12); break;
+    case 'crowd': for (let i = 0; i < 6; i++) tone('sawtooth', rnd(160, 320), rnd(140, 300), rnd(0.2, 0.4), 0.03, i * 0.09); noise(1.2, 700, 0.5, 0.08); break;
+    case 'vendor': tone('square', 520, 480, 0.12, 0.05); tone('square', 620, 560, 0.18, 0.05, 0.14); break;
+    case 'win': [523, 659, 784, 1046].forEach((f, i) => tone('triangle', f, 0, 0.3, 0.2, i * 0.13)); break;
+    case 'say':
+      if (!window.speechSynthesis || performance.now() - lastSay < 1500) break;
+      lastSay = performance.now();
+      try { const u = new SpeechSynthesisUtterance(arg); u.lang = 'hi-IN'; u.rate = 1.05; u.pitch = 1; u.volume = 0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+      break;
+  }
+}
+function sfx(name, arg) {
+  if (G.role === 'host') G.sfxQ.push(arg ? [name, arg] : [name]);
+  playSfx(name, arg);
+}
+function clackTick(dt, speed) {
+  if (!AU.ctx || AU.muted || speed < 0.08) return;
+  AU.clackT -= dt;
+  if (AU.clackT <= 0) { AU.clackT = 0.55 / Math.max(0.25, speed); noise(0.05, 900, 2, 0.09); noise(0.05, 700, 2, 0.08, 0.12); }
+}
+
+// ---------- rendering ----------
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let CW = 0, CH = 0, DPR = 1;
+function resize() { DPR = Math.min(2, window.devicePixelRatio || 1); CW = innerWidth; CH = innerHeight; cv.width = CW * DPR; cv.height = CH * DPR; checkRotate(); }
+addEventListener('resize', resize);
+const VX0 = -160, VX1 = W + 160, VY0 = 40, VY1 = 600;
+function hash(i) { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
+function shade(hex, f) { f = f || 0.72; const n = parseInt(hex.slice(1), 16); const r = (n >> 16) * f | 0, g = ((n >> 8) & 255) * f | 0, b = (n & 255) * f | 0; return `rgb(${r},${g},${b})`; }
+function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+let renderTime = 0;
+function draw(S, dt) {
+  renderTime += dt;
+  const scale = Math.min(CW / (VX1 - VX0), CH / (VY1 - VY0));
+  const offX = (CW - (VX1 - VX0) * scale) / 2 - VX0 * scale;
+  const offY = (CH - (VY1 - VY0) * scale) / 2 - VY0 * scale;
+  const vis = {x0: -offX / scale, x1: (CW - offX) / scale, y0: -offY / scale, y1: (CH - offY) / scale};
+  const tr = S.tr;
+  const sh = (S.sh || 0) * (G.role === 'client' ? 0.5 : 1);
+  const shx = (Math.random() - .5) * sh * 0.6, shy = (Math.random() - .5) * sh * 0.6 + Math.sin(renderTime * 31) * 1.2 * tr.sp;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  // sky
+  const sky = ctx.createLinearGradient(0, 0, 0, CH);
+  sky.addColorStop(0, '#ffb36b'); sky.addColorStop(0.55, '#ffd9a0'); sky.addColorStop(1, '#c9a27a');
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, CW, CH);
+  ctx.setTransform(DPR * scale, 0, 0, DPR * scale, DPR * (offX + shx * scale), DPR * (offY + shy * scale));
+
+  drawOutside(S, vis);
+  drawCarriage(S, vis);
+  // khamba (only outside the coach)
+  if (tr.kh !== null && (tr.kh < 4 || tr.kh > W - 4)) {
+    ctx.fillStyle = '#3a3a3a'; ctx.fillRect(tr.kh - 14, CEIL - 120, 28, FLOOR + 160 - CEIL);
+    ctx.fillStyle = '#ffcc00'; for (let y = CEIL - 100; y < FLOOR + 30; y += 60) ctx.fillRect(tr.kh - 14, y, 28, 22);
+  }
+  // chappals
+  for (const c of S.ch) { ctx.save(); ctx.translate(c[0], c[1]); ctx.rotate(c[2]); ctx.fillStyle = '#2f7de1'; rrect(-12, -4, 24, 7, 3.5); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-3, -3); ctx.lineTo(2, -8); ctx.lineTo(6, -3); ctx.stroke(); ctx.restore(); }
+  // ragdolls: npcs first, then players, me last
+  const me = G.role === 'client' ? NET.myId : 'me';
+  const score = o => (o.k === 'player' ? 1 : 0) + (o.id === me ? 2 : 0);
+  const ord = [...S.r].sort((a, b) => score(a) - score(b));
+  for (const o of ord) drawRag(o, o.id === me);
+  for (const o of ord) drawLabels(o, o.id === me);
+  // door poles in front
+  for (const px of [POLE_L, POLE_R]) { ctx.strokeStyle = '#d8d8d8'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(px, FLOOR - 275); ctx.lineTo(px, FLOOR); ctx.stroke(); ctx.strokeStyle = '#8a8a8a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(px + 2, FLOOR - 275); ctx.lineTo(px + 2, FLOOR); ctx.stroke(); }
+
+  // HUD in screen space
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawHUD(S);
+}
+
+function drawOutside(S, v) {
+  const tr = S.tr, sc = tr.sc;
+  // far buildings
+  const layers = [[0.12, 170, '#c98a6a', 280, 200], [0.3, 120, '#a8665a', 200, 160], [0.6, 90, '#7d4a4a', 140, 110]];
+  for (const [par, P, col, hmax, hmin] of layers) {
+    const off = sc * par;
+    const i0 = Math.floor((v.x0 + off) / P) - 1, i1 = Math.ceil((v.x1 + off) / P) + 1;
+    ctx.fillStyle = col;
+    for (let i = i0; i <= i1; i++) {
+      const bx = i * P - off, h = hmin + hash(i * 3.1 + par) * hmax, w = P * (0.7 + hash(i) * 0.4);
+      ctx.fillRect(bx, FLOOR + 40 - h - 60, w, h + 60);
+      if (par > 0.5) { ctx.fillStyle = '#ffe9a8'; for (let wy = FLOOR - h; wy < FLOOR; wy += 26) for (let wx = bx + 8; wx < bx + w - 10; wx += 20) if (hash(wx * 0.1 + wy) > 0.5) ctx.fillRect(wx, wy, 9, 12); ctx.fillStyle = col; }
+      if (par < 0.2 && hash(i + 9) > 0.7) { ctx.fillRect(bx + w / 2 - 3, FLOOR - h - 120, 6, 60); }
+    }
+  }
+  // ground + tracks
+  ctx.fillStyle = '#6b5a4a'; ctx.fillRect(v.x0, FLOOR + 40, v.x1 - v.x0, v.y1 - FLOOR);
+  ctx.fillStyle = '#4a3c30'; const so = (sc * 1.0) % 40;
+  for (let x = v.x0 - so; x < v.x1; x += 40) ctx.fillRect(x, FLOOR + 90, 22, 10);
+  ctx.fillStyle = '#9aa0a6'; ctx.fillRect(v.x0, FLOOR + 86, v.x1 - v.x0, 4);
+  // overhead wires + poles
+  ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(v.x0, CEIL - 70); ctx.lineTo(v.x1, CEIL - 70); ctx.moveTo(v.x0, CEIL - 50); ctx.lineTo(v.x1, CEIL - 50); ctx.stroke();
+  const po = (sc * 0.9) % 520;
+  ctx.fillStyle = '#555';
+  for (let x = v.x0 - po; x < v.x1 + 520; x += 520) { ctx.fillRect(x, CEIL - 90, 9, FLOOR + 130 - CEIL); ctx.fillRect(x - 30, CEIL - 72, 60, 5); }
+  // station scene
+  if (tr.ss !== null && tr.ss > v.x0 - 1800 && tr.ss < v.x1 + 1800) {
+    const sx = tr.ss;
+    // platform shelter roof
+    ctx.fillStyle = '#5c6b73'; ctx.fillRect(sx - 1700, CEIL - 110, 3400, 22);
+    for (let x = sx - 1650; x < sx + 1700; x += 300) { ctx.fillStyle = '#4a565c'; ctx.fillRect(x, CEIL - 90, 10, FLOOR - CEIL + 90); }
+    // crowd silhouettes behind
+    for (let i = 0; i < 70; i++) {
+      const cx = sx - 1600 + i * 47 + hash(i) * 20, cy = FLOOR - 95 + hash(i + 5) * 14;
+      ctx.fillStyle = ['#3d2b3d','#2b3d4a','#4a3b2b','#5a2b3a'][i % 4];
+      ctx.beginPath(); ctx.arc(cx, cy, 12, 0, 7); ctx.fill(); ctx.fillRect(cx - 14, cy + 10, 28, 70);
+    }
+    // platform
+    ctx.fillStyle = '#9d9488'; ctx.fillRect(sx - 1700, FLOOR, 3400, 60);
+    ctx.fillStyle = '#ffd400'; ctx.fillRect(sx - 1700, FLOOR, 3400, 6);
+    // boards
+    for (const bx of [sx, sx - W / 2 - 110, sx + W / 2 + 110]) {
+      ctx.fillStyle = '#222'; ctx.fillRect(bx - 4, CEIL - 88, 8, 60);
+      ctx.fillStyle = '#ffd400'; ctx.strokeStyle = '#111'; ctx.lineWidth = 4; rrect(bx - 120, CEIL - 40, 240, 70, 6); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#111'; ctx.textAlign = 'center'; ctx.font = '800 24px system-ui,sans-serif';
+      ctx.fillText(S.tr.ph === 'accel' || S.tr.ph === 'run' ? prevStation(S.tr.nx) : S.tr.nx, bx, CEIL + 22);
+      ctx.font = '700 18px system-ui,sans-serif'; ctx.fillText(DEVA[S.tr.ph === 'accel' || S.tr.ph === 'run' ? prevStation(S.tr.nx) : S.tr.nx] || '', bx, CEIL - 4);
+    }
+  }
+}
+function prevStation(nx) { const i = STATIONS.indexOf(nx); return STATIONS[(i - 1 + STATIONS.length) % STATIONS.length]; }
+
+function drawCarriage(S, v) {
+  const tr = S.tr;
+  // back wall with windows (evenodd)
+  ctx.beginPath(); ctx.rect(0, CEIL, W, FLOOR - CEIL);
+  const wins = [];
+  for (let x = 110; x < W - 150; x += 200) wins.push(x);
+  for (const x of wins) ctx.rect(x, 205, 140, 120);
+  ctx.fillStyle = '#a9d6b5'; ctx.fill('evenodd');
+  // window bars
+  ctx.strokeStyle = '#6f8f78'; ctx.lineWidth = 3;
+  for (const x of wins) { ctx.strokeRect(x, 205, 140, 120); for (let bx = x + 20; bx < x + 140; bx += 20) { ctx.beginPath(); ctx.moveTo(bx, 205); ctx.lineTo(bx, 325); ctx.stroke(); } }
+  // posters
+  ctx.textAlign = 'center';
+  wins.forEach((x, i) => {
+    if (i === wins.length - 1) return;
+    const p = POSTERS[i % POSTERS.length], px = x + 170, py = 220;
+    ctx.save(); ctx.translate(px, py); ctx.rotate((hash(i) - .5) * 0.12);
+    ctx.fillStyle = i % 2 ? '#fff4b0' : '#ffd1dc'; ctx.fillRect(-24, 0, 48, 64);
+    ctx.fillStyle = '#b00020'; ctx.font = '800 7px system-ui,sans-serif'; wrapText(p[0], 0, 14, 44, 8);
+    ctx.fillStyle = '#222'; ctx.font = '600 6px system-ui,sans-serif'; wrapText(p[1], 0, 38, 44, 7);
+    ctx.fillStyle = '#b00020'; ctx.font = '800 6px system-ui,sans-serif'; ctx.fillText('98XXX XXXXX', 0, 58);
+    ctx.restore();
+  });
+  // seat benches
+  ctx.fillStyle = '#3b6fb6'; ctx.fillRect(90, FLOOR - 120, W - 180, 34); ctx.fillStyle = '#2d568f'; ctx.fillRect(90, FLOOR - 86, W - 180, 10);
+  ctx.fillStyle = '#7a8a90'; for (let x = 110; x < W - 100; x += 240) ctx.fillRect(x, FLOOR - 76, 8, 76);
+  // luggage rack
+  ctx.strokeStyle = '#8a9aa0'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(90, 190); ctx.lineTo(W - 90, 190); ctx.moveTo(90, 182); ctx.lineTo(W - 90, 182); ctx.stroke();
+  for (let i = 0; i < 6; i++) { const bx = 200 + i * 190 + hash(i + 2) * 40; ctx.fillStyle = ['#7b3f00','#1f4e79','#6a1b9a','#2e7d32'][i % 4]; rrect(bx, 160, 50 + hash(i) * 30, 22, 5); ctx.fill(); }
+  // ceiling
+  ctx.fillStyle = '#efe6d2'; ctx.fillRect(-12, CEIL - 72, W + 24, 72);
+  ctx.fillStyle = '#7a1f3d'; ctx.fillRect(-12, CEIL - 72, W + 24, 16);
+  ctx.fillStyle = '#d9cdb3'; ctx.fillRect(0, CEIL - 6, W, 6);
+  // fans
+  for (const fx of [W * 0.25, W * 0.5, W * 0.75]) {
+    ctx.fillStyle = '#555'; ctx.fillRect(fx - 3, CEIL, 6, 18);
+    const a = renderTime * 14;
+    ctx.fillStyle = '#d6d6d6';
+    for (let k = 0; k < 3; k++) { const w = Math.cos(a + k * 2.094) * 40; ctx.beginPath(); ctx.ellipse(fx + w / 2, CEIL + 22, Math.abs(w / 2) + 2, 4, 0, 0, 7); ctx.fill(); }
+    ctx.fillStyle = '#444'; ctx.beginPath(); ctx.arc(fx, CEIL + 22, 7, 0, 7); ctx.fill();
+  }
+  // LED board
+  ctx.fillStyle = '#111'; rrect(W / 2 - 190, CEIL + 6, 380, 32, 5); ctx.fill();
+  ctx.save(); ctx.beginPath(); ctx.rect(W / 2 - 184, CEIL + 8, 368, 28); ctx.clip();
+  ctx.fillStyle = '#ff4d1a'; ctx.font = '700 20px ui-monospace,Consolas,monospace'; ctx.textAlign = 'left';
+  const led = tr.led || '', lw = Math.max(380, led.length * 12.2), lx = W / 2 + 184 - ((renderTime * 90) % (lw + 368));
+  ctx.fillText(led, lx, CEIL + 29); ctx.fillText(led, lx + lw + 368, CEIL + 29);
+  ctx.restore();
+  // strap rail + straps
+  ctx.strokeStyle = '#b8b8b8'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(110, CEIL + 6); ctx.lineTo(W - 110, CEIL + 6); ctx.stroke();
+  for (let i = 0; i < S.s.length; i++) {
+    const ax = 140 + i * 93, s = S.s[i];
+    ctx.strokeStyle = '#3a3a3a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(ax, CEIL + 6); ctx.lineTo(s[0], s[1] - 8); ctx.stroke();
+    ctx.strokeStyle = '#f2f2f2'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(s[0], s[1], 9, 0, 7); ctx.stroke();
+  }
+  // floor + undercarriage
+  ctx.fillStyle = '#5e5e5e'; ctx.fillRect(0, FLOOR, W, 40);
+  ctx.fillStyle = '#4a4a4a'; for (let x = 0; x < W; x += 30) ctx.fillRect(x, FLOOR + 4, 14, 3);
+  ctx.fillStyle = '#7a1f3d'; ctx.fillRect(-12, FLOOR + 26, W + 24, 16);
+  ctx.fillStyle = '#2a2a2a'; ctx.fillRect(60, FLOOR + 42, W - 120, 26);
+  for (const wx of [150, 270, W - 270, W - 150]) {
+    ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(wx, FLOOR + 70, 22, 0, 7); ctx.fill();
+    ctx.strokeStyle = '#888'; ctx.lineWidth = 3; const a = tr.sc / 22;
+    ctx.beginPath(); ctx.moveTo(wx + Math.cos(a) * 18, FLOOR + 70 + Math.sin(a) * 18); ctx.lineTo(wx - Math.cos(a) * 18, FLOOR + 70 - Math.sin(a) * 18); ctx.stroke();
+  }
+  // door frames
+  for (const dx of [0, W]) {
+    ctx.fillStyle = '#7a1f3d'; ctx.fillRect(dx - 10, CEIL - 72, 20, 62);
+    ctx.fillStyle = '#3b3b3b'; ctx.fillRect(dx - 10, FLOOR, 20, 42);
+  }
+  // door labels
+  ctx.fillStyle = '#fff'; ctx.font = '800 11px system-ui,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('DARWAZA', 60, CEIL + 50); ctx.fillText('DARWAZA', W - 60, CEIL + 50);
+}
+function wrapText(t, x, y, mw, lh) { const words = t.split(' '); let line = ''; for (const w of words) { const tt = line ? line + ' ' + w : w; if (ctx.measureText(tt).width > mw && line) { ctx.fillText(line, x, y); line = w; y += lh; } else line = tt; } ctx.fillText(line, x, y); }
+
+const PL = [0, 50, 26, 24, 26, 24, 30, 28, 30, 28];
+function drawRag(o, isMe) {
+  const p = o.p;
+  const Q = i => ({x: p[i * 3], y: p[i * 3 + 1], a: p[i * 3 + 2] / 100});
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const seg = (i, col, w) => {
+    const q = Q(i), h = PL[i] / 2, sx = Math.sin(q.a) * h, cy = Math.cos(q.a) * h;
+    ctx.beginPath(); ctx.moveTo(q.x + sx, q.y - cy); ctx.lineTo(q.x - sx, q.y + cy);
+    ctx.strokeStyle = '#1e120c'; ctx.lineWidth = w + 4; ctx.stroke();
+    ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke();
+    return {x: q.x - sx, y: q.y + cy, a: q.a};
+  };
+  const foot = (e, col) => { ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.a); ctx.fillStyle = col; ctx.strokeStyle = '#1e120c'; ctx.lineWidth = 2; rrect(-8 + o.d * 3, -3, 16, 7, 3); ctx.fill(); ctx.stroke(); ctx.restore(); };
+  const hand = (e, col) => { ctx.fillStyle = col; ctx.strokeStyle = '#1e120c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(e.x, e.y, 5.5, 0, 7); ctx.fill(); ctx.stroke(); };
+  const sk = o.sk, skD = shade(sk, 0.8), sh = o.c, shD = shade(sh), pc = o.pc, pcD = shade(pc);
+  const sleeve = o.k === 'aunty' ? sk : sh;
+  // back limbs
+  seg(2, o.k === 'aunty' ? skD : shD, 9); hand(seg(3, skD, 8), skD);
+  seg(6, pcD, 12); foot(seg(7, pcD, 10), o.k === 'dabba' ? '#6b4b2a' : '#26303a');
+  // torso
+  const t = Q(1);
+  seg(1, sh, 26);
+  if (o.k === 'aunty') { // saree pallu
+    ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.a); ctx.strokeStyle = '#ffd400'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-10 * o.d, -22); ctx.lineTo(10 * o.d, 20); ctx.stroke(); ctx.restore();
+  } else if (o.k === 'student') { // backpack
+    ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.a); ctx.fillStyle = '#d64545'; ctx.strokeStyle = '#1e120c'; ctx.lineWidth = 2; rrect(-o.d * 26 - 9, -18, 18, 32, 6); ctx.fill(); ctx.stroke(); ctx.restore();
+  } else if (o.k === 'player') { // tiffin bag strap
+    ctx.save(); ctx.translate(t.x, t.y); ctx.rotate(t.a); ctx.strokeStyle = '#4a2f1a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-9, -22); ctx.lineTo(9, 18); ctx.stroke(); ctx.restore();
+  }
+  // front legs
+  seg(8, pc, 12); foot(seg(9, pc, 10), o.k === 'dabba' ? '#6b4b2a' : '#3a4654');
+  // head
+  drawHead(o, Q(0));
+  // front arm
+  seg(4, sleeve, 9); hand(seg(5, sk, 8), sk);
+  if (isMe && !o.o) { const h = Q(0); ctx.fillStyle = '#ffe14d'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(h.x - 8, h.y - 62); ctx.lineTo(h.x + 8, h.y - 62); ctx.lineTo(h.x, h.y - 52); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+}
+
+function drawHead(o, h) {
+  const d = o.d;
+  ctx.save(); ctx.translate(h.x, h.y); ctx.rotate(h.a);
+  // hair back
+  if (o.k === 'aunty') { ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.arc(-d * 13, -5, 8, 0, 7); ctx.fill(); }
+  ctx.fillStyle = o.sk; ctx.strokeStyle = '#1e120c'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(0, 0, 15, 0, 7); ctx.fill(); ctx.stroke();
+  // hair
+  ctx.fillStyle = '#1a1a1a';
+  if (o.k === 'uncle') { ctx.beginPath(); ctx.arc(-d * 10, -2, 6, 0, 7); ctx.fill(); }
+  else if (o.k === 'dabba') { ctx.fillStyle = '#fafafa'; ctx.strokeStyle = '#1e120c'; ctx.beginPath(); ctx.moveTo(-14, -8); ctx.lineTo(14, -8); ctx.lineTo(10, -22); ctx.lineTo(-10, -22); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+  else { ctx.beginPath(); ctx.arc(0, -3, 15.5, Math.PI * 1.05, Math.PI * 1.95); ctx.lineTo(d * 4, -10); ctx.closePath(); ctx.fill(); }
+  // eyes
+  const ex1 = d * 4, ex2 = d * 11, ey = -2;
+  if (o.o) {
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+    for (const ex of [ex1, ex2]) { ctx.beginPath(); ctx.moveTo(ex - 3, ey - 3); ctx.lineTo(ex + 3, ey + 3); ctx.moveTo(ex + 3, ey - 3); ctx.lineTo(ex - 3, ey + 3); ctx.stroke(); }
+  } else if (o.st) {
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5;
+    for (const ex of [ex1, ex2]) { ctx.beginPath(); for (let k = 0; k < 14; k++) { const a = k * 0.9 + renderTime * 8, rr = k * 0.32; ctx.lineTo(ex + Math.cos(a) * rr, ey + Math.sin(a) * rr); } ctx.stroke(); }
+  } else {
+    const blink = (Math.sin(renderTime * 1.3 + o.p[0] * 0.01) > 0.985);
+    for (const ex of [ex1, ex2]) {
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(ex, ey, 4, blink ? 0.8 : 4.5, 0, 0, 7); ctx.fill();
+      if (!blink) { ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(ex + d * 1.5, ey, 2, 0, 7); ctx.fill(); }
+    }
+  }
+  if (o.ac === 1 && o.k === 'player') { ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.strokeRect(ex1 - 4, ey - 4, 8, 8); ctx.strokeRect(ex2 - 4, ey - 4, 8, 8); }
+  // mustache
+  if (o.k === 'uncle' || (o.k === 'player' && o.ac === 2) || o.k === 'vendor') { ctx.fillStyle = '#1a1a1a'; ctx.beginPath(); ctx.ellipse(d * 8, 5, 6, 2.5, 0, 0, 7); ctx.fill(); }
+  // mouth
+  ctx.fillStyle = '#5a1010';
+  if (o.o || o.st || o.b) { ctx.beginPath(); ctx.ellipse(d * 8, 9, 3.5, o.o ? 5 : 4, 0, 0, 7); ctx.fill(); }
+  else { ctx.strokeStyle = '#5a1010'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.arc(d * 8, 6, 4, 0.3, Math.PI - 0.3); ctx.stroke(); }
+  // cap / headphones / vendor tray
+  if (o.k === 'player' && o.ac === 3) { ctx.fillStyle = '#e63946'; ctx.beginPath(); ctx.arc(0, -6, 15, Math.PI, 0); ctx.fill(); ctx.fillRect(-d * 24, -8, 14, 4); }
+  if (o.k === 'player' && o.ac === 4) { ctx.strokeStyle = '#222'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 17, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); ctx.fillStyle = '#222'; ctx.fillRect(-4, -4, 8, 10); }
+  if (o.k === 'vendor') { ctx.fillStyle = '#a0522d'; ctx.strokeStyle = '#1e120c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(0, -18, 26, 6, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#e9b44c'; ctx.beginPath(); ctx.arc(-8, -24, 6, 0, 7); ctx.arc(4, -25, 7, 0, 7); ctx.arc(14, -22, 5, 0, 7); ctx.fill(); }
+  if (o.k === 'dabba') { ctx.fillStyle = '#c0392b'; ctx.fillRect(-18, -40, 36, 16); ctx.fillStyle = '#f1c40f'; ctx.fillRect(-14, -36, 8, 8); ctx.fillRect(-2, -36, 8, 8); ctx.fillRect(10, -36, 6, 8); }
+  ctx.restore();
+  // stars
+  if (o.sr && !o.o) { ctx.fillStyle = '#ffe14d'; for (let k = 0; k < 3; k++) { const a = renderTime * 5 + k * 2.1; star(h.x + Math.cos(a) * 20, h.y - 20 + Math.sin(a) * 6, 5); } }
+}
+function star(x, y, r) { ctx.beginPath(); for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * 0.45 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } ctx.closePath(); ctx.fill(); }
+
+function drawLabels(o, isMe) {
+  const hx = o.p[0], hy = o.p[1];
+  ctx.textAlign = 'center';
+  ctx.font = (isMe ? '800 15px' : '700 13px') + ' system-ui,sans-serif';
+  ctx.lineWidth = 4; ctx.strokeStyle = '#000c';
+  const ny = hy - (o.k === 'dabba' || o.k === 'vendor' ? 50 : 26);
+  if (o.k === 'player' || o.k === 'vendor') { ctx.strokeText(o.n, hx, ny); ctx.fillStyle = isMe ? '#ffe14d' : (o.k === 'vendor' ? '#ffb347' : '#fff'); ctx.fillText(o.n, hx, ny); }
+  if (o.b) {
+    ctx.font = '700 14px system-ui,sans-serif';
+    const tw = ctx.measureText(o.b).width + 16, by = ny - 34;
+    let bx = clamp(hx, VX0 + tw / 2, VX1 - tw / 2);
+    ctx.fillStyle = o.k === 'player' ? '#fff' : '#fff4c9'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2;
+    rrect(bx - tw / 2, by - 14, tw, 26, 10); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hx - 5, by + 12); ctx.lineTo(hx, by + 20); ctx.lineTo(hx + 5, by + 12); ctx.fill();
+    ctx.fillStyle = '#111'; ctx.fillText(o.b, bx, by + 4);
+  }
+}
+
+function drawHUD(S) {
+  const s = Math.min(1.25, Math.max(0.7, Math.min(CW, CH * 1.8) / 800));
+  ctx.textAlign = 'left';
+  // top-left pill
+  ctx.font = `800 ${15 * s}px system-ui,sans-serif`;
+  const t1 = `🚉 ${S.tr.ph === 'stop' ? 'Station: ' : 'Agla: '}${S.tr.ph === 'stop' ? S.tr.nx : S.tr.nx}`;
+  const t2 = `🧍 Andar: ${S.al}/${S.tot}`;
+  const w = Math.max(ctx.measureText(t1).width, ctx.measureText(t2).width) + 20 * s;
+  ctx.fillStyle = 'rgba(20,8,18,.7)'; rrect(10, 8, w, 48 * s, 10); ctx.fill();
+  ctx.fillStyle = '#ffcc00'; ctx.fillText(t1, 20 * s, 8 + 20 * s); ctx.fillStyle = '#fff'; ctx.fillText(t2, 20 * s, 8 + 40 * s);
+  // feed
+  ctx.font = `600 ${12 * s}px system-ui,sans-serif`; ctx.textAlign = 'right';
+  S.fe.forEach((f, i) => { const y = 60 * s + i * 18 * s, tw = ctx.measureText(f).width; ctx.fillStyle = 'rgba(20,8,18,.6)'; ctx.fillRect(CW - tw - 22, y - 13 * s, tw + 14, 17 * s); ctx.fillStyle = '#fff'; ctx.fillText(f, CW - 14, y); });
+  // banner
+  if (S.bn) {
+    ctx.textAlign = 'center'; ctx.font = `900 ${18 * s}px system-ui,sans-serif`;
+    const tw = ctx.measureText(S.bn).width + 30;
+    const y = 66 * s + (S.fe.length ? S.fe.length * 18 * s : 0) * 0;
+    ctx.fillStyle = '#ffcc00'; ctx.strokeStyle = '#000'; ctx.lineWidth = 3; rrect(CW / 2 - tw / 2, y - 22 * s, tw, 32 * s, 10); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#2a1300'; ctx.fillText(S.bn, CW / 2, y);
+  }
+  // big text
+  if (S.bg) {
+    const [a, b, tt] = S.bg;
+    const pop = Math.min(1, (2.4 - Math.min(2.4, 2.4 - (tt > 2.2 ? (2.4 - tt) * 5 : 1) )));
+    const sz = Math.min(CW / 14, 50) * (tt > 2.0 && !S.res ? 1 + (tt - 2.0) * 0.8 : 1);
+    ctx.textAlign = 'center'; ctx.font = `900 ${sz}px system-ui,sans-serif`;
+    ctx.lineWidth = 8; ctx.strokeStyle = '#000'; ctx.fillStyle = '#ffcc00';
+    const y = CH * 0.33;
+    ctx.save(); ctx.translate(CW / 2, y); ctx.rotate(-0.04); ctx.strokeText(a, 0, 0); ctx.fillText(a, 0, 0);
+    ctx.font = `800 ${sz * 0.36}px system-ui,sans-serif`; ctx.lineWidth = 5; ctx.fillStyle = '#fff'; ctx.strokeText(b, 0, sz * 0.62); ctx.fillText(b, 0, sz * 0.62); ctx.restore();
+  }
+  // result table
+  if (S.res && S.res.t > 1.5) {
+    const rows = S.res.sc.slice(0, 8);
+    const bw = Math.min(340, CW - 40), rh = 22 * s, bh = rows.length * rh + 44 * s;
+    const bx = CW / 2 - bw / 2, by = CH * 0.52;
+    ctx.fillStyle = 'rgba(20,8,18,.85)'; ctx.strokeStyle = '#ffcc00'; ctx.lineWidth = 3; rrect(bx, by, bw, bh, 12); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#ffcc00'; ctx.textAlign = 'center'; ctx.font = `800 ${14 * s}px system-ui,sans-serif`; ctx.fillText('Seat jeetne wale (wins)  ·  next round in ' + Math.max(0, Math.ceil(6.5 - S.res.t)), CW / 2, by + 20 * s);
+    rows.forEach((r, i) => { ctx.textAlign = 'left'; ctx.fillStyle = r[0] === S.res.w ? '#ffe14d' : '#fff'; ctx.font = `700 ${14 * s}px system-ui,sans-serif`; ctx.fillText((i + 1) + '. ' + r[0] + (r[2] ? ' 🤖' : ''), bx + 16, by + 40 * s + i * rh); ctx.textAlign = 'right'; ctx.fillText('🏆 ' + r[1], bx + bw - 16, by + 40 * s + i * rh); });
+  }
+  if (G.role === 'client' && NET.lastSnapAt && performance.now() - NET.lastSnapAt > 3000) {
+    ctx.textAlign = 'center'; ctx.font = '800 18px system-ui,sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText('Signal weak hai... reconnecting 📶', CW / 2, CH - 20);
+  }
+}
+
+// ---------- network (PeerJS, host-authoritative) ----------
+const NET = {peer: null, conns: [], host: null, code: '', myId: null, snaps: [], lastSnapAt: 0, lastInput: '', inputT: 0};
+function randCode() { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ'; let s = ''; for (let i = 0; i < 4; i++) s += A[Math.random() * A.length | 0]; return s; }
+function msg(t) { document.getElementById('msg').textContent = t || ''; }
+function myName() { const n = (document.getElementById('name').value || '').trim().slice(0, 12); return n || pick(['Rahul','Priya','Aditya','Sneha','Vikram','Neha']) ; }
+function netReady() {
+  if (typeof Peer === 'undefined' || typeof RTCPeerConnection === 'undefined' || /claude|anthropic/.test(location.hostname)) { msg('Online rooms need the hosted version of the game. Practice vs bots works here!'); return false; }
+  return true;
+}
+function netTimeout() { setTimeout(() => { if (G.role !== 'host' && G.role !== 'client' && NET.peer && !NET.peer.open) msg('Online server se connect nahi hua. Network check karo, ya Practice khelo.'); }, 9000); }
+
+function hostRoom() {
+  if (!netReady()) return;
+  audioInit();
+  const code = randCode();
+  msg('Room bana rahe hain...'); netTimeout();
+  const peer = new Peer(PEER_PREFIX + code, {debug: 0});
+  NET.peer = peer; NET.code = code;
+  peer.on('open', () => {
+    G.role = 'host';
+    G.roster = [{id: 'me', name: myName(), isBot: false, ctrl: makeCtrl(), wins: 0}];
+    G.myId = 'me';
+    showLobby(code, true); updateLobby(); msg('');
+  });
+  peer.on('error', e => {
+    if (e.type === 'unavailable-id') { peer.destroy(); hostRoom(); return; }
+    msg('Connection error: ' + (e.type || e.message));
+  });
+  peer.on('connection', conn => {
+    conn.on('data', d => onHostData(conn, d));
+    conn.on('close', () => onConnClose(conn));
+    conn.on('error', () => onConnClose(conn));
+  });
+}
+function onHostData(conn, d) {
+  if (!d || typeof d !== 'object') return;
+  if (d.t === 'join') {
+    if (G.roster.filter(p => !p.isBot).length >= 8) { conn.send({t: 'full'}); return; }
+    if (!NET.conns.includes(conn)) NET.conns.push(conn);
+    const name = String(d.name || 'Guest').slice(0, 12);
+    const existingBot = G.running ? null : null;
+    G.roster.push({id: conn.peer, name, isBot: false, ctrl: makeCtrl(), wins: 0, conn, alive: false});
+    conn.send({t: 'welcome', id: conn.peer, code: NET.code});
+    if (G.running) { conn.send({t: 'go'}); G.feed.push({text: '🚶 ' + name + ' dabbe mein aaya (next round)', t: 4}); }
+    updateLobby();
+  } else if (d.t === 'in') {
+    const p = G.roster.find(p => p.id === conn.peer);
+    if (p && d.c) { const c = p.ctrl; c.l = !!d.c[0]; c.r = !!d.c[1]; c.jump = !!d.c[2]; c.push = !!d.c[3]; c.grab = !!d.c[4]; }
+  }
+}
+function onConnClose(conn) {
+  NET.conns = NET.conns.filter(c => c !== conn);
+  const p = G.roster.find(p => p.id === conn.peer);
+  if (p) {
+    if (G.running) { p.isBot = true; p.skill = 0.5; p.name += ' (bot)'; if (p.rag) p.rag.name = p.name; G.feed.push({text: p.name.replace(' (bot)', '') + ' ka network gaya. Bot sambhalega.', t: 4}); }
+    else G.roster = G.roster.filter(x => x !== p);
+  }
+  updateLobby();
+}
+function lobbyList() { return G.roster.filter(p => !p.isBot).map(p => p.name); }
+function updateLobby() {
+  if (G.role !== 'host') return;
+  const names = lobbyList();
+  renderLobby(names);
+  for (const c of NET.conns) if (c.open) c.send({t: 'lobby', names, code: NET.code});
+}
+function netBroadcast() {
+  if (!NET.conns.length) { G.sfxQ = []; return; }
+  const s = getState(); s.fx = G.sfxQ; G.sfxQ = [];
+  const msgS = {t: 'snap', s};
+  for (const c of NET.conns) if (c.open) { try { c.send(msgS); } catch (e) {} }
+}
+
+function joinRoom() {
+  if (!netReady()) return;
+  audioInit();
+  const code = (document.getElementById('code').value || '').trim().toUpperCase();
+  if (code.length !== 4) { msg('4-letter room code daalo'); return; }
+  msg('Dabbe mein ghus rahe hain...'); netTimeout();
+  const peer = new Peer(undefined, {debug: 0});
+  NET.peer = peer;
+  peer.on('open', () => {
+    const conn = peer.connect(PEER_PREFIX + code, {serialization: 'json', reliable: true});
+    NET.host = conn;
+    const to = setTimeout(() => { if (!conn.open) msg('Room nahi mila. Code check karo.'); }, 8000);
+    conn.on('open', () => { clearTimeout(to); conn.send({t: 'join', name: myName()}); });
+    conn.on('data', onClientData);
+    conn.on('close', () => { if (G.role === 'client') { alertBack('Host chala gaya. Train cancel. 😢'); } });
+  });
+  peer.on('error', e => msg(e.type === 'peer-unavailable' ? 'Room nahi mila. Code check karo.' : 'Connection error: ' + (e.type || e.message)));
+}
+function onClientData(d) {
+  if (!d || typeof d !== 'object') return;
+  if (d.t === 'welcome') { G.role = 'client'; NET.myId = d.id; NET.code = d.code; showLobby(d.code, false); msg(''); }
+  else if (d.t === 'full') { msg('Dabba full hai (8 log). Agli train pakdo.'); }
+  else if (d.t === 'lobby') { renderLobby(d.names); }
+  else if (d.t === 'go') { enterGame(); }
+  else if (d.t === 'snap') {
+    if (!G.running) enterGame();
+    NET.snaps.push({s: d.s, at: performance.now()}); if (NET.snaps.length > 3) NET.snaps.shift();
+    NET.lastSnapAt = performance.now();
+    if (d.s.fx) for (const f of d.s.fx) playSfx(f[0], f[1]);
+  }
+}
+function clientSendInput(dt) {
+  if (!NET.host || !NET.host.open) return;
+  const c = LOCAL_CTRL, arr = [c.l, c.r, c.jump, c.push, c.grab].map(v => v ? 1 : 0), key = arr.join('');
+  NET.inputT -= dt;
+  if (key !== NET.lastInput || NET.inputT <= 0) { NET.lastInput = key; NET.inputT = 0.25; try { NET.host.send({t: 'in', c: arr}); } catch (e) {} }
+}
+function interpState() {
+  const n = NET.snaps.length; if (!n) return null;
+  const cur = NET.snaps[n - 1];
+  if (n < 2) return cur.s;
+  const prev = NET.snaps[n - 2];
+  const span = Math.max(16, cur.at - prev.at);
+  const k = clamp((performance.now() - cur.at) / span, 0, 1);
+  const pm = new Map(prev.s.r.map(r => [r.id, r]));
+  const out = Object.assign({}, cur.s);
+  out.r = cur.s.r.map(r => {
+    const q = pm.get(r.id); if (!q || q.p.length !== r.p.length) return r;
+    const p = r.p.map((v, i) => (i % 3 === 2) ? q.p[i] + wrap((v - q.p[i]) / 100) * 100 * k : q.p[i] + (v - q.p[i]) * k);
+    return Object.assign({}, r, {p});
+  });
+  out.s = cur.s.s.map((s, i) => { const q = prev.s.s[i]; return q ? [q[0] + (s[0] - q[0]) * k, q[1] + (s[1] - q[1]) * k] : s; });
+  return out;
+}
+
+// ---------- UI ----------
+const $ = id => document.getElementById(id);
+function showLobby(code, isHost) {
+  $('menu').classList.add('hidden'); $('lobby').classList.remove('hidden');
+  $('lcode').textContent = code;
+  $('bStart').classList.toggle('hidden', !isHost);
+  $('lhint').textContent = isHost ? 'Share this code with friends. Empty spots get bots. 2 to 8 humans.' : 'Host train chalayega. Wait karo...';
+}
+function renderLobby(names) {
+  $('plist').innerHTML = '';
+  names.forEach((n, i) => { const li = document.createElement('li'); li.textContent = (i === 0 ? '👑 ' : '🧍 ') + n; $('plist').appendChild(li); });
+  const bots = Math.max(0, 6 - names.length);
+  if (bots) { const li = document.createElement('li'); li.style.opacity = .7; li.textContent = '🤖 + ' + bots + ' bots'; $('plist').appendChild(li); }
+}
+function enterGame() {
+  $('menu').classList.add('hidden'); $('lobby').classList.add('hidden');
+  $('controls').classList.remove('hidden'); $('topbtns').classList.remove('hidden');
+  G.running = true;
+  try { if (document.documentElement.requestFullscreen && matchMedia('(pointer:coarse)').matches) document.documentElement.requestFullscreen().then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape').catch(() => {})).catch(() => {}); } catch (e) {}
+  checkRotate();
+}
+function startLocal() {
+  audioInit();
+  G.role = 'local';
+  G.roster = [{id: 'me', name: myName(), isBot: false, ctrl: LOCAL_CTRL, wins: 0}];
+  fillBots(6);
+  G.round = 0; startRound(); enterGame();
+}
+function hostStart() {
+  for (const p of G.roster) if (p.id === 'me') p.ctrl = LOCAL_CTRL;
+  G.roster = G.roster.filter(p => !p.isBot);
+  fillBots(Math.max(6, G.roster.length));
+  startRound();
+  for (const c of NET.conns) if (c.open) c.send({t: 'go'});
+  enterGame();
+}
+function quit() {
+  try { if (NET.peer) NET.peer.destroy(); } catch (e) {}
+  NET.peer = null; NET.conns = []; NET.host = null; NET.snaps = [];
+  G.running = false; G.role = 'none';
+  $('controls').classList.add('hidden'); $('topbtns').classList.add('hidden'); $('lobby').classList.add('hidden'); $('menu').classList.remove('hidden');
+  $('rotate').classList.add('hidden');
+}
+function alertBack(t) { quit(); msg(t); }
+let rotDismissed = false;
+function checkRotate() { const show = G.running && !rotDismissed && innerHeight > innerWidth * 1.05 && matchMedia('(pointer:coarse)').matches; $('rotate').classList.toggle('hidden', !show); }
+$('bRotOk').onclick = () => { rotDismissed = true; checkRotate(); };
+$('bPractice').onclick = startLocal;
+$('bHost').onclick = hostRoom;
+$('bJoin').onclick = joinRoom;
+$('bStart').onclick = hostStart;
+$('bLeave').onclick = quit;
+$('bQuit').onclick = quit;
+$('bMute').onclick = () => { AU.muted = !AU.muted; $('bMute').textContent = AU.muted ? '🔇' : '🔊'; if (AU.muted && window.speechSynthesis) speechSynthesis.cancel(); };
+try { $('name').value = localStorage.getItem('dl_name') || ''; } catch (e) {}
+$('name').addEventListener('change', () => { try { localStorage.setItem('dl_name', $('name').value); } catch (e) {} });
+const qs = new URLSearchParams(location.search); if (qs.get('room')) $('code').value = qs.get('room').toUpperCase().slice(0, 4);
+
+// input
+const LOCAL_CTRL = makeCtrl();
+const KEYMAP = {ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'jump', KeyW: 'jump', Space: 'jump', KeyJ: 'push', KeyF: 'push', KeyK: 'grab', ShiftLeft: 'grab', KeyG: 'grab'};
+addEventListener('keydown', e => { const k = KEYMAP[e.code]; if (k && G.running) { LOCAL_CTRL[k] = true; e.preventDefault(); } });
+addEventListener('keyup', e => { const k = KEYMAP[e.code]; if (k) LOCAL_CTRL[k] = false; });
+addEventListener('blur', () => { for (const k in LOCAL_CTRL) LOCAL_CTRL[k] = false; });
+document.querySelectorAll('.cbtn').forEach(el => {
+  const k = el.dataset.k;
+  const on = e => { e.preventDefault(); audioInit(); LOCAL_CTRL[k] = true; el.classList.add('on'); if (navigator.vibrate && k === 'push') navigator.vibrate(15); };
+  const off = e => { e.preventDefault(); LOCAL_CTRL[k] = false; el.classList.remove('on'); };
+  el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointercancel', off); el.addEventListener('pointerleave', off);
+});
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// ---------- main loop ----------
+let lastT = performance.now(), acc = 0, menuDemo = null;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
+  let S = null;
+  if (G.running && G.role !== 'client') {
+    G.slowT -= dt; engine.timing.timeScale = G.slowT > 0 ? 0.3 : 1;
+    G.shake *= Math.pow(0.02, dt);
+    acc += dt * 1000; let n = 0;
+    while (acc >= STEP && n < 4) { step(); acc -= STEP; n++; }
+    if (n === 4) acc = 0;
+    S = getState();
+  } else if (G.running && G.role === 'client') {
+    clientSendInput(dt);
+    S = interpState();
+  } else {
+    // menu backdrop: idle train
+    if (!menuDemo) { menuDemo = true; G.role = 'none'; G.roster = []; for (let i = 0; i < 5; i++) G.roster.push({id: 'd' + i, name: BOT_NAMES[i], isBot: true, ctrl: makeCtrl(), wins: 0, skill: 0.6}); startRound(); G.big = null; G.banner = null; }
+    if (G.role === 'none' && engine) { engine.timing.timeScale = 1; acc += dt * 1000; let n = 0; while (acc >= STEP && n < 3) { step(); acc -= STEP; n++; } if (n === 3) acc = 0; G.big = null; G.banner = null; G.feed = []; G.sfxQ = []; S = getState(); }
+  }
+  if (S) { draw(S, dt); clackTick(dt, S.tr.sp); }
+}
+resize();
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
