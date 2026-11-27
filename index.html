@@ -2480,6 +2480,7 @@ function hostData(conn, d) {
     if (GAME.state === 'play') {
       const back = tok && GAME.roster.find(p => p.tok === tok);
       if (back) { Object.assign(back, {id, isRemote: true, isBot: false}); if (!back.netCtrl) back.netCtrl = back.ctrl || makeCtrl(); pe.p = back; pe.name = back.name; conn.send({t: 'go'}); feed('🔌 ' + back.name + ' is back!'); }
+      else if (dropIn(pe)) { conn.send({t: 'go', late: pe.took}); feed('🚶 ' + pe.name + ' jumped in for ' + pe.took + '!'); sfx('ui'); }
       else { conn.send({t: 'go', spect: true}); feed('🚶 ' + pe.name + ' joined. They play next match.'); }
       NET.lastSp = ''; NET.lastR = '';
     }
@@ -2568,6 +2569,24 @@ function hostStart() {
   for (const h of humans()) try { h.conn.send({t: 'go'}); } catch (e) {}
   enterPlayUI(); startRound();
 }
+// Drop-in: a friend joining mid-match takes over a bot right away, body and all, like joining a skribbl room.
+// Their score starts at 0 from here; their own outfit shows from the next round.
+function dropIn(pe) {
+  if (GAME.phase === 'podium') return false;
+  const ids = NET_IDS(), free = GAME.roster.filter(p => p.isBot && !p.isMe && !ids.has(p.id));
+  // prefer a pure bot that is still in the train, then any pure bot, then a seat kept for someone who dropped
+  const bot = free.find(p => !p.tok && p.alive && p.ch && !p.ch.out) || free.find(p => !p.tok) || free[0];
+  if (!bot) return false;
+  pe.took = bot.name;
+  const keep = {ch: bot.ch, alive: bot.alive, idx: bot.idx, acc: bot.acc, aim: bot.aim, revCd: bot.revCd, peelCd: bot.peelCd};
+  const ctrl = (bot.ch && bot.ch.ctrl) || bot.ctrl || makeCtrl(); ctrl.mx = ctrl.mz = 0; ctrl.push = ctrl.jump = ctrl.grab = false;
+  const fresh = newPlayer({}, keep.idx);
+  Object.assign(bot, {wins: 0, score: 0, rs: [], seatT: 0, stats: fresh.stats, target: null, think: 0}, keep, {id: pe.id, tok: pe.tok, name: pe.name, look: pe.look, isBot: false, isRemote: true, netCtrl: ctrl, ctrl, late: true});
+  const ch = bot.ch;
+  if (ch) { ch.id = pe.id; ch.name = pe.name; ch.isBot = false; ch.basePower = 1; ch.target = null; if (ch.el) { const nm = ch.el.querySelector('.nm'); if (nm) nm.textContent = pe.name; } }
+  pe.p = bot;
+  return true;
+}
 // people who joined during a match take over a bot's seat when the next match starts
 function netSeatWaiting() {
   for (const h of humans()) {
@@ -2600,7 +2619,7 @@ function hostSnapshot() {
     return [ch.cid, fl, r2(ch.stun), ch.charging ? r2(ch.charge) : -1, r2(ch.grip), r2(ch.yaw), FACES.indexOf(ch.face), ch.bubble ? ch.bubble.text : 0];
   });
   const m = {ht: Math.round(performance.now()), st};
-  const spKey = list.map(c => c.cid).join(',');
+  const spKey = list.map(c => c.cid + (c.name || '')).join(',');
   if (full || spKey !== NET.lastSp) { NET.lastSp = spKey; m.sp = list.map(ch => { const p = rosterOf(ch); return [ch.cid, ch.kind, ch.name, ch.color, ch.pants, ch.skin, ch.acc, ch.heavy ? 1 : 0, ch.isNpc ? 1 : 0, p ? p.id : '', ch.look || 0]; }); }
   const R = GAME.roster.map(p => [p.id, p.name, p.idx, p.alive ? 1 : 0, p.score, p.wins, Math.round(p.seatT * 10) / 10, p.isBot ? 1 : 0, p.ch && !p.ch.removed ? p.ch.cid : 0, p.rs, p.stats, p.acc]);
   const rk = JSON.stringify(R); if (full || rk !== NET.lastR) { NET.lastR = rk; m.R = R; }
@@ -2676,7 +2695,7 @@ function clientData(d) {
   else if (d.t === 'closed') { NET.host = null; netAbort('The host closed the room.'); }
   else if (d.t === 'cd') { if (GAME.state !== 'play') countdown(d.n); }
   else if (d.t === 'lobby') { NET.lobby = d.pl || []; NET.lobbyMode = d.mode; GAME.botN = d.seats; if (GAME.state !== 'play') renderLobby(); }
-  else if (d.t === 'go') clientGo(d.spect);
+  else if (d.t === 'go') clientGo(d.spect, d.late);
   else if (d.t === 's' && NET.role === 'client') clientSnap(d.m, d.b);
 }
 // a guest that loses the host (WiFi to mobile data, a call, a tunnel) quietly tries to get back in for ~25 s;
@@ -2702,12 +2721,13 @@ function reFail() {
   setTimeout(() => reTry(), 1200 * R.tries);
 }
 $('bNetGiveUp').onclick = () => { NET.reconnecting = null; $('netov').classList.add('hidden'); NET.role = 'client'; netAbort('You left the room.'); };
-function clientGo(spect) {
+function clientGo(spect, late) {
   $('lcd').classList.add('hidden');
   clearWorld(); GAME.roster = []; GAME.feed = []; GAME.big = GAME.banner = null; GAME.result = null; GAME.phase = 'round'; GAME.demoWait = 0;
   NET.role = 'client'; NET.snaps = []; NET.offset = null; NET.spawn = new Map(); NET.byCid = new Map(); NET.station = -1; NET.lastSnapAt = performance.now();
   GAME.state = 'play'; enterPlayUI();
   if (spect) bigText('MATCH IN PROGRESS', 'Watch for now, you are in next match!', 3);
+  else if (late) bigText("YOU'RE IN!", 'Taking over from ' + String(late).slice(0, 12) + '. Your score starts now.', 2.6);
 }
 function toI16(b) {
   if (b instanceof ArrayBuffer) return new Int16Array(b);
@@ -2726,7 +2746,11 @@ function diffSync(list, data, make, keyOf) {
 function clientSnap(m, b) {
   const now = performance.now(); NET.lastSnapAt = now;
   const off = now - m.ht; NET.offset = NET.offset === null || off < NET.offset ? off : NET.offset + (off - NET.offset) * 0.02;
-  if (m.sp) for (const s of m.sp) NET.spawn.set(s[0], s);
+  if (m.sp) for (const s of m.sp) {
+    NET.spawn.set(s[0], s);
+    const ch = NET.byCid.get(s[0]);
+    if (ch && !ch.removed && ch.name !== s[2]) { ch.name = s[2]; if (ch.el) { const nm = ch.el.querySelector('.nm'); if (nm) nm.textContent = s[2]; } }
+  }
   if (m.R) GAME.roster = m.R.map(r => ({id: r[0], name: r[1], idx: r[2], alive: !!r[3], score: r[4], wins: r[5], seatT: r[6], isBot: !!r[7], cid: r[8], rs: r[9] || [], stats: r[10] || {}, acc: r[11], isMe: r[0] === NET.myId}));
   if (m.led) LED.text = m.led;
   const G = m.G; GAME.round = G[0]; GAME.mode = G[1]; GAME.phase = G[2];
