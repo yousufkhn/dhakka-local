@@ -3341,8 +3341,8 @@ function syncWorld(dt) {
 // ================= camera =================
 const camTarget = new THREE.Vector3(0, 0.6, 0.25);
 function updateCamera(dt) {
-  const aspect = innerWidth / innerHeight;
-  camera.aspect = aspect;
+  const aspect = innerWidth / innerHeight, port = aspect < 0.85 && GAME.state === 'play';
+  camera.aspect = aspect; camera.fov = port ? 55 : 38;
   const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * aspect);
   if (GAME.preview && PREV.ch) {
     const tp = PREV.ch.parts.torso.position, d = PREV.frame === 'menu' ? 5.6 : 5.2, panel = PREV.frame === 'menu' ? (innerWidth > innerHeight ? 0.26 : 0) : Math.min(430, innerWidth * 0.56) / innerWidth, halfW = d * Math.tan(hfov / 2);
@@ -3356,9 +3356,11 @@ function updateCamera(dt) {
   for (const p of GAME.roster) { if (!p.alive || !p.ch || p.ch.out) continue; const x = p.ch.parts.torso.position.x; x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
   if (x0 > x1) { x0 = -3; x1 = 3; }
   if (GAME.phase === 'podium') { const card = innerWidth > 560; x0 = card ? -1.2 : -3; x1 = card ? 5.2 : 3; }
-  const halfW = clamp((x1 - x0) / 2 + 2.8, 4, HL + 0.6);
+  // phone held upright: the whole coach can't fit, so follow your own character up close instead
+  const meC = port && CHARS.find(c => c.isMe && !c.out);
+  const halfW = port ? 2.4 : clamp((x1 - x0) / 2 + 2.8, 4, HL + 0.6);
   let dist = Math.max(halfW / Math.tan(hfov / 2), 2.75 / Math.tan(vfov / 2));
-  let tx = clamp((x0 + x1) / 2, -HL + halfW - 0.4, HL - halfW + 0.4), tz = 0.2;
+  let tx = clamp(meC ? meC.parts.torso.position.x : (x0 + x1) / 2, -HL + halfW - 0.4, HL - halfW + 0.4), tz = 0.2;
   if (CAM.focus) { CAM.focus.t -= dt; const k = Math.min(1, CAM.focus.t * 2) * 0.55; tx = lerpTo(tx, CAM.focus.x, k); tz += CAM.focus.z * k * 0.6; dist *= 1 - k * 0.45; if (CAM.focus.t <= 0) CAM.focus = null; }
   const ck = CAM.focus ? 5 : 1.6;
   camTarget.x = lerpTo(camTarget.x, tx, dt * ck); camTarget.z = lerpTo(camTarget.z, tz, dt * ck);
@@ -3369,6 +3371,7 @@ function updateCamera(dt) {
   const kd = Math.exp(-dt * 9); FX.kick.x *= kd; FX.kick.z *= kd;
   camera.position.set(camTarget.x + FX.kick.x + rnd(-sh, sh), camTarget.y + Math.sin(el) * CAM.d + rnd(-sh, sh) + Math.sin(performance.now() * 0.03) * vib, camTarget.z + FX.kick.z + Math.cos(el) * CAM.d);
   camera.lookAt(v3b.set(camTarget.x + FX.kick.x * 0.5, camTarget.y, camTarget.z + FX.kick.z * 0.5));
+  if (window.__camOv) window.__camOv(camera, dt); // used only by the trailer/cover capture tool
   camera.updateProjectionMatrix();
 }
 function resize() { renderer.setPixelRatio(pixelCap()); renderer.setSize(innerWidth, innerHeight, false); checkRotate(); }
