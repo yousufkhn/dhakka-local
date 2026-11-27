@@ -1284,6 +1284,15 @@ function controlChar(ch, dt) {
     driveQ(P['fa' + s], yq.mult(qAx(X_AX, f)), 8, kA);
   }
 
+  if (!ch.isNpc && mag > 0.5 && !holding && !ch.charging) {
+    const hsp = Math.hypot(t.velocity.x, t.velocity.z);
+    ch.wedgeT = hsp < 0.35 ? (ch.wedgeT || 0) + dt : 0;
+    if (ch.wedgeT > 1.0) {
+      ch.wedgeT = 0; const tz = t.position.z, inward = Math.abs(tz) > HW - 0.7 ? -Math.sign(tz) : 0;
+      for (const b of ch.list) { b.velocity.y = Math.max(b.velocity.y, 3.2); b.velocity.x += c.mx * 1.5; b.velocity.z += c.mz * 1.5 + inward * 2.2; }
+      if (ch.grab) releaseGrab(ch);
+    }
+  } else ch.wedgeT = 0;
   const spd = (ch.isNpc ? 2.4 : 3.6) * (ch.speedT > 0 ? 1.45 : 1) * (ch.charging ? 0.45 : 1) * (ch.tired ? 0.7 : 1);
   const acc = ch.grounded ? (MONSOON.on ? 3.5 : 15) : (holding ? 3 : 2.2);
   // steer the whole body, not only the torso, so the legs don't drag behind like a sack (limbs get half the pull)
@@ -2299,6 +2308,10 @@ const tbUp = e => {
   if (el) tbSet(el.dataset.k); tbSet('grab');
 };
 addEventListener('pointerup', tbUp); addEventListener('pointercancel', tbUp);
+function tbReset() { TB.ptr.clear(); TB.pos.clear(); TB.latch = null; for (const k of ['push', 'grab', 'jump']) tbSet(k); }
+addEventListener('touchend', e => { if (!e.touches || e.touches.length === 0) tbReset(); }, {passive: true});
+addEventListener('touchcancel', e => { if (!e.touches || e.touches.length === 0) tbReset(); }, {passive: true});
+document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible') tbReset(); });
 // keep the button labels honest: PUSH reads THROW while you carry someone; drop the latch once they're thrown
 const IS_PC = matchMedia('(hover:hover) and (pointer:fine)').matches;
 // on a computer, say keys instead of touch words in tips, the tutorial and banners
@@ -2340,6 +2353,7 @@ const MB = {0: 'push', 2: 'grab'};
 canvas.addEventListener('mousedown', e => { if (GAME.state !== 'play' || !MB[e.button] || (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents)) return; e.preventDefault(); audioInit(); LOCAL[MB[e.button]] = true; MB['d' + e.button] = true; });
 addEventListener('mouseup', e => { if (MB['d' + e.button]) { MB['d' + e.button] = false; LOCAL[MB[e.button]] = false; } });
 addEventListener('blur', () => { MB.d0 = MB.d2 = false; });
+addEventListener('mousemove', e => { if (MB.d0 && !(e.buttons & 1)) { MB.d0 = false; LOCAL.push = false; } if (MB.d2 && !(e.buttons & 2)) { MB.d2 = false; LOCAL.grab = false; } }, {passive: true});
 
 // ================= UI wiring =================
 function chips(attr, key) { const bs = document.querySelectorAll(`.chips button[data-${attr}]`); bs.forEach(b => b.onclick = () => { bs.forEach(x => x.classList.remove('sel')); b.classList.add('sel'); GAME[key] = parseFloat(b.dataset[attr]); }); }
