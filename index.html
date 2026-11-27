@@ -108,6 +108,8 @@ button.shotb{width:auto;margin:0;padding:4px 12px;font-size:16px}
 #stickKnob{position:absolute;width:56px;height:56px;border-radius:50%;background:#ffcc00cc;border:3px solid #000;left:29px;top:29px}
 .cbtn{position:absolute;pointer-events:auto;border-radius:50%;flex-direction:column;border:3px solid #000c;color:#2a1300;font-weight:900;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.05;touch-action:none;box-shadow:0 4px 0 #0008}
 .cbtn.on{filter:brightness(1.4);transform:translateY(2px)}
+#bPush.throw{background:rgba(255,159,28,.95);box-shadow:0 0 0 4px #ffd23f,0 4px 0 #0008}
+#bGrab.carry{box-shadow:0 0 0 4px #fff,0 4px 0 #0008}
 #bJump{right:calc(max(14px,env(safe-area-inset-right)) + 176px);bottom:14px;width:64px;height:64px;background:rgba(120,220,255,.8)}
 #bGrab{right:calc(max(14px,env(safe-area-inset-right)) + 92px);bottom:62px;width:76px;height:76px;background:rgba(140,255,150,.8)}
 #bPush{right:max(14px,env(safe-area-inset-right));bottom:14px;width:90px;height:90px;background:rgba(255,80,110,.88);color:#fff;font-size:15px}
@@ -233,6 +235,20 @@ body.roundover #controls{display:none}
 #chips span.out::after{content:"✕";position:absolute;color:#ff4d4d;font-size:15px;font-weight:900}
 @media (prefers-reduced-motion: reduce){ .lb{transition:none} }
 @media (hover:hover) and (pointer:fine){ #controls{display:none} }
+#keys{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:12px;z-index:6;display:flex;gap:8px;align-items:flex-end;pointer-events:none;font-family:"Baloo 2",sans-serif}
+@media not ((hover:hover) and (pointer:fine)){ #keys{display:none!important} }
+#keys .kg{display:flex;flex-direction:column;align-items:center;gap:2px;background:#1e120cb8;border:2px solid #fff4d633;border-radius:12px;padding:6px 9px 5px;color:#fff4d6;transition:transform .08s,background .15s,border-color .15s;min-width:64px}
+#keys .kg b{font-size:13px;line-height:1;letter-spacing:.5px;text-transform:uppercase}
+#keys .kg small{font-size:10px;line-height:1;color:#fff4d6a0;font-weight:700}
+#keys .kg span{display:flex;align-items:center;gap:3px;line-height:1}#keys .kg span.wasd{display:grid;grid-template-columns:repeat(3,auto);gap:2px}.wasd .kw{grid-column:2;grid-row:1}.wasd kbd:not(.kw){grid-row:2}
+#keys .kg i{font-style:normal;font-size:9px;color:#fff4d680}
+#keys kbd{display:inline-block;min-width:22px;padding:2px 5px;border-radius:5px;background:#fff4d6;color:#2a1300;font:800 12px/1.2 "Baloo 2",sans-serif;text-align:center;box-shadow:0 2px 0 #8a6a55}
+#keys kbd.ms{background:#ffe9b8;font-size:10px}#keys kbd.wide{min-width:70px}
+#keys .kg.on{background:#ffd23fd9;color:#2a1300;transform:translateY(2px)}#keys .kg.on small{color:#2a1300a0}
+#kPush{border-color:#ff5964aa!important}#kGrab{border-color:#6bf178aa!important}#kJump{border-color:#78dcffaa!important}
+#kPush.throw{background:#ff9f1ce6;color:#2a1300}#kPush.throw small{color:#2a1300b0}
+#keys .kg.hint{animation:hintp .9s ease-in-out infinite;box-shadow:0 0 0 4px #ffd23f,0 0 18px #ffd23f}
+body.vet #keys{opacity:.75}
 @media (max-height:460px){ .ticket .chips button{padding:3px 10px;font-size:13px} .ticket .chips{font-size:14px} .ticket h1{font-size:34px} .tk-body{padding:6px 14px 2px} .ticket .tag{margin:2px 0 4px;font-size:13px} .ticket #bPlay{font-size:21px;margin-top:4px} .tk-top{padding:4px 14px} .card{padding:10px 16px} .tag{margin:4px 0 6px;font-size:13px} h1{font-size:34px} input,button{padding:7px 12px;font-size:15px;margin:3px 0} .chips{margin:3px 0} }
 @media (prefers-reduced-motion: reduce){ #big .a{animation:none} #rotate .ph{animation:none} }
 
@@ -341,6 +357,12 @@ body.roundover #controls{display:none}
   <div id="tut" class="hidden"><div class="tstep"></div><div class="ttxt"></div><button id="bTutSkip" class="alt">Skip tutorial</button><div id="tutBtns" class="hidden"><button id="bTutPlay">Play a match!</button><button id="bTutMenu" class="alt">Menu</button></div></div>
 </div>
 
+<div id="keys" class="hidden" aria-hidden="true">
+  <div class="kg" id="kMove"><span class="wasd"><kbd class="kw">W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></span><b>Move</b></div>
+  <div class="kg" id="kPush"><span><kbd>J</kbd><i>or</i><kbd class="ms">🖱 Left</kbd></span><b id="kPushL">Push</b><small id="kPushS">hold = power</small></div>
+  <div class="kg" id="kGrab"><span><kbd>K</kbd><i>or</i><kbd class="ms">🖱 Right</kbd></span><b>Grab</b><small>hold</small></div>
+  <div class="kg" id="kJump"><span><kbd class="wide">Space</kbd></span><b>Jump</b></div>
+</div>
 <div id="controls" class="hidden">
   <div id="stick"><div id="stickBase"><div id="stickKnob"></div></div></div>
   <div class="cbtn" id="bJump" data-k="jump">JUMP</div>
@@ -1153,7 +1175,8 @@ function controlChar(ch, dt) {
     }
   } else {
     ch.grip = Math.min(1, ch.grip + dt * 0.35);
-    if (c.grab && !stunned && ch.gripLock <= 0 && ch.grip > 0.15) tryGrab(ch);
+    if (!c.grab) ch.regrabWait = false;
+    if (c.grab && !ch.regrabWait && !stunned && ch.gripLock <= 0 && ch.grip > 0.15) tryGrab(ch);
   }
 
   ch.tired = Math.max(0, (ch.tired || 0) - dt);
@@ -1164,7 +1187,7 @@ function controlChar(ch, dt) {
   }
   ch.brace = !!(c.grab && !ch.grab && ch.grounded && !stunned && !ch.charging);
   if (c.push && !ch.pushHeld && !stunned && ch.pushCd <= 0 && !ch.tired) {
-    if (ch.grab && ch.grab.type === 'ch') doThrow(ch);
+    if (ch.grab && ch.grab.type === 'ch') { doThrow(ch); ch.regrabWait = true; }
     else if (!ch.grounded && !ch.grab) doKick(ch);
     else { ch.charging = true; ch.charge = 0; }
   }
@@ -1185,22 +1208,32 @@ function controlChar(ch, dt) {
   if (stunned) return;
 
   const mag = Math.hypot(c.mx, c.mz);
-  if (mag > 0.15) { const ty = Math.atan2(c.mx, c.mz); let d = ty - ch.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); ch.yaw += clamp(d, -12 * dt, 12 * dt); }
+  let turn = 0;
+  if (mag > 0.15) { const ty = Math.atan2(c.mx, c.mz); let d = ty - ch.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); turn = clamp(d, -15 * dt, 15 * dt); ch.yaw += turn; }
+  ch.turnV = (ch.turnV || 0) + (turn / Math.max(dt, 1e-3) - (ch.turnV || 0)) * Math.min(1, 10 * dt);
+  // how fast we're really going, as a share of top speed: drives stride, bob and lean so feet match the floor
+  const hs = Math.hypot(t.velocity.x, t.velocity.z), topV = ch.isNpc ? 2.4 : 3.6, sf = Math.min(1.4, hs / topV);
+  ch.sf = (ch.sf || 0) + (sf - (ch.sf || 0)) * Math.min(1, 12 * dt);
   const yq = qYaw(ch.yaw);
 
   if (ch.grounded && ch.jumpT <= 0) {
     const hv = ch.heavy ? 1.5 : 1;
-    const F = clamp(ch.mass * 18 * 0.92 + (1.12 - hgt) * 5200 * hv - t.velocity.y * 420 * hv, 0, 3200 * hv);
+    const bob = mag > 0.15 ? Math.abs(Math.sin(ch.phase)) * 0.04 * Math.min(1, ch.sf) : 0;
+    const F = clamp(ch.mass * 18 * 0.92 + (1.12 + bob - hgt) * 5200 * hv - t.velocity.y * 420 * hv, 0, 3200 * hv);
     t.applyForce(new CANNON.Vec3(0, F, 0));
   }
-  const lean = (mag > 0.15 ? 0.18 : 0) + (ch.charging ? -0.25 : 0) + (ch.pushAnim > 0 ? 0.3 : 0);
-  driveQ(t, yq.mult(qAx(X_AX, lean)), ch.grounded ? 9 : 5, ch.grounded ? 0.35 : 0.15);
+  // lean forward with speed, a bit more while speeding up, back a touch when braking, and into turns
+  ch.accL = (ch.accL || 0) + (((mag > 0.15 ? Math.min(1, mag) : 0) - Math.min(1, ch.sf)) - (ch.accL || 0)) * Math.min(1, 8 * dt);
+  const lean = (ch.grounded ? 0.06 + 0.12 * Math.min(1, ch.sf) + clamp(ch.accL, -0.6, 1) * 0.14 : 0) + (ch.charging ? -0.25 : 0) + (ch.pushAnim > 0 ? 0.3 : 0);
+  const roll = ch.grounded ? clamp(-ch.turnV * 0.025 * Math.min(1, ch.sf), -0.16, 0.16) : 0;
+  driveQ(t, yq.mult(qAx(X_AX, lean)).mult(qAx(Z_AX, roll)), ch.grounded ? 9 : 5, ch.grounded ? 0.35 : 0.15);
   driveQ(P.head, yq, 6, 0.2);
 
   const kL = ch.grounded ? 0.3 : 0.1;
   if (mag > 0.15 && ch.grounded) {
-    ch.phase += dt * 11 * (ch.speedT > 0 ? 1.4 : 1);
-    const s = Math.sin(ch.phase) * 0.6;
+    const g = Math.min(1.3, Math.max(0.25, ch.sf));
+    ch.phase += dt * (4 + 7.5 * g);
+    const s = Math.sin(ch.phase) * (0.25 + 0.4 * Math.min(1, g));
     driveQ(P.thL, yq.mult(qAx(X_AX, -s)), 10, kL); driveQ(P.thR, yq.mult(qAx(X_AX, s)), 10, kL);
     driveQ(P.shL, yq.mult(qAx(X_AX, -s + 0.4 * Math.max(0, Math.cos(ch.phase)))), 10, kL);
     driveQ(P.shR, yq.mult(qAx(X_AX, s + 0.4 * Math.max(0, -Math.cos(ch.phase)))), 10, kL);
@@ -1226,14 +1259,14 @@ function controlChar(ch, dt) {
   }
 
   const spd = (ch.isNpc ? 2.4 : 3.6) * (ch.speedT > 0 ? 1.45 : 1) * (ch.charging ? 0.45 : 1) * (ch.tired ? 0.7 : 1);
-  const acc = ch.grounded ? (MONSOON.on ? 3.5 : 9) : (holding ? 3 : 1.6);
-  const v = t.velocity;
+  const acc = ch.grounded ? (MONSOON.on ? 3.5 : 15) : (holding ? 3 : 2.2);
+  // steer the whole body, not only the torso, so the legs don't drag behind like a sack (limbs get half the pull)
+  const steer = (tx, tz, k) => { for (const b of ch.list) { const w = b === t ? k : k * 0.5, bv = b.velocity; bv.x += (tx - bv.x) * w; bv.z += (tz - bv.z) * w; } };
   if (mag > 0.15) {
     const tx = c.mx / Math.max(1, mag) * spd, tz = c.mz / Math.max(1, mag) * spd;
-    v.x += (tx - v.x) * Math.min(1, acc * dt); v.z += (tz - v.z) * Math.min(1, acc * dt);
+    steer(tx, tz, Math.min(1, acc * dt));
   } else if (ch.grounded) {
-    const damp = MONSOON.on ? 0.8 : 3.2;
-    v.x -= v.x * Math.min(1, damp * dt); v.z -= v.z * Math.min(1, damp * dt);
+    steer(0, 0, Math.min(1, (MONSOON.on ? 0.8 : 11) * dt));
   }
 }
 
@@ -2204,13 +2237,63 @@ stickEl.addEventListener('pointermove', e => {
 });
 const stickEnd = e => { if (e.pointerId !== STICK.id) return; STICK.id = null; STICK.x = STICK.y = 0; knob.style.transform = ''; base.style.top = ''; base.style.bottom = '22px'; base.style.left = ''; };
 stickEl.addEventListener('pointerup', stickEnd); stickEl.addEventListener('pointercancel', stickEnd);
-document.querySelectorAll('.cbtn').forEach(el => {
-  const k = el.dataset.k;
-  const on = e => { e.preventDefault(); audioInit(); LOCAL[k] = true; el.classList.add('on'); if (k === 'push') buzz(10); };
-  const off = e => { e.preventDefault(); LOCAL[k] = false; el.classList.remove('on'); };
-  el.addEventListener('pointerdown', on); el.addEventListener('pointerup', off); el.addEventListener('pointercancel', off); el.addEventListener('pointerleave', off);
-});
+// Touch buttons. Each thumb is tracked on its own and can SLIDE between buttons without lifting:
+// a thumb is "on" the nearest button within reach, and stays on it until it moves well away (no accidental drops).
+// While you carry someone, GRAB stays held when your thumb slides off it, and PUSH turns into THROW,
+// so grab, slide right, throw is one motion. Lifting the thumb lets go.
+const TB = {ptr: new Map(), latch: null};
+const tbEls = [...document.querySelectorAll('.cbtn')];
+function tbCarry() { const me = CHARS.find(c => c.isMe); return !!(me && (NET.role === 'client' ? me.carryF : me.grab && me.grab.type === 'ch')); }
+function tbAt(x, y, cur) {
+  let best = null, bd = 1e9;
+  for (const el of tbEls) { if (!el.offsetParent) continue; const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, rad = r.width / 2, d = Math.hypot(x - cx, y - cy) / rad;
+    if (d < bd) { bd = d; best = el; } }
+  if (cur) { const r = cur.getBoundingClientRect(), d = Math.hypot(x - r.left - r.width / 2, y - r.top - r.height / 2) / (r.width / 2); if (d < 1.55 && !(best !== cur && bd < 0.9)) return cur; }
+  return bd < 1.2 ? best : null;
+}
+function tbHeld(k) { for (const el of TB.ptr.values()) if (el && el.dataset.k === k) return true; return false; }
+function tbSet(k) { const v = tbHeld(k) || (k === 'grab' && TB.latch != null); LOCAL[k] = v; const el = $(k === 'push' ? 'bPush' : k === 'grab' ? 'bGrab' : 'bJump'); el.classList.toggle('on', v); }
+function tbMove(id, x, y) {
+  const prev = TB.ptr.get(id), next = tbAt(x, y, prev);
+  if (next === prev) return;
+  if (prev && prev.dataset.k === 'grab' && tbCarry()) TB.latch = id;   // keep holding the person while the thumb slides on
+  TB.ptr.set(id, next);
+  if (prev) tbSet(prev.dataset.k);
+  if (next) { tbSet(next.dataset.k); if (next.dataset.k === 'push') buzz(10); }
+}
+tbEls.forEach(el => el.addEventListener('pointerdown', e => {
+  e.preventDefault(); audioInit(); try { el.releasePointerCapture(e.pointerId); } catch (er) {}
+  TB.ptr.set(e.pointerId, el); tbSet(el.dataset.k); if (el.dataset.k === 'push') buzz(10);
+}));
+addEventListener('pointermove', e => { if (TB.ptr.has(e.pointerId)) tbMove(e.pointerId, e.clientX, e.clientY); }, {passive: true});
+const tbUp = e => {
+  if (!TB.ptr.has(e.pointerId)) return; const el = TB.ptr.get(e.pointerId); TB.ptr.delete(e.pointerId);
+  if (TB.latch === e.pointerId) TB.latch = null;
+  if (el) tbSet(el.dataset.k); tbSet('grab');
+};
+addEventListener('pointerup', tbUp); addEventListener('pointercancel', tbUp);
+// keep the button labels honest: PUSH reads THROW while you carry someone; drop the latch once they're thrown
+const IS_PC = matchMedia('(hover:hover) and (pointer:fine)').matches;
+// on a computer, say keys instead of touch words in tips, the tutorial and banners
+function kt(t) {
+  if (!IS_PC || typeof t !== 'string') return t;
+  return t.replace(/slide your thumb onto THROW/g, 'press PUSH').replace(/slide your thumb to THROW/g, 'press PUSH to throw')
+    .replace(/the joystick \(or WASD\)/g, 'WASD or the arrow keys').replace(/\bTap\b/g, 'Press').replace(/\btap\b/g, 'press')
+    .replace(/\bPUSH\b/g, 'PUSH (J)').replace(/\bGRAB\b/g, 'GRAB (K)').replace(/\bJUMP\b/g, 'JUMP (Space)');
+}
+function tbTick() {
+  const kd = $('keys'); if (kd) { const show = !$('controls').classList.contains('hidden'); if (kd.classList.contains('hidden') === show) kd.classList.toggle('hidden', !show);
+    if (show) { const mv = KEYS.KeyW || KEYS.KeyA || KEYS.KeyS || KEYS.KeyD || KEYS.ArrowUp || KEYS.ArrowDown || KEYS.ArrowLeft || KEYS.ArrowRight;
+      $('kMove').classList.toggle('on', !!mv); $('kPush').classList.toggle('on', !!LOCAL.push); $('kGrab').classList.toggle('on', !!LOCAL.grab); $('kJump').classList.toggle('on', !!LOCAL.jump); } }
+  const carry = tbCarry(), pb = $('bPush');
+  if (carry !== TB.carry) { TB.carry = carry; pb.classList.toggle('throw', carry); pb.innerHTML = carry ? 'THROW!<br><small>slide here</small>' : 'PUSH!<br><small>hold = power</small>'; $('bGrab').classList.toggle('carry', carry); $('kPush').classList.toggle('throw', carry); $('kPushL').textContent = carry ? 'Throw!' : 'Push'; $('kPushS').textContent = carry ? 'they fly' : 'hold = power'; }
+  if (TB.latch != null && !carry && !tbHeld('grab')) { const id = TB.latch; TB.latch = null; tbSet('grab'); TB.latchGone = id; }
+}
 document.addEventListener('contextmenu', e => e.preventDefault());
+const MB = {0: 'push', 2: 'grab'};
+canvas.addEventListener('mousedown', e => { if (GAME.state !== 'play' || !MB[e.button] || (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents)) return; e.preventDefault(); audioInit(); LOCAL[MB[e.button]] = true; MB['d' + e.button] = true; });
+addEventListener('mouseup', e => { if (MB['d' + e.button]) { MB['d' + e.button] = false; LOCAL[MB[e.button]] = false; } });
+addEventListener('blur', () => { MB.d0 = MB.d2 = false; });
 
 // ================= UI wiring =================
 function chips(attr, key) { const bs = document.querySelectorAll(`.chips button[data-${attr}]`); bs.forEach(b => b.onclick = () => { bs.forEach(x => x.classList.remove('sel')); b.classList.add('sel'); GAME[key] = parseFloat(b.dataset[attr]); }); }
@@ -2484,7 +2567,7 @@ function hostSnapshot() {
   const list = CHARS.filter(c => !c.removed), full = NET.n % 40 === 0;
   const st = list.map(ch => {
     const w = ch.wear || {}, sh = ch.shoes || [];
-    const fl = (ch.out ? 1 : 0) | (ch.power > 0 ? 2 : 0) | (ch.speedT > 0 ? 4 : 0) | (ch.ticket ? 8 : 0) | (w.glasses && !w.glasses.visible ? 16 : 0) | (w.cap && !w.cap.visible ? 32 : 0) | (sh[0] && !sh[0].visible ? 64 : 0) | (sh[1] && !sh[1].visible ? 128 : 0) | (ch.grounded ? 256 : 0) | (ch.tired ? 512 : 0);
+    const fl = (ch.out ? 1 : 0) | (ch.power > 0 ? 2 : 0) | (ch.speedT > 0 ? 4 : 0) | (ch.ticket ? 8 : 0) | (w.glasses && !w.glasses.visible ? 16 : 0) | (w.cap && !w.cap.visible ? 32 : 0) | (sh[0] && !sh[0].visible ? 64 : 0) | (sh[1] && !sh[1].visible ? 128 : 0) | (ch.grounded ? 256 : 0) | (ch.tired ? 512 : 0) | (ch.grab && ch.grab.type === 'ch' ? 1024 : 0);
     return [ch.cid, fl, r2(ch.stun), ch.charging ? r2(ch.charge) : -1, r2(ch.grip), r2(ch.yaw), FACES.indexOf(ch.face), ch.bubble ? ch.bubble.text : 0];
   });
   const m = {ht: Math.round(performance.now()), st};
@@ -2641,7 +2724,7 @@ function clientSnap(m, b) {
       NET.byCid.set(cid, ch);
     }
     const fl = s[1];
-    ch.out = !!(fl & 1); ch.power = fl & 2 ? 1 : 0; ch.speedT = fl & 4 ? 1 : 0; ch.ticket = !!(fl & 8); ch.grounded = !!(fl & 256); ch.tired = fl & 512 ? 1 : 0;
+    ch.out = !!(fl & 1); ch.power = fl & 2 ? 1 : 0; ch.speedT = fl & 4 ? 1 : 0; ch.ticket = !!(fl & 8); ch.grounded = !!(fl & 256); ch.tired = fl & 512 ? 1 : 0; ch.carryF = !!(fl & 1024);
     if (ch.wear.glasses) ch.wear.glasses.visible = !(fl & 16); if (ch.wear.cap) ch.wear.cap.visible = !(fl & 32);
     if (ch.shoes[0]) ch.shoes[0].visible = !(fl & 64); if (ch.shoes[1]) ch.shoes[1].visible = !(fl & 128);
     ch.stun = s[2]; ch.charging = s[3] >= 0; ch.charge = Math.max(0, s[3]); ch.grip = s[4]; ch.yaw = s[5]; ch.netFace = FACES[s[6]] || 'normal';
@@ -2920,7 +3003,7 @@ const TUT_STEPS = [
   {k: 'super', b: 'bPush', txt: 'Now HOLD PUSH until the bar fills, then let go. Super push!'},
   {k: 'grab', b: 'bGrab', txt: 'Hold GRAB near a strap or the door pole. Holding on saves you on curves.'},
   {k: 'kick', b: 'bJump', txt: 'Tap JUMP, then PUSH in the air. Flying dropkick the dummy!'},
-  {k: 'throw', b: 'bGrab', txt: 'Hold GRAB on the dummy to pick it up, then tap PUSH to throw it out of the door.'}
+  {k: 'throw', b: 'bGrab', txt: 'Hold GRAB on the dummy to pick it up, then slide your thumb onto THROW. Out the door!'}
 ];
 function tutEv(k) { TUT.ev[k] = true; }
 function tutDummy(x, z) {
@@ -2946,7 +3029,7 @@ function startTutorial() {
 }
 function tutShow() {
   const el = $('tut'); el.classList.remove('hidden', 'tip');
-  document.querySelectorAll('.cbtn').forEach(b => b.classList.remove('hint'));
+  document.querySelectorAll('.cbtn,#keys .kg').forEach(b => b.classList.remove('hint'));
   if (TUT.step >= TUT_STEPS.length) {
     el.querySelector('.tstep').textContent = 'Tutorial complete';
     el.querySelector('.ttxt').textContent = 'You are ready for the real local. Be gentle with the uncles.';
@@ -2954,8 +3037,10 @@ function tutShow() {
   }
   const S = TUT_STEPS[TUT.step];
   el.querySelector('.tstep').textContent = 'Step ' + (TUT.step + 1) + ' of ' + TUT_STEPS.length;
-  el.querySelector('.ttxt').textContent = S.txt; $('tutBtns').classList.add('hidden'); $('bTutSkip').classList.remove('hidden');
+  el.querySelector('.ttxt').textContent = kt(S.txt); $('tutBtns').classList.add('hidden'); $('bTutSkip').classList.remove('hidden');
   if (S.b) $(S.b).classList.add('hint');
+  document.querySelectorAll('#keys .kg').forEach(b => b.classList.remove('hint'));
+  const KH = {bPush: 'kPush', bGrab: 'kGrab', bJump: 'kJump', '': 'kMove'}; if (KH[S.b]) $(KH[S.b]).classList.add('hint');
   TUT.ev = {}; TUT.ok = 0;
   if (S.k === 'walk') TUT.ring.visible = true; else TUT.ring.visible = false;
   if (S.k === 'push') tutDummy(1.6, 0);
@@ -2987,7 +3072,7 @@ function tutTick(dt) {
   if (done) { TUT.wait = 0.9; const h = ch.parts.head.position; burst(pick(['NICE!', 'PERFECT!', 'GREAT!']), h.x, h.y + 0.9, h.z, '#6bf178'); }
 }
 function tutCleanup() {
-  GAME.tutorial = false; $('tut').classList.add('hidden'); document.querySelectorAll('.cbtn').forEach(b => b.classList.remove('hint'));
+  GAME.tutorial = false; $('tut').classList.add('hidden'); document.querySelectorAll('.cbtn,#keys .kg').forEach(b => b.classList.remove('hint'));
   if (TUT.ring) { scene.remove(TUT.ring); TUT.ring = null; } TUT.dummy = null;
   if (TUT.prevMode) { GAME.mode = TUT.prevMode; TUT.prevMode = null; }
 }
@@ -2998,7 +3083,7 @@ $('bTutMenu').onclick = () => $('bQuit').onclick();
 if (!PROF.trained) $('bTrain').classList.add('new');
 
 // ---- fading tips for the first few matches ----
-const TIPS = ['Tap PUSH when someone is close. Missing makes you stumble.', 'Hold PUSH, then let go: a charged push sends people flying.', 'Hold GRAB on a strap when the train curves or brakes.', 'Holding GRAB also braces you: pushes hit you half as hard.', 'JUMP, then PUSH in the air = flying dropkick.', 'GRAB someone, then PUSH to throw them toward the door.', 'Spamming PUSH tires you out. Time your shoves.'];
+const TIPS = ['Tap PUSH when someone is close. Missing makes you stumble.', 'Hold PUSH, then let go: a charged push sends people flying.', 'Hold GRAB on a strap when the train curves or brakes.', 'Holding GRAB also braces you: pushes hit you half as hard.', 'JUMP, then PUSH in the air = flying dropkick.', 'GRAB someone, then slide your thumb to THROW. They fly toward the door.', 'Spamming PUSH tires you out. Time your shoves.'];
 const TIP = {t: 0, i: 0};
 function tipTick(dt) {
   const el = $('tut');
@@ -3006,7 +3091,7 @@ function tipTick(dt) {
   const lvl = Math.max(0, 1 - PROF.matches / 3);
   if (lvl <= 0 || GAME.state !== 'play' || GAME.phase !== 'round' || GAME.result || T_now > 40) { if (el.classList.contains('tip')) el.classList.add('hidden'); return; }
   TIP.t -= dt;
-  if (TIP.t <= 0) { TIP.t = 7; TIP.i = (TIP.i + 1) % TIPS.length; el.classList.remove('hidden'); el.classList.add('tip'); el.querySelector('.tstep').textContent = '💡 Tip'; el.querySelector('.ttxt').textContent = TIPS[TIP.i]; $('tutBtns').classList.add('hidden'); $('bTutSkip').classList.add('hidden'); }
+  if (TIP.t <= 0) { TIP.t = 7; TIP.i = (TIP.i + 1) % TIPS.length; el.classList.remove('hidden'); el.classList.add('tip'); el.querySelector('.tstep').textContent = '💡 Tip'; el.querySelector('.ttxt').textContent = kt(TIPS[TIP.i]); $('tutBtns').classList.add('hidden'); $('bTutSkip').classList.add('hidden'); }
   el.style.opacity = (0.45 + 0.55 * lvl) * Math.min(1, TIP.t * 1.5, (7 - TIP.t) * 2);
 }
 function vetCheck() { document.body.classList.toggle('vet', PROF.matches >= 3); }
@@ -3058,6 +3143,7 @@ if (!onlineBlocked() && location.protocol === 'https:' && 'serviceWorker' in nav
 const v3 = new THREE.Vector3();
 const HUDK = {route: '', chips: ''};
 function updateHUD(dt) {
+  tbTick();
   const T = TR, nm = STATIONS[T.station % STATIONS.length];
   $('pillSt').textContent = (T.phase === 'stop' ? '🚉 ' : '🚃 Next: ') + nm + (MONSOON.on ? '  🌧' : '');
   const rk = T.station + T.phase;
@@ -3069,7 +3155,7 @@ function updateHUD(dt) {
   const sh = $('seatHud'); sh.classList.toggle('hidden', GAME.mode !== 'seat' || GAME.phase === 'podium');
   if (GAME.mode === 'seat') { const top = [...GAME.roster].sort((a, b) => b.seatT - a.seatT).slice(0, 2).filter(p => p.seatT > 0.05); const t = '🪑 ' + (top.length ? top.map(p => p.name + ' ' + p.seatT.toFixed(0) + '/' + SEAT_WIN + 's').join(' · ') : 'The seat is free!'); if (sh.textContent !== t) sh.textContent = t; }
   const bn = $('banner');
-  if (GAME.banner) { GAME.banner.t -= dt; if (bn.textContent !== GAME.banner.text) bn.textContent = GAME.banner.text; bn.classList.remove('hidden'); if (GAME.banner.t <= 0) GAME.banner = null; } else bn.classList.add('hidden');
+  if (GAME.banner) { GAME.banner.t -= dt; const btx = kt(GAME.banner.text); if (bn.textContent !== btx) bn.textContent = btx; bn.classList.remove('hidden'); if (GAME.banner.t <= 0) GAME.banner = null; } else bn.classList.add('hidden');
   const bg = $('big');
   if (GAME.big) {
     if (GAME.big.fresh) { GAME.big.fresh = false; const a = bg.querySelector('.a'); a.textContent = GAME.big.a; bg.querySelector('.b').textContent = GAME.big.b; a.style.animation = 'none'; void a.offsetWidth; a.style.animation = ''; }
@@ -3261,7 +3347,7 @@ resize();
 applySettings(); vetCheck();
 $('loading').remove(); openMenu();
 requestAnimationFrame(frame);
-window.__sfx = sfx; window.__AU = AU; window.__GAME = GAME; window.__CHARS = () => CHARS; window.__TR = TR; window.__LOCAL = LOCAL; window.__NET = NET; window.__podium = () => startPodium(); window.__newMatch = () => newMatch();
+window.__sfx = sfx; window.__AU = AU; window.__T = () => T_now; window.__GAME = GAME; window.__CHARS = () => CHARS; window.__TR = TR; window.__LOCAL = LOCAL; window.__NET = NET; window.__podium = () => startPodium(); window.__newMatch = () => newMatch();
 window.__lamp = v => { LAMP_I = v; applyLight(Infinity); };
 window.__look = (tod, theme, rain) => { if (tod != null) LIGHT.tod = TODS[tod]; if (theme) setTheme(theme, true); if (rain != null) MONSOON.on = rain; applyLight(Infinity); };
 </script>
