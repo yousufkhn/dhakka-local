@@ -126,6 +126,8 @@ details li{margin:3px 0}
 .lcodebox b{display:block;font-family:Bangers,"Baloo 2",sans-serif;font-weight:400;font-size:54px;letter-spacing:10px;color:#e8456b;text-shadow:3px 3px 0 #3a1d0e;line-height:1}
 #plist{list-style:none;margin:6px 0;padding:0;font-weight:800;font-size:16px;color:#3a1d0e;display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:center}
 #plist .bots{opacity:.65;font-weight:700}
+#lstat{text-align:center;font-size:12px;font-weight:700;color:#6b4a35}
+#lstat:empty{display:none}
 #lhint{text-align:center;font-size:14px;color:#6b4a35;font-weight:700}
 #lmsg{text-align:center;font-size:14px;color:#c0392b;font-weight:800;min-height:0;margin:4px 0}
 #lmsg:empty{display:none}
@@ -232,7 +234,7 @@ body.roundover #controls{display:none}
         <div class="lcodebox">Room code <b id="lcode">----</b></div>
         <div class="sharerow"><button id="bShare">WhatsApp pe bulao</button><button id="bCopy" class="alt">Link copy</button></div>
         <ul id="plist"></ul>
-        <div id="lhint"></div>
+        <div id="lhint"></div><div id="lstat"></div>
         <button id="bStart" class="hidden">Train chalao! 🚦</button>
       </div>
       <div id="lmsg"></div>
@@ -1772,7 +1774,7 @@ function startDemo() {
 const PEER_PREFIX = 'dhakkalocal-', PEERJS_URL = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js';
 const FACES = ['normal', 'angry', 'scared', 'smug', 'ko'], PHASES = ['run', 'brake', 'stop', 'accel'], MAX_HUMANS = 6;
 function lmsg(t) { $('lmsg').textContent = t || ''; }
-function myName() { const n = ($('lname').value || $('name').value || '').trim().slice(0, 12); return n || pick(['Rahul', 'Priya', 'Aditya', 'Sneha', 'Vikram', 'Neha']); }
+function myName() { const n = ($('lname').value || $('name').value || '').trim().slice(0, 12); return n || (NET.rndName = NET.rndName || pick(['Rahul', 'Priya', 'Aditya', 'Sneha', 'Vikram', 'Neha'])); }
 function randCode() { const A = 'ABCDEFGHJKMNPQRSTUVWXYZ'; let s = ''; for (let i = 0; i < 4; i++) s += A[Math.random() * A.length | 0]; return s; }
 function onlineBlocked() { return typeof RTCPeerConnection === 'undefined' || /(^|\.)claude(usercontent)?\.(ai|com)$|anthropic/.test(location.hostname); }
 let peerLoad = null;
@@ -1791,22 +1793,51 @@ function closeLobby() { netLeave(); $('lobby').classList.add('hidden'); $('menu'
 function netFail(t) { lmsg(t); try { NET.peer && NET.peer.destroy(); } catch (e) {} NET.peer = null; NET.role = null; lobbyView('pre'); $('bHost').disabled = $('bJoin').disabled = false; }
 function shareUrl() { return location.origin + location.pathname + '?room=' + NET.code; }
 
+const ICE = {iceServers: [{urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302']}, {urls: 'stun:stun.cloudflare.com:3478'}, {urls: ['turn:eu-0.turn.peerjs.com:3478', 'turn:us-0.turn.peerjs.com:3478'], username: 'peerjs', credential: 'peerjsp'}]};
+const SIGNAL_ERR = new Set(['network', 'server-error', 'socket-error', 'socket-closed', 'disconnected']);
+function netStatus(t) { const el = $('lstat'); if (el) el.textContent = t || ''; }
 async function hostRoom(tries) {
   if (onlineBlocked()) return lmsg('Is link pe online nahi chalta. Hosted link kholo.');
   audioInit(); $('bHost').disabled = true; lmsg('Room bana rahe hain…');
   try { await loadPeer(); } catch (e) { return netFail('Online server tak nahi pahunche. Network check karo.'); }
-  const code = randCode(), peer = new Peer(PEER_PREFIX + code, {debug: 0});
-  NET.peer = peer; NET.code = code; NET.peers = new Map();
-  const to = setTimeout(() => { if (!peer.open) netFail('Online server se connect nahi hua. Network check karo, ya bots ke saath khelo.'); }, 10000);
-  peer.on('open', () => { clearTimeout(to); NET.role = 'host'; NET.myId = 'me'; lobbyView('room'); $('lcode').textContent = code; $('bHost').disabled = false; lmsg(''); renderLobby(); });
-  peer.on('error', e => { clearTimeout(to); if (e.type === 'unavailable-id' && (tries || 0) < 3) { peer.destroy(); hostRoom((tries || 0) + 1); } else if (NET.role !== 'host' || GAME.state !== 'play') netFail('Connection error: ' + (e.type || e.message)); });
-  peer.on('disconnected', () => { try { if (NET.peer === peer) peer.reconnect(); } catch (e) {} });
+  hostPeer(randCode(), tries || 0);
+}
+// the host keeps its room code even if the phone drops off the online server (screen off, WhatsApp open): it re-registers as soon as it can
+function hostPeer(code, tries) {
+  const peer = new Peer(PEER_PREFIX + code, {debug: 0, config: ICE});
+  NET.peer = peer; NET.code = code; if (NET.role !== 'host') NET.peers = new Map();
+  const to = setTimeout(() => { if (!peer.open && NET.role !== 'host') netFail('Online server se connect nahi hua. Network check karo, ya bots ke saath khelo.'); }, 12000);
+  peer.on('open', () => {
+    clearTimeout(to); NET.retry = 0;
+    if (NET.role !== 'host') { NET.role = 'host'; NET.myId = 'me'; lobbyView('room'); $('lcode').textContent = code; $('bHost').disabled = false; lmsg(''); renderLobby(); }
+    netStatus('🟢 Room online');
+  });
+  peer.on('error', e => {
+    clearTimeout(to);
+    if (e.type === 'unavailable-id' && NET.role !== 'host' && tries < 3) { peer.destroy(); hostPeer(randCode(), tries + 1); return; }
+    if (e.type === 'peer-unavailable') return;
+    if (NET.role === 'host') { netStatus('🟠 Online server se dobara jud rahe hain…'); hostRejoin(peer); return; }
+    netFail('Room nahi bana: ' + (e.type || e.message) + '. Network check karke phir try karo.');
+  });
+  peer.on('disconnected', () => { if (NET.role === 'host') { netStatus('🟠 Online server se dobara jud rahe hain…'); hostRejoin(peer); } });
   peer.on('connection', conn => {
     conn.on('data', d => hostData(conn, d));
     conn.on('close', () => dropPeer(conn.peer));
     conn.on('error', () => dropPeer(conn.peer));
   });
 }
+function hostRejoin(peer) {
+  if (NET.role !== 'host' || NET.peer !== peer || NET.rejoinT) return;
+  const wait = Math.min(8000, 800 * Math.pow(2, NET.retry = (NET.retry || 0) + 1));
+  NET.rejoinT = setTimeout(() => {
+    NET.rejoinT = 0; if (NET.role !== 'host' || NET.peer !== peer) return;
+    try {
+      if (peer.destroyed) hostPeer(NET.code, 9);
+      else if (peer.disconnected) peer.reconnect();
+    } catch (e) { hostRejoin(peer); }
+  }, wait);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && NET.role === 'host' && NET.peer && (NET.peer.disconnected || NET.peer.destroyed)) { clearTimeout(NET.rejoinT); NET.rejoinT = 0; NET.retry = 0; hostRejoin(NET.peer); } });
 function humans() { return [...NET.peers.values()]; }
 function hostData(conn, d) {
   if (!d || typeof d !== 'object') return;
@@ -1913,21 +1944,37 @@ function hostSnapshot() {
 }
 
 // ---- client: joining and applying snapshots ----
-async function joinRoom() {
+async function joinRoom(again) {
   if (onlineBlocked()) return lmsg('Is link pe online nahi chalta. Hosted link kholo.');
   const code = ($('code').value || '').trim().toUpperCase();
   if (!/^[A-Z]{4}$/.test(code)) return lmsg('4 letter ka room code daalo');
-  audioInit(); $('bJoin').disabled = true; lmsg('Dabbe mein ghus rahe hain…');
+  audioInit(); $('bJoin').disabled = true; lmsg(again ? 'Ek baar aur koshish…' : 'Dabbe mein ghus rahe hain…');
   try { await loadPeer(); } catch (e) { return netFail('Online server tak nahi pahunche. Network check karo.'); }
-  const peer = new Peer(undefined, {debug: 0}); NET.peer = peer; NET.code = code;
-  const to = setTimeout(() => { if (NET.role !== 'lobby' && NET.role !== 'client') netFail('Room nahi mila (' + code + '). Code check karo.'); }, 12000);
+  try { NET.peer && NET.peer.destroy(); } catch (e) {}
+  const peer = new Peer(undefined, {debug: 0, config: ICE}); NET.peer = peer; NET.code = code; NET.stage = 'server'; NET.ice = '';
+  const done = () => NET.role === 'lobby' || NET.role === 'client';
+  const fail = (t) => { clearTimeout(to); if (!done() && NET.peer === peer) netFail(t); };
+  const to = setTimeout(() => {
+    if (done() || NET.peer !== peer) return;
+    if (NET.stage === 'server') fail('Online server tak nahi pahunche. Internet check karo, phir try karo.');
+    else fail('Room ' + code + ' mil gaya, par host ke phone tak raasta nahi bana' + (NET.ice ? ' (' + NET.ice + ')' : '') + '. Phir try karo. Baar baar ho toh dono phones ek WiFi pe try karo.');
+  }, 20000);
   peer.on('open', () => {
+    NET.stage = 'connecting'; lmsg('Room ' + code + ' dhoondh rahe hain…');
     const conn = peer.connect(PEER_PREFIX + code, {reliable: true}); NET.host = conn;
-    conn.on('open', () => conn.send({t: 'join', name: myName()}));
+    conn.on('iceStateChanged', st => { NET.ice = st; if (st === 'checking') { NET.stage = 'ice'; lmsg('Host mil gaya! Connect ho rahe hain…'); } });
+    conn.on('open', () => { NET.stage = 'open'; conn.send({t: 'join', name: myName()}); });
     conn.on('data', d => { if (d && d.t === 'welcome') clearTimeout(to); clientData(d); });
-    conn.on('close', () => { if (NET.role === 'client' || NET.role === 'lobby') netAbort('Host chala gaya. Train cancel. 😢'); });
+    conn.on('error', e => { if (!done()) fail('Host ke phone tak raasta nahi bana (' + (e.type || 'network') + '). Phir try karo. Baar baar ho toh dono phones ek WiFi pe try karo.'); });
+    conn.on('close', () => { if (done()) netAbort('Host chala gaya. Train cancel. 😢'); });
   });
-  peer.on('error', e => { clearTimeout(to); if (NET.role === 'client') netAbort('Connection toot gaya. 😢'); else netFail(e.type === 'peer-unavailable' ? 'Room nahi mila (' + code + '). Code check karo.' : 'Connection error: ' + (e.type || e.message)); });
+  peer.on('error', e => {
+    if (done()) return; // the game itself runs phone-to-phone; online-server hiccups after joining don't matter
+    if (e.type === 'peer-unavailable') {
+      if (!again) { clearTimeout(to); setTimeout(() => { if (NET.peer === peer) joinRoom(true); }, 1500); return; }
+      fail('Room ' + code + ' abhi online nahi hai. Host ke phone pe game khula aur screen on honi chahiye (WhatsApp se wapas game pe aao). Code sahi hai na?');
+    } else if (!SIGNAL_ERR.has(e.type) || NET.stage === 'server') fail('Connection error (' + (e.type || e.message) + '). Phir try karo.');
+  });
 }
 function clientData(d) {
   if (!d || typeof d !== 'object') return;
@@ -2074,7 +2121,7 @@ function clientInput(dt) {
 function netLeave() {
   const was = NET.role;
   try { if (NET.peer) NET.peer.destroy(); } catch (e) {}
-  NET.peer = null; NET.host = null; NET.peers = new Map(); NET.role = null; NET.snaps = []; NET.ev = []; NET.evTo = {}; NET.byCid = new Map(); NET.spawn = new Map();
+  clearTimeout(NET.rejoinT); NET.rejoinT = 0; NET.peer = null; NET.host = null; NET.peers = new Map(); NET.role = null; NET.snaps = []; NET.ev = []; NET.evTo = {}; NET.byCid = new Map(); NET.spawn = new Map();
   if (was === 'client') { for (const ch of CHARS) ch.netFace = null; RETICLE.visible = false; }
 }
 function netAbort(t) {
@@ -2085,7 +2132,7 @@ function netAbort(t) {
 }
 $('bOnline').onclick = () => openLobby();
 $('bHost').onclick = () => hostRoom(0);
-$('bJoin').onclick = joinRoom;
+$('bJoin').onclick = () => joinRoom(false);
 $('bStart').onclick = hostStart;
 $('bLobBack').onclick = closeLobby;
 $('lname').addEventListener('change', () => { $('name').value = $('lname').value; try { localStorage.setItem('dl_name', $('name').value); } catch (e) {} if (NET.role === 'host') renderLobby(); });
