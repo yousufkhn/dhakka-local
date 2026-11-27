@@ -44,6 +44,8 @@ details li{margin:3px 0}
 .lab .bar{width:46px;height:7px;background:#0008;border-radius:3px;overflow:hidden;border:1px solid #000}
 .lab .bar i{display:block;height:100%;background:#6bf178}
 .lab .bar.ch i{background:#ff4d6d}
+.lab .tt{font-size:10px;font-weight:800;color:#ffd23f;text-shadow:0 0 3px #000,1px 1px 0 #000;margin-top:-2px}
+.lab .tt:empty{display:none}
 .lab .pw{font-size:13px;line-height:1}
 #pill{position:absolute;top:8px;left:max(10px,env(safe-area-inset-left));background:rgba(20,8,18,.78);border-radius:10px;padding:6px 10px;font-weight:800;font-size:14px;line-height:1.3}
 #pill .st{color:var(--accent)}
@@ -109,6 +111,56 @@ details li{margin:3px 0}
 .ticket .kbd{color:#6b4a35}
 .tk-foot{position:relative;font-size:11px;font-weight:700;color:#8a6a55;padding:4px 16px 10px;border-top:2px dotted #3a1d0e44}
 @media (max-width:520px){ .tk-stub{display:none} }
+.tk-top{align-items:center}
+.tk-btns{display:flex;gap:6px}
+.tk-btns button{width:auto;margin:0;padding:2px 9px;font-size:12px;font-weight:800;border-radius:8px;border:2px solid #3a1d0e;box-shadow:0 2px 0 #3a1d0e;background:#ffe9b8;color:#3a1d0e;letter-spacing:0}
+#kmBadge{background:#e8456b;color:#fff;border-radius:6px;padding:0 5px;margin-left:2px}
+#kmBadge:empty{display:none}
+#almari{position:fixed;inset:0;z-index:12;pointer-events:none}
+.alm-panel{pointer-events:auto;position:absolute;top:8px;bottom:8px;right:max(8px,env(safe-area-inset-right));width:min(430px,56vw);background:#fff4d6;color:#3a1d0e;border-radius:14px;box-shadow:0 8px 0 #000a,0 0 0 3px #3a1d0e;display:flex;flex-direction:column;overflow:hidden}
+.alm-head{display:flex;justify-content:space-between;align-items:center;background:#7a1f3d;color:#ffe9b8;padding:6px 58px 6px 12px;font-size:15px;min-height:46px;box-sizing:border-box}
+.alm-head #almTitle{font-size:12px;color:#ffd23f;font-weight:800}
+.alm-head button{width:auto;margin:0;padding:2px 10px;font-size:14px;background:#ffe9b8;color:#3a1d0e;border-color:#3a1d0e;box-shadow:none}
+.kmbar{padding:6px 12px 2px}
+.kmtxt{font-size:12px;font-weight:800;color:#5b3a28}
+.kmtrack{height:9px;background:#3a1d0e22;border-radius:5px;overflow:hidden;margin-top:2px}
+.kmtrack i{display:block;height:100%;background:linear-gradient(90deg,#e8456b,#ff9f1c);width:0}
+.alm-tabs{display:flex;gap:4px;padding:6px 10px 4px;flex-wrap:wrap}
+.alm-tabs button{width:auto;margin:0;padding:3px 10px;font-size:13px;background:#f3dfb4;color:#3a1d0e;border-color:#3a1d0e;box-shadow:0 2px 0 #3a1d0e}
+.alm-tabs button.sel{background:#e8456b;color:#fff}
+#almBody{flex:1;overflow:auto;padding:4px 12px 12px;font-size:13px}
+#almBody h4{margin:8px 0 3px;font-size:13px;color:#7a1f3d}
+.itm{display:flex;flex-wrap:wrap;gap:5px}
+.itm button{width:auto;margin:0;padding:4px 9px;font-size:12px;background:#fffaf0;color:#3a1d0e;border-color:#3a1d0e;box-shadow:0 2px 0 #3a1d0e;font-weight:700}
+.itm button.sel{background:#ffcc00}
+.itm button.lock{opacity:.55;background:#eadfc8}
+.stamps{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;margin-top:6px}
+.stamp{border:2px dashed #3a1d0e66;border-radius:10px;padding:5px;text-align:center;font-size:11px;font-weight:700;position:relative;min-height:56px}
+.stamp b{display:block;font-family:Bangers,"Baloo 2",sans-serif;font-weight:400;font-size:16px;color:#7a1f3d}
+.stamp.got{border-style:solid;border-color:#e8456b;background:#ffe3ea}
+.stamp.got::after{content:"PAID";position:absolute;right:4px;top:4px;transform:rotate(-14deg);border:2px solid #e8456b;color:#e8456b;font-size:9px;padding:0 3px;border-radius:4px;font-weight:900}
+.dly{border:2px solid #3a1d0e33;border-radius:10px;padding:6px 8px;margin:6px 0}
+.dly .bar{height:7px;background:#3a1d0e22;border-radius:4px;overflow:hidden;margin-top:4px}
+.dly .bar i{display:block;height:100%;background:#6bf178}
+.dly.done{background:#e6ffe9;border-color:#2e9e4a}
+.strow{display:flex;justify-content:space-between;border-bottom:1px dotted #3a1d0e44;padding:3px 0}
+.kmline{font-size:13px;font-weight:800;color:#2e7d32;margin:6px 0 2px}
+.setc{max-width:420px}
+.set-body{position:relative;padding:8px 16px 12px;display:flex;flex-direction:column;gap:6px;font-weight:800;color:#3a1d0e}
+.set-body label{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.set-body input[type=range]{width:55%;accent-color:#e8456b;padding:0;margin:0}
+.togs{display:flex;gap:6px;flex-wrap:wrap}
+.togs button{flex:1;min-width:120px;margin:0;padding:6px 8px;font-size:13px;background:#f3dfb4;color:#3a1d0e;border-color:#3a1d0e;box-shadow:0 3px 0 #3a1d0e}
+.togs button.on{background:#6bf178}
+#bSetClose{font-family:Bangers,"Baloo 2",sans-serif;font-weight:400;font-size:20px;letter-spacing:1px}
+body.lefty #stick{left:auto;right:0}
+body.lefty #stickBase{left:auto;right:calc(max(20px,env(safe-area-inset-right)) + 10px)}
+body.lefty #bJump{right:auto;left:calc(max(14px,env(safe-area-inset-left)) + 176px)}
+body.lefty #bGrab{right:auto;left:calc(max(14px,env(safe-area-inset-left)) + 92px)}
+body.lefty #bPush{right:auto;left:max(14px,env(safe-area-inset-left))}
+body.btn-s .cbtn{scale:.85} body.btn-l .cbtn{scale:1.2}
+.cbtn{transform-origin:50% 100%}
+@media (max-height:460px){ .alm-panel{width:min(430px,60vw)} #almBody{font-size:12px} .tk-btns button{font-size:11px;padding:1px 7px} }
 .playrow{display:flex;gap:8px;align-items:stretch}
 .ticket .playrow #bPlay{flex:2}
 #bOnline{flex:1;margin-top:8px;font-family:Bangers,"Baloo 2",sans-serif;font-weight:400;font-size:19px;letter-spacing:1px;background:#35a7ff;color:#fff;line-height:1.05}
@@ -160,13 +212,13 @@ body.roundover #controls{display:none}
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="loading">Train aa rahi hai… 🚃</div>
+<div id="loading">Train arriving… 🚃</div>
 
 <div id="vig"></div><div class="lb" id="lbT"></div><div class="lb" id="lbB"></div>
 <div id="hud" class="hidden">
   <div id="labels"></div>
   <div id="bursts"></div>
-  <div id="pill"><div class="st" id="pillSt">Agla: —</div><div id="route"></div><div id="chips"></div><div id="seatHud" class="hidden"></div></div>
+  <div id="pill"><div class="st" id="pillSt">Next: —</div><div id="route"></div><div id="chips"></div><div id="seatHud" class="hidden"></div></div>
   <div id="feed"></div>
   <div id="banner" class="hidden"></div>
   <div id="big" class="hidden"><div class="a"></div><div class="b"></div></div>
@@ -176,76 +228,99 @@ body.roundover #controls{display:none}
 
 <div id="controls" class="hidden">
   <div id="stick"><div id="stickBase"><div id="stickKnob"></div></div></div>
-  <div class="cbtn" id="bJump" data-k="jump">KOODO</div>
-  <div class="cbtn" id="bGrab" data-k="grab">PAKDO<br><small>hold</small></div>
-  <div class="cbtn" id="bPush" data-k="push">DHAKKA!<br><small>hold = power</small></div>
+  <div class="cbtn" id="bJump" data-k="jump">JUMP</div>
+  <div class="cbtn" id="bGrab" data-k="grab">GRAB<br><small>hold</small></div>
+  <div class="cbtn" id="bPush" data-k="push">PUSH!<br><small>hold = power</small></div>
 </div>
 <button id="bFS" class="hidden" aria-label="Fullscreen" title="Fullscreen">⛶</button>
-<div id="topbtns" class="hidden"><button id="bMute" aria-label="Mute">🔊</button><button id="bQuit" aria-label="Quit">✕</button></div>
+<div id="topbtns" class="hidden"><button id="bSet2" aria-label="Settings">⚙️</button><button id="bMute" aria-label="Mute">🔊</button><button id="bQuit" aria-label="Quit">✕</button></div>
 
 <div id="menu" class="overlay hidden">
   <div class="card ticket">
-    <div class="tk-top"><span>DHAKKA SUBURBAN RAILWAY</span><span>II CLASS · PEAK HOUR</span></div>
+    <div class="tk-top"><span>DHAKKA SUBURBAN RAILWAY</span><span class="tk-btns"><button id="bTrain">🎓 Tutorial</button><button id="bAlmari">🎫 Pass · Wardrobe <b id="kmBadge"></b></button><button id="bSet" aria-label="Settings">⚙️</button></span></div>
     <div class="tk-body">
      <div class="tk-main">
       <h1>DHAKKA LOCAL</h1>
       <div class="sub3d">3D · Peak hour edition</div>
-      <p class="tag">Ek dabba. Chaar darwaze. Sab andar ghusna chahte hain.<br><b>Push everyone out of the local. Last one inside wins.</b></p>
-      <input id="name" maxlength="12" placeholder="Yatri ka naam (your name)">
-      <div class="chips">Kitne log?
+      <p class="tag">One coach. Four doors. Everyone wants in.<br><b>Push everyone out of the local. Last one inside wins.</b></p>
+      <input id="name" maxlength="12" placeholder="Your name">
+      <div class="chips">Players:
         <button data-n="3">3</button><button data-n="4" class="sel">4</button><button data-n="6">6</button>
       </div>
       <div class="chips modes">Mode:
         <button data-m="classic" class="sel">Classic</button><button data-m="seat">Seat Wars</button><button data-m="virar">Virar Fast</button><button data-m="monsoon">Monsoon</button>
       </div>
-      <div class="chips">Bots?
-        <button data-d="0.45">Aram se</button><button data-d="0.7" class="sel">Normal</button><button data-d="0.95">Virar fast</button>
+      <div class="chips">Bots:
+        <button data-d="0.45">Easy</button><button data-d="0.7" class="sel">Normal</button><button data-d="0.95">Hard</button>
       </div>
-      <div class="playrow"><button id="bPlay">Ticket punch karo · Chalo!</button><button id="bOnline">👫 Dosto ke saath</button></div>
+      <div class="playrow"><button id="bPlay">Punch ticket · Play!</button><button id="bOnline">👫 Play with friends</button></div>
      </div>
      <div class="tk-stub"><span>FROM</span><b>CHURCHGATE</b><span>TO</span><b>VIRAR</b><span>FARE</span><b>₹ 1 CHAPPAL</b></div>
     </div>
     <details>
-      <summary>Kaise khelna hai (how to play)</summary>
+      <summary>How to play</summary>
       <ul>
-        <li><b>Joystick</b> to walk. <b>KOODO</b> to jump.</li>
-        <li><b>DHAKKA!</b> tap for a quick shove. <b>Hold, then let go</b> for a super dhakka that sends people flying.</li>
-        <li><b>KOODO, then DHAKKA in the air</b> = flying dropkick. Huge hit, but you land on your face.</li>
-        <li><b>PAKDO</b> (hold) grabs a strap, a door pole or a person. Holding a person + DHAKKA = <b>throw</b>. Your grip (green bar) runs out!</li>
-        <li>Out of the train for about a second = <b>BAHAR</b>. Hanging on the door pole is allowed, until the khamba comes.</li>
-        <li><b>Clutch save:</b> flying out of the door? Hit <b>PAKDO</b> near the pole to catch it. BACH GAYA!</li>
+        <li><b>Joystick</b> to walk. <b>JUMP</b> to jump.</li>
+        <li><b>PUSH!</b> tap for a quick shove. <b>Hold, then let go</b> for a super push that sends people flying.</li>
+        <li><b>JUMP, then PUSH in the air</b> = flying dropkick. Huge hit, but you land on your face.</li>
+        <li><b>GRAB</b> (hold) grabs a strap, a door pole or a person. Holding a person + PUSH = <b>throw</b>. Your grip (green bar) runs out!</li>
+        <li>Out of the train for about a second = <b>OUT</b>. Hanging on the door pole is allowed, until a trackside pole comes.</li>
+        <li><b>Clutch save:</b> flying out of the door? Hit <b>GRAB</b> near the pole to catch it. SAVED!</li>
         <li>🍔 Vada pav = super strength. ☕ Cutting chai = speed. 🎫 Ticket = safe when the TC comes.</li>
         <li>Curves throw everyone sideways, brakes throw everyone forward. Stations bring crowds. Dadar, Andheri, Borivali: full rush.</li>
       </ul>
-      <div class="kbd">Keyboard: WASD or arrows to move, Space jump, J dhakka (hold for power), K hold to pakdo.</div>
+      <div class="kbd">Keyboard: WASD or arrows to move, Space jump, J push (hold for power), K hold to grab.</div>
     </details>
-    <div class="tk-foot">Valid for one journey only · No refund for lost chappals · Darwaze pe mat latko</div>
+    <div class="tk-foot">Valid for one journey only · No refund for lost chappals · Do not hang from the door</div>
+  </div>
+</div>
+
+<div id="almari" class="hidden">
+  <div class="alm-panel">
+    <div class="alm-head"><div><b id="almName"></b> <span id="almTitle"></span></div><button id="bAlmClose" aria-label="Close">✕</button></div>
+    <div class="kmbar"><div class="kmtxt" id="kmTxt"></div><div class="kmtrack"><i id="kmFill"></i></div></div>
+    <div class="alm-tabs"><button data-t="wear" class="sel">Wardrobe</button><button data-t="pass">Monthly Pass</button><button data-t="daily">Daily tasks</button><button data-t="stats">Record</button></div>
+    <div id="almBody"></div>
+  </div>
+</div>
+
+<div id="settings" class="overlay hidden">
+  <div class="card ticket setc">
+    <div class="tk-top"><span>SETTINGS</span><span>⚙️</span></div>
+    <div class="set-body">
+      <label>🎵 Music <input type="range" id="sMusic" min="0" max="1" step="0.05"></label>
+      <label>💥 Effects <input type="range" id="sSfx" min="0" max="1" step="0.05"></label>
+      <label>🗣️ Voice (announcements) <input type="range" id="sVoice" min="0" max="1" step="0.05"></label>
+      <div class="togs"><button id="tHaptic"></button><button id="tCalm"></button><button id="tLefty"></button></div>
+      <div class="chips">Buttons: <button data-bs="s">Small</button><button data-bs="m">Normal</button><button data-bs="l">Large</button></div>
+      <button id="bSetClose">Done ✓</button>
+    </div>
   </div>
 </div>
 
 <div id="lobby" class="overlay hidden">
   <div class="card ticket lob">
-    <div class="tk-top"><span>ONLINE DABBA</span><span>DOSTO KE SAATH</span></div>
+    <div class="tk-top"><span>ONLINE COACH</span><span>PLAY WITH FRIENDS</span></div>
     <div class="lob-body">
       <div id="lbPre">
-        <input id="lname" maxlength="12" placeholder="Yatri ka naam (your name)">
-        <button id="bHost">Naya room banao 🚃</button>
-        <div class="joinrow"><input id="code" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters"><button id="bJoin">Room mein ghuso</button></div>
+        <input id="lname" maxlength="12" placeholder="Your name">
+        <button id="bHost">Create a room 🚃</button>
+        <div class="joinrow"><input id="code" maxlength="4" placeholder="CODE" autocomplete="off" autocapitalize="characters"><button id="bJoin">Join room</button></div>
       </div>
       <div id="lbRoom" class="hidden">
         <div class="lcodebox">Room code <b id="lcode">----</b></div>
-        <div class="sharerow"><button id="bShare">WhatsApp pe bulao</button><button id="bCopy" class="alt">Link copy</button></div>
+        <div class="sharerow"><button id="bShare">Invite on WhatsApp</button><button id="bCopy" class="alt">Copy link</button></div>
         <ul id="plist"></ul>
         <div id="lhint"></div><div id="lstat"></div>
-        <button id="bStart" class="hidden">Train chalao! 🚦</button>
+        <button id="bStart" class="hidden">Start the train! 🚦</button>
       </div>
       <div id="lmsg"></div>
-      <button id="bLobBack" class="alt">← Wapas</button>
+      <button id="bLobBack" class="alt">← Back</button>
     </div>
   </div>
 </div>
 
-<div id="rotate" class="hidden"><div class="ph">📱</div><div>Phone ghumao!<br><small style="font-weight:500">Rotate to landscape for the full dabba</small></div><button style="width:auto;margin-top:16px" id="bRotOk">Aise hi khelunga</button></div>
+<div id="rotate" class="hidden"><div class="ph">📱</div><div>Turn your phone!<br><small style="font-weight:500">Rotate to landscape to see the whole coach</small></div><button style="width:auto;margin-top:16px" id="bRotOk">Play like this</button></div>
 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js';
@@ -262,19 +337,56 @@ const $ = id => document.getElementById(id);
 // ---- network core (host-authoritative online rooms; the rest of NET lives near the HUD code) ----
 const r2 = v => Math.round(v * 100) / 100;
 const NET = {role: null, peer: null, peers: new Map(), host: null, code: '', myId: null, ev: [], evTo: {}, mute: 0, sendT: 0, snaps: [], offset: null, spawn: new Map(), byCid: new Map(), lastR: '', lastSp: '', lastLed: '', n: 0, inT: 0, lastIn: '', latch: {push: false, jump: false, grab: false}, lastSnapAt: 0, station: -1};
+// ---- saved settings and player profile (this phone only) ----
+const store = {get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }};
+const SET = Object.assign({music: 0.5, sfx: 0.85, voice: 0.9, haptics: true, calm: false, lefty: false, btn: 'm'}, store.get('dl_set', {}));
+const PROF = Object.assign({km: 0, matches: 0, mwins: 0, life: {}, look: {head: '', face: '', extra: 'strap', fx: 'dust', title: 'naya'}, daily: null, trained: false, uses: {}, recent: []}, store.get('dl_prof', {}));
+let profT = 0; function saveProf(now) { if (now) { store.set('dl_prof', PROF); return; } clearTimeout(profT); profT = setTimeout(() => store.set('dl_prof', PROF), 400); }
+const ITEMS = {
+  head: [['', 'Nothing'], ['cap', 'Red cap'], ['capb', 'Backwards blue cap'], ['phones', 'Headphones'], ['hardhat', 'Yellow hard hat'], ['umbrella', 'Umbrella hat'], ['crown', 'Paper crown']],
+  face: [['', 'Nothing'], ['glasses', 'Glasses'], ['must', 'Moustache'], ['shades', 'Sunglasses'], ['bigmust', 'Huge moustache']],
+  extra: [['strap', 'Sling bag'], ['backpack', 'College bag'], ['tie', 'Office tie'], ['dupatta', 'Scarf'], ['lanyard', 'College ID'], ['garland', 'Flower garland'], ['tiffin', 'Tiffin bag']],
+  fx: [['dust', 'Dust cloud'], ['petals', 'Marigold petals'], ['chai', 'Chai splash'], ['paper', 'Newspaper']],
+  title: [['naya', 'New Commuter'], ['don', 'Door Don'], ['clutch', 'Clutch King'], ['khamba', 'Pole Magnet'], ['chor', 'Chappal Thief'], ['badla', 'Platform Avenger'], ['raja', 'King of Virar'], ['asli', 'True Mumbaikar']]
+};
+const CAT_NAME = {head: 'Head', face: 'Face', extra: 'Carry', fx: 'Fall style', title: 'Title'};
+const FREE = new Set(['head:', 'head:cap', 'face:', 'face:glasses', 'face:must', 'extra:strap', 'extra:backpack', 'fx:dust', 'title:naya']);
+const PASS = ['head:capb', 'extra:tie', 'fx:petals', 'face:shades', 'head:phones', 'extra:dupatta', 'extra:lanyard', 'fx:chai', 'head:hardhat', 'face:bigmust', 'extra:garland', 'fx:paper', 'head:umbrella', 'extra:tiffin', 'head:crown', 'title:asli'];
+const STAMP_KM = 100;
+const TITLE_REQ = {don: ['outs', 10, 'people pushed out'], clutch: ['saves', 8, 'clutch saves'], khamba: ['khamba', 5, 'pole hits taken'], chor: ['props', 20, 'things knocked loose'], badla: ['revenge', 8, 'platform revenge hits'], raja: ['mwins', 3, 'matches won']};
+function itemName(key) { const [c, id] = key.split(':'); const r = (ITEMS[c] || []).find(x => x[0] === id); return r ? r[1] : id; }
+function lifeOf(k) { return k === 'mwins' ? PROF.mwins : (PROF.life[k] || 0); }
+function isUnlocked(cat, id) {
+  const key = cat + ':' + id; if (FREE.has(key)) return true;
+  const pi = PASS.indexOf(key); if (pi >= 0) return Math.floor(PROF.km / STAMP_KM) > pi;
+  const tr = cat === 'title' && TITLE_REQ[id]; return !!(tr && lifeOf(tr[0]) >= tr[1]);
+}
+function lockText(cat, id) { const pi = PASS.indexOf(cat + ':' + id); if (pi >= 0) return 'Stamp ' + (pi + 1) + ' (' + (pi + 1) * STAMP_KM + ' km)'; const tr = TITLE_REQ[id]; return tr ? tr[1] + ' ' + tr[2] + ' (' + Math.min(tr[1], lifeOf(tr[0])) + '/' + tr[1] + ')' : ''; }
+function cleanLook(l) { const o = {}; for (const c of ['head', 'face', 'extra', 'fx', 'title']) { const v = l && typeof l[c] === 'string' ? l[c] : ''; o[c] = ITEMS[c].some(x => x[0] === v) ? v : ITEMS[c][0][0]; } return o; }
+function titleName(id) { const r = ITEMS.title.find(x => x[0] === id); return r && id !== 'naya' ? r[1] : ''; }
+// daily challenges: 3 a day, the same for everyone on that date
+const DAILY_POOL = [['outs', 3, 'Push 3 people out'], ['outs', 6, 'Push 6 people out'], ['kicks', 1, 'Dropkick someone out'], ['throws', 2, 'Throw 2 people out'], ['saves', 2, 'Make 2 clutch saves'], ['wins', 1, 'Win a round'], ['wins', 2, 'Win 2 rounds'], ['props', 5, 'Knock 5 things off people'], ['revenge', 2, 'Land 2 revenge hits from the platform'], ['seatwins', 1, 'Win a Seat Wars round'], ['matches', 2, 'Finish 2 matches']];
+const DAILY_KM = 60;
+function todayKey() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+function ensureDaily() {
+  const k = todayKey(); if (PROF.daily && PROF.daily.date === k) return PROF.daily;
+  let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  const idx = [], pool = DAILY_POOL.map((_, i) => i);
+  while (idx.length < 3) { h = (h * 1103515245 + 12345) >>> 0; const i = pool.splice(h % pool.length, 1)[0]; if (!idx.some(j => DAILY_POOL[j][0] === DAILY_POOL[i][0])) idx.push(i); }
+  PROF.daily = {date: k, list: idx.map(i => ({i, p: 0, done: false}))}; saveProf(); return PROF.daily;
+}
 function netEv(...a) { if (NET.role === 'host' && !NET.mute && GAME.state === 'play' && NET.ev.length < 160) NET.ev.push(a); }
 function netTo(pid, a) { if (NET.role === 'host' && GAME.state === 'play') (NET.evTo[pid] = NET.evTo[pid] || []).push(a); }
 
 const STATIONS = ['Lower Parel','Prabhadevi','Dadar','Matunga Road','Mahim','Bandra','Khar Road','Santacruz','Vile Parle','Andheri','Jogeshwari','Goregaon','Malad','Kandivali','Borivali','Dahisar','Mira Road','Bhayandar','Vasai Road','Virar'];
-const DEVA = {'Dadar':'दादर','Bandra':'वांद्रे','Andheri':'अंधेरी','Borivali':'बोरीवली','Virar':'विरार','Mahim':'माहीम','Malad':'मालाड','Goregaon':'गोरेगाव','Santacruz':'सांताक्रूझ','Lower Parel':'लोअर परळ','Prabhadevi':'प्रभादेवी','Vile Parle':'विले पार्ले','Kandivali':'कांदिवली','Jogeshwari':'जोगेश्वरी','Khar Road':'खार रोड','Matunga Road':'माटुंगा रोड','Dahisar':'दहिसर','Mira Road':'मीरा रोड','Bhayandar':'भाईंदर','Vasai Road':'वसई रोड'};
 const RUSH = new Set(['Dadar','Andheri','Borivali','Virar']);
 
-const HIT_LINES = ['Arre bhai!','Dhakka mat do!','Oye!','Abey!','Mera tiffin!','Mera chashma!','Aaiyo!','Kya kar raha hai?!','Bhai mera phone!','Aai ga!','Dekh ke!'];
-const NPC_HIT = ['Tameez nahi hai?','Aajkal ke bachche!','Main complaint karunga!','Arre baba!','Ghar pe maa-baap nahi?'];
-const BOARD_LINES = ['Andar chalo!','Aage badho!','Thoda adjust karo','Side do na!','Andar jagah hai!','Chalo chalo!'];
-const ALIGHT_LINES = ['Utarna hai!','Bhaiya utarna hai!','Hato hato!','Jagah do!','Side, side!'];
-const VENDOR_LINES = ['Chana jor garam!','Vada pav! Bees rupaye!','Chikki lo chikki!','Earphone pachaas rupaye!','Pen le lo pen!','Mobile cover! Sasta!'];
-const OUT_SUBS = ['Next train 3 minute mein hai.','Chappal yahin reh gayi.','Ab platform pe cutting chai pi.','Office late. Boss naraz.','Monthly pass waste ho gaya.','Mumbai ki speed, bhai!','Mummy ko kya bolega?','Seat ka sapna toot gaya.','Ab ghar tak paidal.'];
+const HIT_LINES = ['Hey bro!','Stop pushing!','Oi!','Watch it!','My tiffin!','My glasses!','Ouch!','What are you doing?!','My phone, bro!','Aiyo!','Look where you\'re going!'];
+const NPC_HIT = ['No manners!','Kids these days!','I will complain!','Oh my god!','Who raised you?'];
+const BOARD_LINES = ['Move inside!','Keep moving!','Adjust a little','Make some room!','There\'s space inside!','Come on, come on!'];
+const ALIGHT_LINES = ['Getting off!','Bro, I need to get off!','Move, move!','Let me out!','Side, side!'];
+const VENDOR_LINES = ['Hot roasted chana!','Vada pav! Twenty rupees!','Chikki, get your chikki!','Earphones, fifty rupees!','Pens, buy a pen!','Phone covers! Cheap!'];
+const OUT_SUBS = ['Next train in 3 minutes.','The chappal stayed on board.','Time for a cutting chai on the platform.','Late for office. Boss is angry.','Monthly pass wasted.','Mumbai speed, bro!','What will you tell your mum?','The seat dream is over.','Walking home now.'];
 const BOT_NAMES = ['Pappu','Chintu','Bunty','Golu','Pinky','Tinku','Munna','Sonu','Guddu','Dolly'];
 const COLORS = [0xff5964,0x35a7ff,0xffd23f,0x6bf178,0xc77dff,0xff9f1c,0x2ec4b6,0xf15bb5];
 const SKINS = [0xc68642,0x8d5524,0xe0ac69,0xa0663c,0xd9a066];
@@ -302,11 +414,11 @@ const fill = new THREE.DirectionalLight(0xfff6e0, 0); fill.position.set(0, 10, 0
 const LAMPS = [-4.2, 0, 4.2].map(x => { const l = new THREE.PointLight(0xfff0cc, 0, 7.5, 1.2); l.position.set(x, 2.3, 0); scene.add(l); return l; });
 // time of day presets: one per round, cycling through a Mumbai day
 const TODS = [
-  {name: 'morning', label: 'Subah 8:14', sky: 0xbfe2f5, sun: 0xfff2dc, sunI: 2.1, hs: 0xeaf6ff, hg: 0x6b5a4a, hI: 1.2, fillI: 0, glow: 0, pos: [8, 14, 6]},
-  {name: 'noon', label: 'Dopahar 1:05', sky: 0x9fd0f2, sun: 0xffffff, sunI: 2.3, hs: 0xf4fbff, hg: 0x7a6552, hI: 1.25, fillI: 0, glow: 0, pos: [1, 16, 5]},
-  {name: 'golden', label: 'Shaam 5:48', sky: 0xffc48a, sun: 0xffe2b0, sunI: 2.0, hs: 0xfff1d6, hg: 0x6b4a3a, hI: 1.25, fillI: 0, glow: 0, pos: [-6, 14, 8]},
-  {name: 'dusk', label: 'Shaam 7:02', sky: 0xd98a9c, sun: 0xff9a6a, sunI: 1.2, hs: 0xffd6e0, hg: 0x5a3a50, hI: 0.85, fillI: 0, glow: 0.6, pos: [-10, 9, 6]},
-  {name: 'night', label: 'Raat 10:47', sky: 0x141a36, sun: 0x8fa6ff, sunI: 0.35, hs: 0x8a96d0, hg: 0x2a2040, hI: 0.45, fillI: 0, glow: 1, pos: [4, 14, 6]}
+  {name: 'morning', label: 'Morning 8:14', sky: 0xbfe2f5, sun: 0xfff2dc, sunI: 2.1, hs: 0xeaf6ff, hg: 0x6b5a4a, hI: 1.2, fillI: 0, glow: 0, pos: [8, 14, 6]},
+  {name: 'noon', label: 'Afternoon 1:05', sky: 0x9fd0f2, sun: 0xffffff, sunI: 2.3, hs: 0xf4fbff, hg: 0x7a6552, hI: 1.25, fillI: 0, glow: 0, pos: [1, 16, 5]},
+  {name: 'golden', label: 'Evening 5:48', sky: 0xffc48a, sun: 0xffe2b0, sunI: 2.0, hs: 0xfff1d6, hg: 0x6b4a3a, hI: 1.25, fillI: 0, glow: 0, pos: [-6, 14, 8]},
+  {name: 'dusk', label: 'Dusk 7:02', sky: 0xd98a9c, sun: 0xff9a6a, sunI: 1.2, hs: 0xffd6e0, hg: 0x5a3a50, hI: 0.85, fillI: 0, glow: 0.6, pos: [-10, 9, 6]},
+  {name: 'night', label: 'Night 10:47', sky: 0x141a36, sun: 0x8fa6ff, sunI: 0.35, hs: 0x8a96d0, hg: 0x2a2040, hI: 0.45, fillI: 0, glow: 1, pos: [4, 14, 6]}
 ];
 const LIGHT = {tod: TODS[2], glow: 0, sky: new THREE.Color(0xffc48a), tmp: new THREE.Color(), tmp2: new THREE.Color()};
 
@@ -356,7 +468,7 @@ const WHEELS = [], FANS = [], LED = {tex: null, text: '', x: 512};
 const TUBE_MAT = new THREE.MeshBasicMaterial({color: 0xcfd3cf});
 const NEAR_WALL = new THREE.MeshToonMaterial({color: 0xa9d6b5, gradientMap: grad, transparent: true, opacity: 0.45, depthWrite: false});
 const NEAR_STRIPE = new THREE.MeshToonMaterial({color: 0x7a1f3d, gradientMap: grad, transparent: true, opacity: 0.55, depthWrite: false});
-const POSTERS = [['EK PHONE CALL','Har samasya ka hal!','#ffd1dc'],['ENGLISH BOLO','Sirf 30 din mein','#fff4b0'],['BABA BENGALI','Pyaar, paisa, naukri','#d1f0ff'],['GHAR BAITHE','Kamaao lakhon!','#e6ffd1']];
+const POSTERS = [['ONE PHONE CALL','Solves every problem!','#ffd1dc'],['SPEAK ENGLISH','In just 30 days','#fff4b0'],['LOVE GURU','Love, money, job','#d1f0ff'],['WORK FROM HOME','Earn lakhs!','#e6ffd1']];
 const POSTER_TEX = POSTERS.map(([a, b, bg]) => canvasTex(256, 208, (c, w, h) => { c.fillStyle = bg; c.fillRect(0, 0, w, h); c.fillStyle = '#b00020'; c.font = '900 30px system-ui,sans-serif'; c.textAlign = 'center'; c.fillText(a, w / 2, 56); c.fillStyle = '#222'; c.font = '700 24px system-ui,sans-serif'; c.fillText(b, w / 2, 110); c.fillStyle = '#b00020'; c.font = '800 26px system-ui,sans-serif'; c.fillText('☎ 98XXX XXXXX', w / 2, 170); }));
 
 function buildCoach() {
@@ -443,7 +555,7 @@ function drawLED(dt) {
 
 const OUT = {items: [], poles: [], platform: null, tall: null, khamba: null, rain: null, groundTex: null, boardTex: null, winMats: [], puddles: [], ptrain: null, theme: 'city'};
 const THEME_OF = {'Lower Parel': 'city', 'Prabhadevi': 'city', 'Dadar': 'city', 'Matunga Road': 'slum', 'Mahim': 'sea', 'Bandra': 'sea', 'Khar Road': 'slum', 'Santacruz': 'city', 'Vile Parle': 'slum', 'Andheri': 'city', 'Jogeshwari': 'slum', 'Goregaon': 'green', 'Malad': 'slum', 'Kandivali': 'city', 'Borivali': 'green', 'Dahisar': 'green', 'Mira Road': 'city', 'Bhayandar': 'sea', 'Vasai Road': 'green', 'Virar': 'city'};
-const WALL_ADS = [['TUITION CLASSES', '100% pass guarantee*', '#fff4b0'], ['PAPPU PAAN', 'Since 1987', '#d1f0ff'], ['VADA PAV KING', '2 lo, 1 free', '#ffd1dc'], ['SHARMA TAILORS', 'Same day alteration', '#e6ffd1'], ['GYM KARO', 'Pehla mahina free', '#ffe0b8'], ['DHAKKA COLA', 'Thanda thanda!', '#d9f2ff']];
+const WALL_ADS = [['TUITION CLASSES', '100% pass guarantee*', '#fff4b0'], ['PAPPU PAAN', 'Since 1987', '#d1f0ff'], ['VADA PAV KING', 'Buy 2, get 1 free', '#ffd1dc'], ['SHARMA TAILORS', 'Same day alteration', '#e6ffd1'], ['JOIN THE GYM', 'First month free', '#ffe0b8'], ['DHAKKA COLA', 'Ice cold!', '#d9f2ff']];
 const SPAN = 64;
 function addItem(obj, theme, k) { obj.visible = theme === OUT.theme; ext.add(obj); OUT.items.push({obj, theme, k: k || 1}); return obj; }
 function buildOutside() {
@@ -556,7 +668,7 @@ function buildOutside() {
 function setTheme(th, now) { OUT.theme = th; if (now) for (const it of OUT.items) it.obj.visible = it.theme === th; }
 function drawBoard(name) {
   const c = OUT.boardTex._g; c.fillStyle = '#ffd400'; c.fillRect(0, 0, 512, 160); c.strokeStyle = '#111'; c.lineWidth = 10; c.strokeRect(5, 5, 502, 150);
-  c.fillStyle = '#111'; c.textAlign = 'center'; c.font = '800 40px system-ui,sans-serif'; c.fillText(DEVA[name] || '', 256, 64); c.font = '900 52px system-ui,sans-serif'; c.fillText(name.toUpperCase(), 256, 128); OUT.boardTex.needsUpdate = true;
+  c.fillStyle = '#111'; c.textAlign = 'center'; c.font = '800 30px system-ui,sans-serif'; c.fillText('WESTERN RAILWAY', 256, 60); c.font = '900 52px system-ui,sans-serif'; c.fillText(name.toUpperCase(), 256, 128); OUT.boardTex.needsUpdate = true;
 }
 
 // ================= characters =================
@@ -612,7 +724,7 @@ function makeChar(x, z, o) {
   }
   const ch = {
     cid: o.cid || ++cidSeq, id: o.id || ('n' + (++charSeq)), name: o.name, kind: o.kind || 'player', color: o.color, pants: o.pants, skin: o.skin ?? pick(SKINS), acc: o.acc || 0,
-    heavy: !!o.heavy, isNpc: !!o.isNpc, isBot: !!o.isBot, isMe: !!o.isMe, parts, list: Object.values(parts), cons,
+    heavy: !!o.heavy, isNpc: !!o.isNpc, isBot: !!o.isBot, isMe: !!o.isMe, look: o.look || null, parts, list: Object.values(parts), cons,
     yaw, ctrl: o.ctrl || makeCtrl(), stun: 0, jumpT: 0, grounded: false, phase: Math.random() * 6,
     grab: null, grip: 1, gripLock: 0, charge: 0, charging: false, pushHeld: false, jumpHeld: false, pushCd: 0, pushAnim: 0, kick: 0, kickHit: new Set(),
     outT: 0, out: false, outAt: 0, removed: false, bubble: null, lastHitBy: null, lastHitT: -99, lastCause: null,
@@ -639,19 +751,30 @@ function makeChar(x, z, o) {
 
 const PRING_GEO = new THREE.RingGeometry(0.4, 0.5, 28);
 const ARROW_GEO = (() => { const sh = new THREE.Shape(); sh.moveTo(-0.12, 0); sh.lineTo(0.12, 0); sh.lineTo(0.12, 0.6); sh.lineTo(0.3, 0.6); sh.lineTo(0, 1); sh.lineTo(-0.3, 0.6); sh.lineTo(-0.12, 0.6); sh.closePath(); const g = new THREE.ShapeGeometry(sh); g.rotateX(Math.PI / 2); return g; })();
+function buildLookExtras(ch, L, torso, head, face) {
+  if (L.face === 'bigmust') { const mu = mesh(new THREE.BoxGeometry(0.24, 0.05, 0.045), 0x1a1a1a, {cast: false}); mu.position.set(0, -0.045, 0.205); face.add(mu); for (const sx of [-1, 1]) { const c = mesh(new THREE.SphereGeometry(0.035, 8, 6), 0x1a1a1a, {cast: false}); c.position.set(sx * 0.13, -0.015, 0.2); face.add(c); } }
+  if (L.head === 'hardhat') { const hg = new THREE.Group(); const dome = mesh(new THREE.SphereGeometry(0.25, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0xffc107, {cast: false, outline: true}); dome.position.y = 0.04; hg.add(dome); const rim = mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.025, 16), 0xffc107, {cast: false}); rim.position.y = 0.05; hg.add(rim); head.add(hg); ch.wear.cap = hg; }
+  if (L.head === 'umbrella') { const ug = new THREE.Group(); const st = mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.75, 6), 0x3a2a1a, {cast: false}); st.position.y = 0.45; ug.add(st); const can = mesh(new THREE.ConeGeometry(0.6, 0.28, 8, 1, true), 0x1d1d6b, {cast: true, outline: true}); can.position.y = 0.9; ug.add(can); const tip = mesh(new THREE.SphereGeometry(0.03, 6, 4), 0xdddddd, {cast: false}); tip.position.y = 1.05; ug.add(tip); head.add(ug); ch.wear.umb = ug; }
+  if (L.head === 'crown') { const cg = new THREE.Group(); const band = mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.1, 10, 1, true), 0xffd23f, {cast: false, outline: true}); band.position.y = 0.2; cg.add(band); for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2, sp = mesh(new THREE.ConeGeometry(0.045, 0.1, 4), 0xffd23f, {cast: false}); sp.position.set(Math.sin(a) * 0.19, 0.29, Math.cos(a) * 0.19); cg.add(sp); } head.add(cg); ch.wear.cap = cg; }
+  if (L.extra === 'garland') { const g1 = mesh(new THREE.TorusGeometry(0.2, 0.045, 6, 18), 0xff9f1c, {cast: false}); g1.rotation.x = Math.PI / 2 + 0.5; g1.scale.set(1, 1.15, 1); g1.position.set(0, 0.2, 0.04); torso.add(g1); const g2 = mesh(new THREE.TorusGeometry(0.2, 0.02, 4, 18), 0xffd23f, {cast: false}); g2.rotation.copy(g1.rotation); g2.scale.copy(g1.scale); g2.position.set(0, 0.21, 0.06); torso.add(g2); }
+  if (L.extra === 'lanyard') { for (const sx of [-1, 1]) { const st = mesh(new THREE.BoxGeometry(0.02, 0.3, 0.012), 0xd62828, {cast: false}); st.position.set(sx * 0.06, 0.15, 0.17); st.rotation.z = sx * 0.35; torso.add(st); } const card = mesh(new THREE.BoxGeometry(0.1, 0.13, 0.012), 0xffffff, {cast: false}); card.position.set(0, -0.02, 0.18); torso.add(card); const ph = mesh(new THREE.BoxGeometry(0.04, 0.05, 0.006), 0x35a7ff, {cast: false}); ph.position.set(-0.02, 0, 0.188); torso.add(ph); }
+  if (L.extra === 'tiffin') { const strap = mesh(new THREE.BoxGeometry(0.05, 0.62, 0.36), 0x2f5d3a); strap.rotation.z = 0.55; torso.add(strap); const tf = mesh(GEO.tiffinBig || (GEO.tiffinBig = new THREE.CylinderGeometry(0.1, 0.1, 0.26, 10)), 0xbfc5c9, {outline: true, cast: false}); tf.position.set(-0.3, -0.25, 0.05); torso.add(tf); }
+}
+function lookFromAcc(a) { return {head: a === 3 ? 'capb' : (a === 7 ? 'phones' : ''), face: a === 4 ? 'glasses' : (a === 1 ? 'must' : ''), extra: a === 2 ? 'backpack' : (a === 5 ? 'tie' : (a === 6 ? 'dupatta' : 'strap')), fx: 'dust', title: ''}; }
 function buildCharMesh(ch) {
   const g = new THREE.Group(); scene.add(g); ch.group = g; ch.meshes = {};
+  const L = ch.kind === 'player' ? (ch.look || lookFromAcc(ch.acc)) : null;
   const shirt = ch.color, pants = ch.pants, skin = ch.skin;
   const sleeve = ch.kind === 'aunty' ? skin : shirt;
   const add = (name, geo, col) => { const m = mesh(geo, col, {outline: true, ol: 1.14}); g.add(m); ch.meshes[name] = m; return m; };
   const torso = add('torso', GEO.torso, shirt);
   if (ch.kind === 'aunty') { const sash = mesh(new THREE.BoxGeometry(0.06, 0.7, 0.42), 0xffd400); sash.rotation.z = 0.6; torso.add(sash); }
-  if (ch.kind === 'student' || (ch.kind === 'player' && ch.acc === 2)) { const bp = mesh(new THREE.BoxGeometry(0.34, 0.42, 0.16), ch.kind === 'student' ? 0xd64545 : 0x3a3a3a, {outline: true}); bp.position.set(0, 0, -0.24); torso.add(bp); }
+  if (ch.kind === 'student' || (L && L.extra === 'backpack')) { const bp = mesh(new THREE.BoxGeometry(0.34, 0.42, 0.16), ch.kind === 'student' ? 0xd64545 : 0x3a3a3a, {outline: true}); bp.position.set(0, 0, -0.24); torso.add(bp); }
   if (ch.kind === 'tc') { const sf = mesh(new THREE.BoxGeometry(0.16, 0.5, 0.02), 0xffffff); sf.position.set(0, 0.02, 0.17); torso.add(sf); const badge = mesh(new THREE.BoxGeometry(0.08, 0.05, 0.02), 0xffd400); badge.position.set(0.14, 0.12, 0.17); torso.add(badge); }
-  if (ch.kind === 'player' && ch.acc !== 5 && ch.acc !== 6) { const strap = mesh(new THREE.BoxGeometry(0.05, 0.62, 0.36), 0x4a2f1a); strap.rotation.z = -0.55; torso.add(strap); }
+  if (L && L.extra === 'strap') { const strap = mesh(new THREE.BoxGeometry(0.05, 0.62, 0.36), 0x4a2f1a); strap.rotation.z = -0.55; torso.add(strap); }
   ch.wear = {}; ch.shoes = []; ch.lost = 0;
-  if (ch.kind === 'player' && ch.acc === 5) { const tie = mesh(GEO.tie, 0xb00020, {cast: false}); tie.position.set(0, 0.02, 0.2); tie.rotation.x = -0.1; torso.add(tie); const col = mesh(new THREE.BoxGeometry(0.22, 0.05, 0.05), 0xffffff, {cast: false}); col.position.set(0, 0.29, 0.14); torso.add(col); }
-  if (ch.kind === 'player' && ch.acc === 6) {
+  if (L && L.extra === 'tie') { const tie = mesh(GEO.tie, 0xb00020, {cast: false}); tie.position.set(0, 0.02, 0.2); tie.rotation.x = -0.1; torso.add(tie); const col = mesh(new THREE.BoxGeometry(0.22, 0.05, 0.05), 0xffffff, {cast: false}); col.position.set(0, 0.29, 0.14); torso.add(col); }
+  if (L && L.extra === 'dupatta') {
     const dup = mesh(new THREE.BoxGeometry(0.5, 0.06, 0.38), 0xffd23f, {cast: false}); dup.position.set(0, 0.28, 0); torso.add(dup);
     const piv = new THREE.Group(); piv.position.set(0.12, 0.28, -0.17); torso.add(piv);
     const tail = mesh(new THREE.BoxGeometry(0.16, 0.55, 0.02), 0xffd23f, {cast: false}); tail.position.y = -0.27; piv.add(tail); ch.flap = piv;
@@ -668,14 +791,15 @@ function buildCharMesh(ch) {
   for (const ex of [-0.085, 0.085]) { const b = mesh(GEO.brow, 0x1a1a1a, {cast: false}); b.position.set(ex, 0.125, 0.19); face.add(b); ch.brows.push(b); }
   applyFace(ch, 'normal');
   const mouth = mesh(GEO.mouth, 0x5a1010, {cast: false}); mouth.position.set(0, -0.09, 0.19); mouth.scale.set(1, 0.4, 0.5); face.add(mouth); ch.mouth = mouth;
-  if (ch.kind === 'uncle' || ch.kind === 'vendor' || ch.kind === 'tc' || (ch.kind === 'player' && ch.acc === 1)) { const mu = mesh(GEO.must, 0x1a1a1a, {cast: false}); mu.position.set(0, -0.04, 0.205); face.add(mu); }
+  if (ch.kind === 'uncle' || ch.kind === 'vendor' || ch.kind === 'tc' || (L && L.face === 'must')) { const mu = mesh(GEO.must, 0x1a1a1a, {cast: false}); mu.position.set(0, -0.04, 0.205); face.add(mu); }
   if (ch.kind !== 'uncle') { const hair = mesh(GEO.hair, 0x1a1a1a, {cast: false}); hair.rotation.x = -0.25; head.add(hair); }
   else { for (const sx of [-1, 1]) { const tuft = mesh(new THREE.SphereGeometry(0.08, 8, 6), 0xdddddd, {cast: false}); tuft.position.set(sx * 0.2, 0.02, -0.04); head.add(tuft); } }
   if (ch.kind === 'aunty') { const bun = mesh(new THREE.SphereGeometry(0.11, 10, 8), 0x1a1a1a, {cast: false}); bun.position.set(0, 0.06, -0.22); head.add(bun); const bindi = mesh(new THREE.SphereGeometry(0.018, 6, 4), 0xd00000, {cast: false}); bindi.position.set(0, 0.13, 0.21); face.add(bindi); }
-  if (ch.kind === 'player' && ch.acc === 3) { const cg = new THREE.Group(); const cap = mesh(new THREE.SphereGeometry(0.24, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0xe63946, {cast: false}); cap.position.y = 0.03; cg.add(cap); const brim = mesh(new THREE.BoxGeometry(0.26, 0.03, 0.2), 0xe63946, {cast: false}); brim.position.set(0, 0.04, -0.27); cg.add(brim); head.add(cg); ch.wear.cap = cg; }
-  if ((ch.kind === 'player' && ch.acc === 4) || ch.kind === 'uncle') { const gl = new THREE.Group(); for (const ex of [-0.08, 0.08]) { const r = mesh(new THREE.TorusGeometry(0.06, 0.012, 6, 14), 0x111111, {cast: false}); r.position.set(ex, 0.04, 0.215); gl.add(r); } face.add(gl); ch.wear.glasses = gl; }
-  if (ch.kind === 'player' && ch.acc === 6) { const pn = mesh(GEO.pony, 0x1a1a1a, {cast: false}); pn.position.set(0, -0.02, -0.25); pn.rotation.x = 0.5; head.add(pn); }
-  if (ch.kind === 'player' && ch.acc === 7) { const hp = new THREE.Group(); const band = mesh(GEO.band, 0x222222, {cast: false}); band.position.y = 0.02; hp.add(band); for (const sx of [-1, 1]) { const cup = mesh(GEO.phone, 0x35a7ff, {cast: false, outline: true}); cup.rotation.z = Math.PI / 2; cup.position.set(sx * 0.23, 0.0, 0); hp.add(cup); } head.add(hp); ch.wear.phones = hp; }
+  if (L && (L.head === 'cap' || L.head === 'capb')) { const cc = L.head === 'cap' ? 0xe63946 : 0x2f7de1, cg = new THREE.Group(); const cap = mesh(new THREE.SphereGeometry(0.24, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), cc, {cast: false}); cap.position.y = 0.03; cg.add(cap); const brim = mesh(new THREE.BoxGeometry(0.26, 0.03, 0.2), cc, {cast: false}); brim.position.set(0, 0.04, L.head === 'cap' ? 0.27 : -0.27); cg.add(brim); head.add(cg); ch.wear.cap = cg; }
+  if ((L && (L.face === 'glasses' || L.face === 'shades')) || ch.kind === 'uncle') { const gl = new THREE.Group(); for (const ex of [-0.08, 0.08]) { const r = mesh(new THREE.TorusGeometry(0.06, 0.012, 6, 14), 0x111111, {cast: false}); r.position.set(ex, 0.04, 0.215); gl.add(r); if (L && L.face === 'shades') { const ln = mesh(new THREE.CircleGeometry(0.058, 14), 0x0d0d14, {cast: false}); ln.position.set(ex, 0.04, 0.222); gl.add(ln); } } if (L && L.face === 'shades') { const br = mesh(new THREE.BoxGeometry(0.06, 0.014, 0.014), 0x111111, {cast: false}); br.position.set(0, 0.05, 0.222); gl.add(br); } face.add(gl); ch.wear.glasses = gl; }
+  if (L) buildLookExtras(ch, L, torso, head, face);
+  if (L && L.extra === 'dupatta') { const pn = mesh(GEO.pony, 0x1a1a1a, {cast: false}); pn.position.set(0, -0.02, -0.25); pn.rotation.x = 0.5; head.add(pn); }
+  if (L && L.head === 'phones') { const hp = new THREE.Group(); const band = mesh(GEO.band, 0x222222, {cast: false}); band.position.y = 0.02; hp.add(band); for (const sx of [-1, 1]) { const cup = mesh(GEO.phone, 0x35a7ff, {cast: false, outline: true}); cup.rotation.z = Math.PI / 2; cup.position.set(sx * 0.23, 0.0, 0); hp.add(cup); } head.add(hp); ch.wear.phones = hp; }
   if (ch.kind === 'dabba') { const cap = mesh(new THREE.CylinderGeometry(0.2, 0.23, 0.12, 12), 0xfafafa, {cast: false}); cap.position.y = 0.19; head.add(cap); const crate = mesh(new THREE.BoxGeometry(0.6, 0.18, 0.4), 0xc0392b, {outline: true}); crate.position.y = 0.36; head.add(crate); for (let i = 0; i < 3; i++) { const d = mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.14, 8), 0xbfc5c9, {cast: false}); d.position.set(-0.18 + i * 0.18, 0.12, 0); crate.add(d); } }
   if (ch.kind === 'vendor') { const tray = mesh(new THREE.CylinderGeometry(0.38, 0.32, 0.1, 14), 0xa0522d, {outline: true}); tray.position.y = 0.3; head.add(tray); for (let i = 0; i < 6; i++) { const c = mesh(new THREE.SphereGeometry(0.08, 6, 5), 0xe9b44c, {cast: false}); c.position.set(rnd(-0.2, 0.2), 0.1, rnd(-0.2, 0.2)); tray.add(c); } }
   if (ch.kind === 'tc') { const hat = mesh(new THREE.CylinderGeometry(0.23, 0.23, 0.12, 12), 0x1b1b1b, {cast: false}); hat.position.y = 0.2; head.add(hat); }
@@ -692,8 +816,9 @@ function buildCharMesh(ch) {
   if (!ch.isNpc) { const ar = new THREE.Mesh(ARROW_GEO, new THREE.MeshBasicMaterial({color: 0xff3355, transparent: true, opacity: 0.75, side: THREE.DoubleSide, depthWrite: false})); ar.visible = false; scene.add(ar); ch.arrow = ar; }
   if (ch.isMe) { const yr = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.64, 32), new THREE.MeshBasicMaterial({color: 0xffe14d, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthTest: false, depthWrite: false})); yr.rotation.x = -Math.PI / 2; yr.renderOrder = 10; scene.add(yr); ch.youRing = yr; }
   const el = document.createElement('div'); el.className = 'lab' + (ch.isMe ? ' me' : '');
-  el.innerHTML = '<div class="bub hidden"></div><div class="pw"></div><div class="nm"></div><div class="bars"><div class="bar gr hidden"><i></i></div><div class="bar ch hidden"><i></i></div></div>';
+  el.innerHTML = '<div class="bub hidden"></div><div class="pw"></div><div class="nm"></div><div class="tt"></div><div class="bars"><div class="bar gr hidden"><i></i></div><div class="bar ch hidden"><i></i></div></div>';
   el.querySelector('.nm').textContent = (ch.kind === 'player' || ch.kind === 'vendor' || ch.kind === 'tc') ? ch.name : '';
+  el.querySelector('.tt').textContent = ch.look ? titleName(ch.look.title) : '';
   $('labels').appendChild(el); ch.el = el; ch.elB = el.querySelector('.bub'); ch.elPw = el.querySelector('.pw'); ch.elGr = el.querySelector('.bar.gr'); ch.elCh = el.querySelector('.bar.ch');
   if (ch.isNpc) ch.elB.classList.add('npc');
 }
@@ -748,7 +873,7 @@ function tryGrab(ch) {
     const local = best.body.pointToLocalFrame(h);
     c = new CANNON.PointToPointConstraint(ch.parts.faR, new CANNON.Vec3(0, -0.17, 0), best.body, local.scale(0.5), 900);
     best.ch.lastHitBy = ch.name; best.ch.lastHitCh = ch; best.ch.lastHitT = T_now; best.ch.lastCause = ch.isNpc ? 'npc' : 'player';
-    if (Math.random() < .7) say(best.ch, pick(['Chhod mujhe!','Kurta mat kheench!','Bhai chhod!','Haath hata!','Collar chhod!']));
+    if (Math.random() < .7) say(best.ch, pick(['Let go of me!','Don\'t pull my kurta!','Bro, let go!','Hands off!','Let go of my collar!']));
     if (!ch.isNpc) { const bp = best.body.position; burst('grab', bp.x, bp.y + 0.4, bp.z, '#6bf178'); vib(20, ch, best.ch); }
   } else {
     anchor = new CANNON.Body({mass: 0, type: CANNON.Body.STATIC, collisionResponse: false, collisionFilterGroup: 0, collisionFilterMask: 0});
@@ -778,7 +903,7 @@ function aimAssist(ch, reach, cone) {
 }
 function hitChar(o, dir, power, by, cause, word) {
   const brace = !!(o.brace && cause !== 'tc' && cause !== 'revenge'), k = (o.heavy ? 0.45 : 1) * (brace ? 0.5 : 1), up = (1.6 + power * 0.28) * k;
-  if (brace) { power *= 0.75; const hp0 = o.parts.torso.position; if (!o.isNpc) burst('SAMBHALA!', hp0.x, hp0.y + 0.9, hp0.z, '#6bf178'); }
+  if (brace) { power *= 0.75; const hp0 = o.parts.torso.position; if (!o.isNpc) burst('BRACED!', hp0.x, hp0.y + 0.9, hp0.z, '#6bf178'); }
   const strong = power >= 9, hp = o.parts.torso.position;
   puff(hp.x, hp.y, hp.z, strong ? 7 : 3, 0xfff3d6, strong ? 2.6 : 1.5);
   burst(word || (cause === 'tc' ? 'fine' : (strong ? 'big' : 'light')), hp.x, hp.y + 0.5, hp.z, strong ? '#ff5964' : null);
@@ -811,9 +936,9 @@ function doShove(ch) {
   const lurch = hit ? 2 : 3.4;
   ch.parts.torso.velocity.x += f.x * lurch; ch.parts.torso.velocity.z += f.z * lurch;
   ch.pushAnim = 0.25; ch.pushCd = ch.isNpc ? 1.0 : (ch.isBot ? 1.1 : (hit ? 0.3 : 0.7));
-  if (!hit && !ch.isNpc && ch.charge > 0.6) { ch.stun = Math.max(ch.stun, 0.45); say(ch, pick(['Arre, hawa mein!', 'Miss!', 'Kahan gaya?!']), 1); }
+  if (!hit && !ch.isNpc && ch.charge > 0.6) { ch.stun = Math.max(ch.stun, 0.45); say(ch, pick(['Whoa, missed!', 'Miss!', 'Where did he go?!']), 1); }
   if (!ch.isNpc || hit) shockwave(tp.x + f.x * 0.55, tp.y - 0.05, tp.z + f.z * 0.55, 0.5 + ch.charge * 0.9, ch.charge > 0.6 ? 0xff5964 : 0xffffff);
-  if (hit) { sfx(ch.charge > 0.6 ? 'bigthud' : 'thud'); shake(ch.charge > 0.6 ? 0.35 : 0.15); if (!ch.isNpc && Math.random() < .35) say(ch, pick(ch.charge > 0.6 ? ['SUPER DHAKKA!','Jaa Virar!','Bye bye!'] : ['DHAKKA!','Aage chalo!','Hatt!','Nikal!'])); }
+  if (hit) { sfx(ch.charge > 0.6 ? 'bigthud' : 'thud'); shake(ch.charge > 0.6 ? 0.35 : 0.15); if (!ch.isNpc && Math.random() < .35) say(ch, pick(ch.charge > 0.6 ? ['SUPER PUSH!','Go to Virar!','Bye bye!'] : ['PUSH!','Keep moving!','Move!','Out!'])); }
   else sfx('whoosh');
   ch.charge = 0;
 }
@@ -824,7 +949,7 @@ function doKick(ch) {
   for (const b of ch.list) { b.velocity.x = f.x * 8.5; b.velocity.z = f.z * 8.5; b.velocity.y = Math.max(b.velocity.y, 2.5); }
   ch.parts.torso.angularVelocity.set(f.z * -6, 0, f.x * 6);
   ch.kick = 0.5; ch.kickHit.clear(); ch.stun = 1.3; ch.charge = 0; ch.pushCd = 0.9;
-  say(ch, pick(['HAAAIIYAA!','Dropkick!','Bruce Lee mode!','Jai Maharashtra!']), 1.2); sfx('whoosh');
+  say(ch, pick(['HAAAIIYAA!','Dropkick!','Kung fu mode!','Flying kick!']), 1.2); sfx('whoosh');
 }
 
 function doThrow(ch) {
@@ -838,7 +963,7 @@ function doThrow(ch) {
   const p = 9 * (ch.power > 0 ? 1.4 : 1);
   for (const b of o.list) { b.velocity.x = f.x * p; b.velocity.z = f.z * p; b.velocity.y = 4.5; }
   o.stun = Math.max(o.stun, 1.6); o.lastHitBy = ch.name; o.lastHitCh = ch; o.lastHitT = T_now; o.lastCause = 'throw';
-  say(o, 'AAAAAA!', 1.2); say(ch, pick(['Utha ke phek diya!','Parcel delivered!','Ja, udd ja!']), 1.4);
+  say(o, 'AAAAAA!', 1.2); say(ch, pick(['Yeeted!','Parcel delivered!','Fly away!']), 1.4);
   sfx('bigthud'); shake(0.3); ch.pushCd = 0.6; ch.charge = 0;
   const op = o.parts.torso.position; burst('throw', op.x, op.y + 0.5, op.z, '#ffe14d'); puff(op.x, op.y, op.z, 6, 0xfff3d6, 2.2); hitstop(0.07); camKick(f.x, f.z, 0.2); ch.smugT = T_now;
   if (Math.random() < 0.6 && loseSomething(o, f)) { const bp = rosterOf(ch); if (bp) bp.stats.props++; } vib(50, o); vib([30, 30, 60], ch);
@@ -872,10 +997,10 @@ function controlChar(ch, dt) {
   if (ch.grab) {
     ch.grab.t += dt;
     ch.grip -= dt * (ch.grab.type === 'ch' ? 0.32 : (outside ? 0.22 : 0.1)) * (MONSOON.on ? 1.4 : 1);
-    if (ch.grab.type === 'pole' && outside && !ch.isNpc && T_now - (ch.hangSay ?? -9) > 5) { ch.hangSay = T_now; say(ch, pick(['Latak raha hoon!', 'Bas ek station!', 'Pakad ke rakha hai!', 'Hawa aa rahi hai!']), 1.5); }
+    if (ch.grab.type === 'pole' && outside && !ch.isNpc && T_now - (ch.hangSay ?? -9) > 5) { ch.hangSay = T_now; say(ch, pick(['Just hanging!', 'Only one station!', 'Holding on!', 'Nice breeze!']), 1.5); }
     const lost = ch.grip <= 0;
     if (!c.grab || lost || (ch.grab.type === 'ch' && (ch.grab.ch.out || ch.grab.ch.removed || ch.grab.t > 3.5))) {
-      if (lost) { say(ch, pick(['Haath phisal gaya!','Grip gayi!','Bas, nahi hota!'])); ch.gripLock = 1.2; }
+      if (lost) { say(ch, pick(['My hand slipped!','Lost my grip!','Can\'t hold on!'])); ch.gripLock = 1.2; }
       releaseGrab(ch);
     }
   } else {
@@ -887,7 +1012,7 @@ function controlChar(ch, dt) {
   if (c.push && !ch.pushHeld && !ch.isNpc) {
     // mashing DHAKKA tires you out for a moment
     ch.presses = (ch.presses || []).filter(t => T_now - t < 1.6); ch.presses.push(T_now);
-    if (ch.presses.length >= 5 && !ch.tired) { ch.tired = 1.3; ch.presses = []; say(ch, pick(['Saans to lene do! 😮‍💨', 'Thak gaya…', 'Haath dukh gaye!']), 1.2); if (ch.charging) { ch.charging = false; ch.charge = 0; } }
+    if (ch.presses.length >= 5 && !ch.tired) { ch.tired = 1.3; ch.presses = []; say(ch, pick(['Let me breathe! 😮‍💨', 'So tired…', 'My arms hurt!']), 1.2); if (ch.charging) { ch.charging = false; ch.charge = 0; } }
   }
   ch.brace = !!(c.grab && !ch.grab && ch.grounded && !stunned && !ch.charging);
   if (c.push && !ch.pushHeld && !stunned && ch.pushCd <= 0 && !ch.tired) {
@@ -969,16 +1094,16 @@ const GAME = {state: 'menu', roster: [], npcs: [], pickups: [], chappals: [], fe
 const TR = {phase: 'run', t: 0, dur: 9, speed: 0.6, scroll: 0, gx: 0, gz: 0, station: 0, platSide: 0, platX: null, curve: null, jerk: null, khamba: null, announced: false, did: {}, nextEvt: 4, tcDone: -99, tcWarn: 0};
 const MONSOON = {on: false, t: 0};
 const CAM = {focus: null, shake: 0, d: 0};
-function shake(a) { CAM.shake = Math.max(CAM.shake, a); netEv('k', +a.toFixed(2)); }
+function shake(a) { CAM.shake = Math.max(CAM.shake, a * (SET.calm ? 0.3 : 1)); netEv('k', +a.toFixed(2)); }
 
 // ================= juice: hit-stop, comic words, dust, flying props =================
 const FX = {hitstop: 0, kick: {x: 0, z: 0}, bursts: [], parts: [], props: []};
 function hitstop(s) { if (GAME.state === 'play' && !GAME.result) { FX.hitstop = Math.max(FX.hitstop, s); netEv('h', +s.toFixed(3)); } }
-function camKick(dx, dz, a) { FX.kick.x += dx * a; FX.kick.z += dz * a; }
+function camKick(dx, dz, a) { if (SET.calm) a *= 0.3; FX.kick.x += dx * a; FX.kick.z += dz * a; }
 // haptics: Android vibrates; iPhone (no vibrate API) gets a tick from a hidden iOS switch control
 const IOS_TICK = (() => { if (navigator.vibrate || !/iP(hone|ad|od)/.test(navigator.userAgent)) return null; const l = document.createElement('label'); l.setAttribute('aria-hidden', 'true'); l.style.cssText = 'position:fixed;left:-200px;top:0;opacity:0;pointer-events:none'; const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1; l.appendChild(i); document.body.appendChild(l); return l; })();
 function buzz(ms) {
-  if (window.SET && SET.haptics === false) return;
+  if (SET.haptics === false) return;
   if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} return; }
   if (IOS_TICK) { const n = Array.isArray(ms) ? Math.ceil(ms.length / 2) : 1; for (let i = 0; i < n; i++) setTimeout(() => { try { IOS_TICK.click(); } catch (e) {} }, i * 90); }
 }
@@ -991,6 +1116,11 @@ function you(who, kind, ...a) {
   if (p && p.isRemote) netTo(p.id, ['Y', kind, ...a]);
 }
 function vib(ms, ...chs) { for (const c of chs) if (c && !c.isNpc) you(c, 'buzz', ms); }
+function fallFx(fx, x, y, z) {
+  netEv('x', fx, r2(x), r2(y), r2(z));
+  const C = {petals: [0xff9f1c, 0xffd23f, 0xff7b00], chai: [0x9c5a2b, 0xc58a52, 0xf3e3c8], paper: [0xf2efe6, 0xdcd6c4, 0x222222]}[fx]; if (!C) return;
+  for (let i = 0; i < 26; i++) { const a = rnd(0, 6.28), sp = rnd(1, fx === 'chai' ? 2.4 : 3.4); particle(x, y, z, Math.cos(a) * sp, rnd(2.5, 5.5), Math.sin(a) * sp, fx === 'chai' ? rnd(0.14, 0.26) : rnd(0.12, 0.18), fx === 'chai' ? 0.4 : 0, rnd(1.1, 1.8), pick(C), fx === 'chai' ? 12 : 6, fx !== 'chai'); }
+}
 function camFocus(x, z, t) { CAM.focus = {x, z, t}; netEv('f', r2(x), r2(z), t); }
 const puffTex = canvasTex(64, 64, (c) => { const g = c.createRadialGradient(32, 32, 4, 32, 32, 30); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.6, 'rgba(255,255,255,.7)'); g.addColorStop(1, 'rgba(255,255,255,0)'); c.fillStyle = g; c.fillRect(0, 0, 64, 64); });
 const confTex = canvasTex(8, 8, (c) => { c.fillStyle = '#fff'; c.fillRect(0, 0, 8, 8); });
@@ -1013,7 +1143,7 @@ function updateParticles(dt) {
     p.s.position.set(p.x, p.y, p.z); p.s.scale.setScalar(p.size); p.s.material.opacity = Math.min(1, (p.life / p.max) * 2);
   }
 }
-const WORDS = {grab: ['PAKDA!', 'COLLAR!', 'GOTCHA!'], out: ['BAHAR!', 'TATA!', 'BYE BYE!'], light: ['DHAKK!', 'THAPP!', 'DHAPP!', 'POK!'], big: ['DHISHOOM!', 'DHADAAM!', 'BHADAAK!'], kick: ['DHISHKYAAON!', 'HAIYAA!'], throw: ['UTHA KE PHEK!', 'WHOOOSH!'], khamba: ['KHATAAK!', 'TANNNG!'], fine: ['FINE!', 'CHALAN!'], save: ['BACH GAYA!', 'CLUTCH!'], land: ['DHAP!', 'PHATAK!']};
+const WORDS = {grab: ['GOT YOU!', 'COLLAR!', 'GOTCHA!'], out: ['OUT!', 'TATA!', 'BYE BYE!'], light: ['THUD!', 'WHAP!', 'BOP!', 'POK!'], big: ['DISHOOM!', 'KABOOM!', 'WHAM!'], kick: ['KAPOW!', 'HAIYAA!'], throw: ['YEET!', 'WHOOOSH!'], khamba: ['CLANG!', 'TANNNG!'], fine: ['FINE!', 'TICKET!'], save: ['SAVED!', 'CLUTCH!'], land: ['SPLAT!', 'THUMP!']};
 const BIGWORDS = new Set(['big', 'kick', 'khamba', 'save', 'throw']);
 function burst(kind, x, y, z, color, text) {
   if (GAME.state !== 'play') return;
@@ -1068,7 +1198,7 @@ function loseSomething(ch, dir) {
   const k = pick(opts);
   if (k === 'chashma') ch.wear.glasses.visible = false; else if (k === 'cap') ch.wear.cap.visible = false; else if (k === 'chappal') shoe.visible = false;
   dropProp(ch, k, dir);
-  if (Math.random() < 0.6) { const L = {phone: ['Mera phone!', 'EMI baaki hai!', 'Phone gaya!'], chappal: ['Meri chappal!', 'Chappal!!', 'Naya tha!'], chashma: ['Mera chashma!', 'Kuch dikh nahi raha!'], cap: ['Meri topi!'], paper: ['Mera akhbaar!'], tiffin: ['Mera tiffin!', 'Lunch gaya!']}[k]; say(ch, pick(L), 1.4); }
+  if (Math.random() < 0.6) { const L = {phone: ['My phone!', 'EMI still pending!', 'Phone\'s gone!'], chappal: ['My chappal!', 'Chappal!!', 'It was new!'], chashma: ['My glasses!', 'I can\'t see!'], cap: ['My cap!'], paper: ['My newspaper!'], tiffin: ['My tiffin!', 'There goes lunch!']}[k]; say(ch, pick(L), 1.4); }
   return true;
 }
 function updateProps(dt) {
@@ -1100,9 +1230,9 @@ function clutch(ch) {
   ch.outT = 0; ch.saves = (ch.saves || 0) + 1;
   const sp = rosterOf(ch); if (sp) { sp.stats.saves++; award(sp, 1, 'Clutch save'); }
   burst('save', t.position.x, t.position.y + 0.6, t.position.z, '#6bf178'); hitstop(0.06); sfx('save');
-  if (!ch.isNpc) { you(ch, 'big', 'BACH GAYA!', pick(['Clutch save! Asli Mumbaikar reflexes.', 'Ek haath se latak gaya!', 'Aaj nahi, Virar!']), 1.6); vib(30, ch); }
-  if (!ch.isNpc && !ch.isMe) feed('🙌 ' + ch.name + ' ne pole pakad liya. BACH GAYA!');
-  say(ch, pick(['BACH GAYA!', 'Abhi nahi!', 'Haha, nahi gira!']), 1.4);
+  if (!ch.isNpc) { you(ch, 'big', 'SAVED!', pick(['Clutch save! True Mumbaikar reflexes.', 'Hanging on with one hand!', 'Not today, Virar!']), 1.6); vib(30, ch); }
+  if (!ch.isNpc && !ch.isMe) feed('🙌 ' + ch.name + ' caught the pole. SAVED!');
+  say(ch, pick(['SAVED!', 'Not yet!', 'Ha, didn\'t fall!']), 1.4);
 }
 
 function clearWorld() {
@@ -1136,22 +1266,22 @@ function startRound() {
   GAME.roster.forEach((p, i) => {
     p.alive = true; p.target = null; p.think = 0; p.ctrl = p.isMe ? LOCAL : (p.netCtrl || makeCtrl());
     const [x, z] = sp[i];
-    p.ch = makeChar(x, z, {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, power: p.isBot ? 0.88 : 1, color: COLORS[(p.idx ?? i) % COLORS.length], pants: pick(PANTS), acc: p.acc ?? (i % 8), ctrl: p.ctrl, yaw: rnd(-3, 3)});
+    p.ch = makeChar(x, z, {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, look: p.look, power: p.isBot ? 0.88 : 1, color: COLORS[(p.idx ?? i) % COLORS.length], pants: pick(PANTS), acc: p.acc ?? (i % 8), ctrl: p.ctrl, yaw: rnd(-3, 3)});
   });
   const u = GAME.roster.length;
   spawnNpc('uncle', sp[u][0], sp[u][1], 'ride'); if (u > 4) spawnNpc('aunty', sp[u + 1][0], sp[u + 1][1], 'ride');
   if (GAME.mode === 'monsoon') { MONSOON.on = true; MONSOON.t = 1e9; }
-  if (GAME.state === 'play') { bigText('ROUND ' + GAME.round + '/' + MATCH_N + ': ' + MODE_INFO[GAME.mode][0], LIGHT.tod.label + ' ki local. ' + MODE_INFO[GAME.mode][1], 2.6); banner(pick(['Peak hour. Dabba full.', 'Strap pakad ke rakho!', 'Andar chalo, andar!']), 2.5); sfx('horn'); }
+  if (GAME.state === 'play') { bigText('ROUND ' + GAME.round + '/' + MATCH_N + ': ' + MODE_INFO[GAME.mode][0], LIGHT.tod.label + ' local. ' + MODE_INFO[GAME.mode][1], 2.6); banner(pick(['Peak hour. Coach is packed.', 'Hold on to a strap!', 'Move inside, inside!']), 2.5); sfx('horn'); }
 }
 
 // ================= NPCs =================
 const NPC_KINDS = {
-  uncle: {names: ['Uncle','Sharma ji','Kaka','Joshi kaka'], color: 0xe8e2d0, pants: 0x4a4a4a},
-  aunty: {names: ['Aunty','Tai','Bhabhi ji'], color: 0xd93a8c, pants: 0xd93a8c},
+  uncle: {names: ['Uncle','Mr Sharma','Grandpa','Mr Joshi'], color: 0xe8e2d0, pants: 0x4a4a4a},
+  aunty: {names: ['Aunty','Granny','Mrs Joshi'], color: 0xd93a8c, pants: 0xd93a8c},
   student: {names: ['College boy','Engg student','Intern'], color: 0x3a7d44, pants: 0x25324a},
   dabba: {names: ['Dabbawala'], color: 0xf4f4f4, pants: 0xf4f4f4},
-  vendor: {names: ['Chana-wala','Vada pav bhaiya','Chikki-wala'], color: 0xf2a33a, pants: 0x6b4b2a},
-  tc: {names: ['TC saab'], color: 0x1d1d1d, pants: 0x1d1d1d}
+  vendor: {names: ['Chana seller','Vada pav guy','Chikki seller'], color: 0xf2a33a, pants: 0x6b4b2a},
+  tc: {names: ['Ticket checker'], color: 0x1d1d1d, pants: 0x1d1d1d}
 };
 function spawnNpc(kind, x, z, state, extra) {
   if (GAME.npcs.length >= 4 && kind !== 'tc' && kind !== 'vendor') return null;
@@ -1176,28 +1306,28 @@ function npcUpdate(n, dt) {
   if (n.state === 'alight' && n.shoutT <= 0) { say(ch, pick(ALIGHT_LINES)); n.shoutT = rnd(1.2, 2.5); }
   if (n.state === 'ride') {
     if (TR.curve || TR.jerk || TR.phase === 'brake' || TR.phase === 'accel') c.grab = true;
-    if (n.shoutT <= 0) { if (Math.random() < .35) say(ch, pick(['Kitni bheed hai!','Bhai thoda khisko','Mera station kab aayega','Pair pe khada hai tu!','Andar chalo na']), 1.5); n.shoutT = rnd(4, 9); }
+    if (n.shoutT <= 0) { if (Math.random() < .35) say(ch, pick(['So crowded!','Bro, move a bit','When is my station?','You\'re on my foot!','Move inside, please']), 1.5); n.shoutT = rnd(4, 9); }
   }
   if (n.state === 'vend') {
     if (n.shoutT <= 0) { say(ch, pick(VENDOR_LINES), 1.8); n.shoutT = rnd(1.8, 3); sfx('vendor'); if (Math.random() < 0.35 && GAME.pickups.length < 4) spawnPickup(pick(['vadapav', 'chai']), tp.x, tp.z); }
-    if (!n.wps.length) { n.dead = true; feed(ch.name + ' agle dabbe mein chala gaya'); }
+    if (!n.wps.length) { n.dead = true; feed(ch.name + ' moved to the next coach'); }
   }
   if (n.state === 'tc') {
-    if (n.shoutT <= 0) { say(ch, pick(['Ticket dikhao!','Pass dikhao!','Ticket? Haan?']), 1.4); n.shoutT = rnd(1.5, 2.5); }
+    if (n.shoutT <= 0) { say(ch, pick(['Ticket please!','Show your pass!','Ticket? Hmm?']), 1.4); n.shoutT = rnd(1.5, 2.5); }
     for (const p of GAME.roster) {
       if (!p.alive || n.checked.has(p)) continue;
       const o = p.ch, op = o.parts.torso.position;
       if (Math.hypot(op.x - tp.x, op.z - tp.z) < 1.15) {
         n.checked.add(p);
-        if (o.ticket) { say(o, pick(['Yeh lo ticket! 😎','Pass hai mere paas!']), 1.4); say(ch, 'Theek hai.', 1); }
+        if (o.ticket) { say(o, pick(['Here\'s my ticket! 😎','I have a pass!']), 1.4); say(ch, 'Okay.', 1); }
         else {
           const dz = op.z >= 0 ? 1 : -1, dd = nearestDoor(op.x);
           const dir = {x: (dd - op.x) * 0.35, z: dz}; const m = Math.hypot(dir.x, dir.z); dir.x /= m; dir.z /= m;
-          hitChar(o, dir, 12, ch, 'tc'); say(ch, pick(['Bina ticket? BAHAR!','FINE! Chal nikal!','Pehli fursat mein nikal!']), 1.6); sfx('bigthud'); shake(0.35);
+          hitChar(o, dir, 12, ch, 'tc'); say(ch, pick(['No ticket? OUT!','FINE! Get out!','Off the train, now!']), 1.6); sfx('bigthud'); shake(0.35);
         }
       }
     }
-    if (!n.wps.length) { n.dead = true; for (const p of GAME.roster) if (p.ch) p.ch.ticket = false; feed('TC agle dabbe mein gaya. Tickets khatam!'); }
+    if (!n.wps.length) { n.dead = true; for (const p of GAME.roster) if (p.ch) p.ch.ticket = false; feed('The ticket checker moved on. Tickets used up!'); }
   }
   if (Math.hypot(c.mx, c.mz) > 0.1) {
     const v = ch.parts.torso.velocity;
@@ -1275,7 +1405,7 @@ function botThink(p, dt) {
 }
 
 // ================= pickups =================
-const PK = {vadapav: 'VADA PAV POWER! 🍔', chai: 'CUTTING CHAI SPEED! ☕', ticket: 'Ticket mil gaya! 🎫'};
+const PK = {vadapav: 'VADA PAV POWER! 🍔', chai: 'CUTTING CHAI SPEED! ☕', ticket: 'Got a ticket! 🎫'};
 function pickupMesh(type) {
   const g = new THREE.Group();
   if (type === 'vadapav') { const b = mesh(new THREE.SphereGeometry(0.16, 12, 8), 0xe9a23b, {outline: true}); b.scale.y = 0.7; g.add(b); g.add(mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.06, 12), 0xb5651d)); }
@@ -1297,9 +1427,9 @@ function updatePickups(dt) {
       const tp = o.parts.torso.position;
       if (Math.hypot(tp.x - pk.x, tp.z - pk.z) < 0.55) {
         pk.taken = true;
-        if (pk.type === 'vadapav') { o.power = 8; say(o, pick(['Vada pav power! 💪','Ab dekh!','Mumbai ka burger!']), 1.5); }
-        else if (pk.type === 'chai') { o.speedT = 8; say(o, pick(['Cutting chai! ⚡','Garam garam!','Kadak!']), 1.5); }
-        else { o.ticket = true; say(o, 'Ticket mil gaya! 🎫', 1.3); }
+        if (pk.type === 'vadapav') { o.power = 8; say(o, pick(['Vada pav power! 💪','Watch this!','Mumbai\'s burger!']), 1.5); }
+        else if (pk.type === 'chai') { o.speedT = 8; say(o, pick(['Cutting chai! ⚡','Piping hot!','Strong!']), 1.5); }
+        else { o.ticket = true; say(o, 'Got a ticket! 🎫', 1.3); }
         sfx('pickup'); you(o, 'ban', PK[pk.type], 1.6);
         break;
       }
@@ -1325,41 +1455,41 @@ function setPlatform(on, side) {
 function announce() {
   const nm = STATIONS[TR.station % STATIONS.length];
   TR.platSide = Math.random() < 0.5 ? -1 : 1;
-  const sideTxt = TR.platSide > 0 ? 'daayi' : 'baayi';
-  LED.text = 'AGLA STATION: ' + nm.toUpperCase() + '   ' + (DEVA[nm] || '') + '   DARWAZA ' + sideTxt.toUpperCase() + ' TARAF KHULEGA   ';
+  const sideTxt = TR.platSide > 0 ? 'right' : 'left';
+  LED.text = 'NEXT STATION: ' + nm.toUpperCase() + '   DOORS OPEN ON THE ' + sideTxt.toUpperCase() + '   ';
   sfx('chime');
-  sfx('say', 'Agla station, ' + nm + '. Pudhil station, ' + nm + '. Darwaza ' + sideTxt + ' taraf khulega.');
-  banner('Agla station: ' + nm + (RUSH.has(nm) ? '  ⚠ BHEED ALERT' : '') + ' · Darwaza ' + sideTxt + ' taraf', 3.2);
+  sfx('say', 'Next station, ' + nm + '. Doors will open on the ' + sideTxt + ' side.');
+  banner('Next station: ' + nm + (RUSH.has(nm) ? '  ⚠ RUSH ALERT' : '') + ' · Doors on the ' + sideTxt, 3.2);
   drawBoard(nm);
 }
 function randomEvent() {
   const r = Math.random(), hasVendor = GAME.npcs.some(n => n.kind === 'vendor'), hasTC = GAME.npcs.some(n => n.kind === 'tc');
-  if (r < 0.27) { TR.curve = {t: 0, dur: rnd(2.4, 3.4), dir: pick([-1, 1]), mag: rnd(4, 6.5) * (GAME.mode === 'virar' ? 1.2 : 1)}; banner(pick(['CURVE! Pakad ke rakho!','Mahim ka mod! Strap pakdo!','Train jhool rahi hai!']), 2); sfx('screech'); }
-  else if (r < 0.42) { const lat = Math.random() < 0.5; TR.jerk = {t: 0, dur: 0.3, ax: lat ? 'z' : 'x', dir: pick([-1, 1]), mag: rnd(9, 13)}; banner(pick(['JHATKA!','Signal laal! Emergency brake!','Motorman ko neend aa gayi!']), 1.6); sfx('screech'); }
-  else if (r < 0.58) { TR.khamba = {x: 30, side: pick([-1, 1]), warned: false}; banner('Door pe mat latko! KHAMBA aa raha hai!', 2.2); sfx('horn'); }
-  else if (r < 0.7 && !hasVendor) { const e = pick([-1, 1]); spawnNpc('vendor', e * 6.4, 0, 'vend', {wps: [[-e * 6.4, rnd(-0.3, 0.3), 0.4]]}); banner('Vendor aa gaya! ' + pick(VENDOR_LINES), 2.2); }
+  if (r < 0.27) { TR.curve = {t: 0, dur: rnd(2.4, 3.4), dir: pick([-1, 1]), mag: rnd(4, 6.5) * (GAME.mode === 'virar' ? 1.2 : 1)}; banner(pick(['CURVE! Hold on!','Mahim bend! Grab a strap!','The train is swaying!']), 2); sfx('screech'); }
+  else if (r < 0.42) { const lat = Math.random() < 0.5; TR.jerk = {t: 0, dur: 0.3, ax: lat ? 'z' : 'x', dir: pick([-1, 1]), mag: rnd(9, 13)}; banner(pick(['JOLT!','Red signal! Emergency brake!','The motorman dozed off!']), 1.6); sfx('screech'); }
+  else if (r < 0.58) { TR.khamba = {x: 30, side: pick([-1, 1]), warned: false}; banner('Get off the door! POLE coming!', 2.2); sfx('horn'); }
+  else if (r < 0.7 && !hasVendor) { const e = pick([-1, 1]); spawnNpc('vendor', e * 6.4, 0, 'vend', {wps: [[-e * 6.4, rnd(-0.3, 0.3), 0.4]]}); banner('Vendor coming through! ' + pick(VENDOR_LINES), 2.2); }
   else if (r < 0.82 && !hasTC && !TR.tcWarn && T_now - TR.tcDone > 25) {
-    TR.tcWarn = 4.5; banner('TC aa raha hai! TICKET PAKDO! 🎫', 3); sfx('whistle');
+    TR.tcWarn = 4.5; banner('Ticket checker coming! GRAB A TICKET! 🎫', 3); sfx('whistle');
     const alive = GAME.roster.filter(p => p.alive).length;
     for (let i = 0; i < Math.max(1, Math.floor(alive / 2)); i++) spawnPickup('ticket');
   }
-  else if (r < 0.86 && !OUT.ptrain.on && T_now > 6) { OUT.ptrain.on = true; OUT.ptrain.x = 75; TR.gust = {t: 0}; banner(pick(['Bagal se FAST LOCAL! Hawa ka jhatka!', 'Doosri train! Darwaze se door!']), 2); sfx('ptrain'); }
-  else if (r < 0.92 && !MONSOON.on) { MONSOON.on = true; MONSOON.t = 14; banner('BAARISH! Floor geela hai, sambhal ke! 🌧', 2.6); sfx('thunder'); }
-  else { spawnPickup(pick(['vadapav', 'chai'])); banner(pick(['Kisi ka vada pav gir gaya!','Free cutting chai!']), 1.8); }
+  else if (r < 0.86 && !OUT.ptrain.on && T_now > 6) { OUT.ptrain.on = true; OUT.ptrain.x = 75; TR.gust = {t: 0}; banner(pick(['FAST LOCAL passing! Wind blast!', 'Another train! Away from the doors!']), 2); sfx('ptrain'); }
+  else if (r < 0.92 && !MONSOON.on) { MONSOON.on = true; MONSOON.t = 14; banner('RAIN! The floor is wet, careful! 🌧', 2.6); sfx('thunder'); }
+  else { spawnPickup(pick(['vadapav', 'chai'])); banner(pick(['Someone dropped a vada pav!','Free cutting chai!']), 1.8); }
 }
 
 function trainUpdate(dt) {
   const T = TR; T.t += dt;
   let gx = 0, gz = 0;
-  if (T.tcWarn > 0) { T.tcWarn -= dt; if (T.tcWarn <= 0) { T.tcWarn = 0; T.tcDone = T_now; const e = pick([-1, 1]); spawnNpc('tc', e * 6.4, 0, 'tc', {checked: new Set(), wps: [[e * 4.3, 0.4, 0.5], [0, -0.3, 0.5], [-e * 4.3, 0.4, 0.5], [-e * 6.4, 0, 0.5]]}); banner('TC SAAB ANDAR! Ticket dikhao!', 2); } }
+  if (T.tcWarn > 0) { T.tcWarn -= dt; if (T.tcWarn <= 0) { T.tcWarn = 0; T.tcDone = T_now; const e = pick([-1, 1]); spawnNpc('tc', e * 6.4, 0, 'tc', {checked: new Set(), wps: [[e * 4.3, 0.4, 0.5], [0, -0.3, 0.5], [-e * 4.3, 0.4, 0.5], [-e * 6.4, 0, 0.5]]}); banner('TICKET CHECK! Show your tickets!', 2); } }
   if (T.phase === 'run') {
     T.speed = Math.min(1, T.speed + dt * 0.7);
     const fast = GAME.mode === 'virar' && GAME.state === 'play';
-    if (!T.announced && T.t > T.dur - 3.8) { T.announced = true; if (fast) { banner('Agla: ' + STATIONS[(T.station + 1) % STATIONS.length] + ' · Fast hai, rukegi nahi! 🚄', 2.4); sfx('chime'); } else announce(); }
-    if (fast) { T.uncleT = (T.uncleT ?? 5) - dt; if (T.uncleT <= 0) { T.uncleT = rnd(6, 9); const e = pick([-1, 1]), ip = interiorPoint(); if (spawnNpc(pick(['uncle', 'uncle', 'dabba']), e * 6.5, rnd(-0.3, 0.3), 'board', {wps: [[ip[0], ip[1], 0.5]]})) banner(pick(['Agle dabbe se uncle aa gaye!', 'Aur ek uncle! Jagah do!']), 1.8); } }
+    if (!T.announced && T.t > T.dur - 3.8) { T.announced = true; if (fast) { banner('Next: ' + STATIONS[(T.station + 1) % STATIONS.length] + ' · Fast train, no stop! 🚄', 2.4); sfx('chime'); } else announce(); }
+    if (fast) { T.uncleT = (T.uncleT ?? 5) - dt; if (T.uncleT <= 0) { T.uncleT = rnd(6, 9); const e = pick([-1, 1]), ip = interiorPoint(); if (spawnNpc(pick(['uncle', 'uncle', 'dabba']), e * 6.5, rnd(-0.3, 0.3), 'board', {wps: [[ip[0], ip[1], 0.5]]})) banner(pick(['An uncle from the next coach!', 'Another uncle! Make room!']), 1.8); } }
     T.nextEvt -= dt;
     if (T.nextEvt <= 0 && (fast || T.t < T.dur - 2) && T_now > 4) { T.nextEvt = rnd(3.6, 5.8) * Math.max(0.6, 1 - T.station * 0.03) * (fast ? 0.7 : 1); randomEvent(); }
-    if (T.t >= T.dur && fast) { T.t = 0; T.station++; T.announced = false; T.dur = rnd(7, 9); const ns = STATIONS[T.station % STATIONS.length]; setTheme(THEME_OF[ns] || 'city'); banner(STATIONS[(T.station - 1) % STATIONS.length] + ' nikal gaya! Rukegi nahi! 🚄', 1.8); sfx('horn'); }
+    if (T.t >= T.dur && fast) { T.t = 0; T.station++; T.announced = false; T.dur = rnd(7, 9); const ns = STATIONS[T.station % STATIONS.length]; setTheme(THEME_OF[ns] || 'city'); banner(STATIONS[(T.station - 1) % STATIONS.length] + ' skipped! No stopping! 🚄', 1.8); sfx('horn'); }
     else if (T.t >= T.dur) { T.phase = 'brake'; T.t = 0; T.dur = 2; T.v0 = T.speed; sfx('brake'); }
   } else if (T.phase === 'brake') {
     T.speed = T.v0 * (1 - T.t / T.dur); gx += 6;
@@ -1368,7 +1498,7 @@ function trainUpdate(dt) {
       T.phase = 'stop'; T.t = 0; T.speed = 0; T.platX = 0;
       const nm = STATIONS[T.station % STATIONS.length]; T.rush = RUSH.has(nm); T.dur = T.rush ? 7 : 5.5; T.did = {};
       setPlatform(true, T.platSide);
-      if (T.rush) { bigText(nm.toUpperCase() + '!!', 'Sab utro, sab chado. Full rush!', 2.4); sfx('crowd'); } else banner(nm + ': darwaze khul gaye', 2);
+      if (T.rush) { bigText(nm.toUpperCase() + '!!', 'Everyone off, everyone on. Full rush!', 2.4); sfx('crowd'); } else banner(nm + ': doors open', 2);
     }
   } else if (T.phase === 'stop') {
     T.speed = 0;
@@ -1382,9 +1512,9 @@ function trainUpdate(dt) {
       const kinds = ['uncle','aunty','student','uncle','dabba','student','aunty'];
       for (let i = 0; i < k; i++) { const dd = pick(DOORX), ip = interiorPoint(); spawnNpc(pick(kinds), dd + rnd(-1.2, 1.2), T.platSide * (HW + rnd(1.4, 3.2)), 'board', {wps: [[dd + rnd(-0.3, 0.3), T.platSide * (HW + 0.3), 0.45], [dd, T.platSide * (HW - 0.7), 0.5], [ip[0], ip[1], 0.5]]}); }
       sfx('crowd');
-      if (Math.random() < 0.7) { spawnPickup(pick(['vadapav', 'chai'])); feed('Platform se kisi ne vada pav phenka!'); }
+      if (Math.random() < 0.7) { spawnPickup(pick(['vadapav', 'chai'])); feed('Someone threw a vada pav from the platform!'); }
     }
-    if (T.t >= T.dur) { T.phase = 'accel'; T.t = 0; T.dur = 1.8; setPlatform(false); sfx('horn'); banner('Train chal padi! Latakne wale sambhal ke', 1.8); }
+    if (T.t >= T.dur) { T.phase = 'accel'; T.t = 0; T.dur = 1.8; setPlatform(false); sfx('horn'); banner('Train is moving! Door hangers, careful', 1.8); }
   } else if (T.phase === 'accel') {
     T.speed = T.t / T.dur; gx -= 4;
     if (T.t >= T.dur) { T.phase = 'run'; T.t = 0; T.station++; T.dur = Math.max(6.5, 10 - T.station * 0.3); T.announced = false; T.nextEvt = rnd(1.5, 2.5); const ns = STATIONS[T.station % STATIONS.length]; setTheme(THEME_OF[ns] || 'city'); LED.text = 'DHAKKA LOCAL  ›  ' + LIGHT.tod.label.toUpperCase() + '  ›  ' + ns.toUpperCase() + '  ›  '; }
@@ -1408,7 +1538,7 @@ function trainUpdate(dt) {
     }
     if (k.x < -30) T.khamba = null;
   }
-  if (MONSOON.on) { MONSOON.t -= dt; if (MONSOON.t <= 0) { MONSOON.on = false; banner('Baarish ruk gayi.', 1.4); } }
+  if (MONSOON.on) { MONSOON.t -= dt; if (MONSOON.t <= 0) { MONSOON.on = false; banner('The rain stopped.', 1.4); } }
   if (T.speed > 0.1) { gx += Math.sin(T_now * 13) * 0.15 * T.speed; gz += Math.sin(T_now * 9.3) * 0.2 * T.speed; }
   T.gx = gx; T.gz = gz;
   T.scroll += T.speed * 22 * dt;
@@ -1434,27 +1564,28 @@ function eliminate(p) {
     if (left === GAME.roster.length - 1) p.stats.first++;
     if (GAME.mode !== 'seat') { if (left === 1) award(p, 3, '2nd place'); else if (left === 2) award(p, 1, '3rd place'); }
     const kp = recent ? (o.lastCause === 'revenge' ? o.revBy : (o.lastHitCh ? rosterOf(o.lastHitCh) : null)) : null;
-    if (kp && kp !== p) { kp.stats.outs++; award(kp, 2, 'Dhakka out'); you(kp, 'buzz', [40, 40, 120]); if (o.lastCause === 'throw') award(kp, 1, 'Throw style'); else if (o.lastCause === 'kick') award(kp, 1, 'Dropkick style'); else if (o.lastCause === 'revenge') award(kp, 1, 'Platform revenge'); }
+    if (kp && kp !== p) { kp.stats.outs++; award(kp, 2, 'Push out'); you(kp, 'buzz', [40, 40, 120]); if (o.lastCause === 'throw') { kp.stats.throws++; award(kp, 1, 'Throw style'); } else if (o.lastCause === 'kick') { kp.stats.kicks++; award(kp, 1, 'Dropkick style'); } else if (o.lastCause === 'revenge') award(kp, 1, 'Platform revenge'); }
   }
   let sub;
-  if (recent && o.lastCause === 'khamba') sub = 'Khamba 1, ' + p.name + ' 0.';
-  else if (recent && o.lastCause === 'tc') sub = 'Bina ticket ka safar. TC ne utaar diya.';
-  else if (recent && o.lastCause === 'throw') sub = o.lastHitBy + ' ne utha ke phek diya!';
-  else if (recent && o.lastCause === 'revenge') sub = o.lastHitBy + ' ne platform se badla liya! 🍔';
-  else if (recent && o.lastCause === 'npc') sub = o.lastHitBy + ' ne utaar diya. ' + pick(OUT_SUBS);
-  else if (recent && o.lastHitBy) sub = o.lastHitBy + ' ka dhakka. ' + pick(OUT_SUBS);
-  else if (TR.curve || TR.jerk) sub = 'Curve ne nikaal diya. Strap pakadna tha!';
-  else if (MONSOON.on) sub = 'Geele floor pe phisal gaya. 🌧';
-  else if (TR.phase === 'stop') sub = 'Platform pe utar gaya. Yeh uska station nahi tha.';
-  else sub = 'Khud hi gir gaya. Shabaash. 👏';
-  bigText(p.name + ' BAHAR!', sub, 2.4);
+  if (recent && o.lastCause === 'khamba') sub = 'Pole 1, ' + p.name + ' 0.';
+  else if (recent && o.lastCause === 'tc') sub = 'No ticket. Thrown off by the checker.';
+  else if (recent && o.lastCause === 'throw') sub = o.lastHitBy + ' threw them out!';
+  else if (recent && o.lastCause === 'revenge') sub = o.lastHitBy + ' got revenge from the platform! 🍔';
+  else if (recent && o.lastCause === 'npc') sub = o.lastHitBy + ' pushed them off. ' + pick(OUT_SUBS);
+  else if (recent && o.lastHitBy) sub = 'Pushed by ' + o.lastHitBy + '. ' + pick(OUT_SUBS);
+  else if (TR.curve || TR.jerk) sub = 'The curve got them. Should have held a strap!';
+  else if (MONSOON.on) sub = 'Slipped on the wet floor. 🌧';
+  else if (TR.phase === 'stop') sub = 'Got off at the platform. Not their station.';
+  else sub = 'Fell out all alone. Well done. 👏';
+  bigText(p.name + ' IS OUT!', sub, 2.4);
   feed('🚪 ' + p.name + ': ' + sub);
   const shoe = o.shoes.find(s => s.visible);
   if (shoe) { shoe.visible = false; dropProp(o, 'chappal', {x: rnd(-0.5, 0.5), z: -Math.sign(tp.z) * 0.8}, {x: clamp(tp.x, -6.6, 6.6), y: 0.6, z: clamp(tp.z, -HW + 0.25, HW - 0.25)}); }
   puff(clamp(tp.x, -HL, HL), Math.max(0.1, tp.y), tp.z, 6, 0xfff3d6, 2);
+  if (o.look && o.look.fx && o.look.fx !== 'dust') fallFx(o.look.fx, clamp(tp.x, -HL, HL), Math.max(0.3, tp.y), tp.z);
   if (GAME.state === 'play') { const recent = T_now - (o.ejectT ?? -9) < 2.5; GAME.slow = recent ? 0.5 : 1.2; camFocus(tp.x, clamp(tp.z, -HW - 0.6, HW + 0.6), recent ? 0.9 : 1.3); shake(0.4); }
   sfx('fall');
-  say(o, pick(['Nahiiiii!','Mera station nahi hai!','Bachaooo!','Chappaaal!','Mummyyy!']), 2);
+  say(o, pick(['Noooo!','Not my station!','Heeelp!','My chappaaal!','Mummyyy!']), 2);
 }
 
 function checkOut(dt) {
@@ -1467,7 +1598,7 @@ function checkOut(dt) {
       o.ejectT = T_now; o.flying = true; o.trail = 0.9;
       GAME.slow = Math.max(GAME.slow, 0.9); camFocus(tp.x, Math.sign(tp.z) * (HW + 0.6), 1.4);
       burst('out', tp.x, tp.y + 0.7, tp.z, '#ffcc00'); sfx('whoosh');
-      if (Math.random() < 0.5) say(o, pick(['AAAAAA!', 'Nahiiii!', 'Mummyyy!']), 1.2);
+      if (Math.random() < 0.5) say(o, pick(['AAAAAA!', 'Noooo!', 'Mummyyy!']), 1.2);
     }
     if (o.trail > 0) { o.trail -= dt; if (Math.random() < 0.5) particle(tp.x, tp.y, tp.z, 0, 0.2, 0, 0.22, 0.8, 0.35, 0xffffff, 0); }
     if (tp.y < -0.5) { eliminate(p); continue; }
@@ -1484,13 +1615,13 @@ function checkRound(dt) {
   const alive = GAME.roster.filter(p => p.alive);
   if (!GAME.result && (alive.length <= 1 || GAME.seatWinner)) {
     const w = GAME.mode === 'seat' && !GAME.seatWinner ? alive[0] : (GAME.seatWinner || alive[0]);
-    if (w) { w.wins++; if (w.stats) { w.stats.wins++; award(w, 5, GAME.mode === 'seat' ? 'Seat jeeti' : 'Last one inside'); } }
+    if (w) { w.wins++; if (w.stats) { w.stats.wins++; if (GAME.mode === 'seat') w.stats.seatwins++; award(w, 5, GAME.mode === 'seat' ? 'Seat jeeti' : 'Last one inside'); } }
     if (GAME.mode === 'seat') { const rest = GAME.roster.filter(q => q !== w).sort((a, b) => b.seatT - a.seatT); if (rest[0] && rest[0].seatT > 0.5) award(rest[0], 3, 'Seat time'); if (rest[1] && rest[1].seatT > 0.5) award(rest[1], 1, 'Seat time'); }
     GAME.result = {w: w ? w.name : null, t: 0};
-    if (GAME.seatWinner) bigText(w.name + ' NE SEAT PAKAD LI!', 'Ab Virar tak aaram se. 🪑', 5.5);
-    else bigText(w ? w.name + ' JEET GAYA!' : 'SAB BAHAR!', w ? pick(['Window seat pakki! 🪟','Andar wala hi asli Mumbaikar!','Dabba tera, bhai.']) : 'Train khali gayi.', 5.5);
+    if (GAME.seatWinner) bigText(w.name + ' GOT THE SEAT!', 'Sitting pretty all the way to Virar. 🪑', 5.5);
+    else bigText(w ? w.name + ' WINS!' : 'EVERYONE OUT!', w ? pick(['Window seat secured! 🪟','Last one inside is the true Mumbaikar!','The coach is yours, bro.']) : 'The train left empty.', 5.5);
     sfx('win');
-    if (w && w.ch) { say(w.ch, pick(['Seat meri! 🪑','Yeh dabba mera hai!','Mumbai meri jaan!']), 4); const wp = w.ch.parts.head.position; confetti(wp.x, wp.y + 0.6, wp.z, 44); w.ch.smugT = T_now + 5; }
+    if (w && w.ch) { say(w.ch, pick(['My seat! 🪑','This coach is mine!','Mumbai, my love!']), 4); const wp = w.ch.parts.head.position; confetti(wp.x, wp.y + 0.6, wp.z, 44); w.ch.smugT = T_now + 5; }
     renderScore(); netEv('S', GAME.result.w);
   }
   if (GAME.result) { GAME.result.t += dt; if (GAME.result.t > 7) { $('score').classList.add('hidden'); if (GAME.round >= MATCH_N) startPodium(); else startRound(); } }
@@ -1498,7 +1629,7 @@ function checkRound(dt) {
 function renderScore() {
   const rows = [...GAME.roster].sort((a, b) => b.score - a.score);
   const el = $('score'); el.innerHTML = '';
-  const h = document.createElement('h3'); h.textContent = 'Round ' + GAME.round + '/' + MATCH_N + (GAME.round >= MATCH_N ? ' · final scores!' : ' · agla round aa raha hai'); el.appendChild(h);
+  const h = document.createElement('h3'); h.textContent = 'Round ' + GAME.round + '/' + MATCH_N + (GAME.round >= MATCH_N ? ' · final scores!' : ' · next round coming up'); el.appendChild(h);
   rows.forEach((r, i) => {
     const d = document.createElement('div'); d.className = 'row' + (r.name === GAME.result.w ? ' w' : '') + (r.isMe ? ' me' : '');
     const a = document.createElement('span'); a.className = 'nm'; a.textContent = (i + 1) + '. ' + r.name + (r.isMe ? ' (you)' : '');
@@ -1509,7 +1640,7 @@ function renderScore() {
   el.classList.remove('hidden');
 }
 function rosterOf(ch) { return ch ? GAME.roster.find(p => p.ch === ch) : null; }
-function newPlayer(o, i) { return Object.assign({wins: 0, score: 0, rs: [], seatT: 0, idx: i, acc: i % 8, stats: {outs: 0, khamba: 0, props: 0, saves: 0, first: 0, wins: 0, revenge: 0}}, o); }
+function newPlayer(o, i) { return Object.assign({wins: 0, score: 0, rs: [], seatT: 0, idx: i, acc: i % 8, stats: {outs: 0, khamba: 0, props: 0, saves: 0, first: 0, wins: 0, revenge: 0, kicks: 0, throws: 0, seatwins: 0}}, o); }
 function award(p, n, why) {
   if (!p || !p.stats || GAME.state !== 'play' || GAME.phase === 'podium') return;
   p.score += n; p.rs.push([n, why]);
@@ -1541,7 +1672,7 @@ function revengeUpdate(dt) {
     if (p.isMe || p.isRemote) {
       const C = p.isMe ? LOCAL : p.netCtrl;
       if (p.isMe) meAiming = true;
-      if (!p.aim) { p.aim = {x: 0, z: 0}; you(p, 'ban', 'Platform se badla lo! DHAKKA = vada pav 🍔 · KOODO = kela 🍌', 4); }
+      if (!p.aim) { p.aim = {x: 0, z: 0}; you(p, 'ban', 'Take revenge from the platform! PUSH = vada pav 🍔 · JUMP = banana 🍌', 4); }
       p.aim.x = clamp(p.aim.x + C.mx * 6 * dt, -HL + 0.4, HL - 0.4); p.aim.z = clamp(p.aim.z + C.mz * 5 * dt, -HW + 0.3, HW - 0.3);
       const pe = C.push && !p.pHeld, je = C.jump && !p.jHeld; p.pHeld = C.push; p.jHeld = C.jump;
       if (pe && p.revCd <= 0) { throwVadaPav(p, p.aim.x, p.aim.z); p.revCd = 2.2; }
@@ -1557,7 +1688,7 @@ function revengeUpdate(dt) {
   for (const s of REV.shots) {
     s.t += dt; s.vy -= 18 * dt; s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt; s.m.position.set(s.x, s.y, s.z); s.m.rotation.x += dt * 10;
     if (s.y <= 0.3 && s.vy < 0) {
-      s.done = true; puff(s.x, 0.4, s.z, 8, 0xe9a23b, 2.4); burst('PHATAK!', s.x, 1.1, s.z, '#ff9f1c'); sfx('thud');
+      s.done = true; puff(s.x, 0.4, s.z, 8, 0xe9a23b, 2.4); burst('SPLAT!', s.x, 1.1, s.z, '#ff9f1c'); sfx('thud');
       for (const o of CHARS) {
         if (o.out) continue; const op = o.parts.torso.position, dx = op.x - s.x, dz = op.z - s.z, d = Math.hypot(dx, dz);
         if (d < 0.95) { const sz = Math.sign(op.z) || 1, dir = {x: dx / (d || 1) * 0.5, z: (dz / (d || 1)) * 0.5 + sz * 0.6}; const m = Math.hypot(dir.x, dir.z); dir.x /= m; dir.z /= m; hitChar(o, dir, 7.5, null, 'revenge', 'light'); revengeHit(o, s.p); }
@@ -1575,7 +1706,7 @@ function revengeUpdate(dt) {
         pl.done = true; const f = facing(o);
         o.stun = 1.5; for (const b of o.list) { b.velocity.x += f.x * 2; b.velocity.z += f.z * 2; b.velocity.y += 3.5; }
         o.parts.shL.velocity.y += 6; o.parts.shR.velocity.y += 6; o.parts.torso.angularVelocity.set(-f.z * 9, 0, f.x * 9);
-        burst('PHISLA!', op.x, op.y + 0.5, op.z, '#ffd23f'); sfx('jump'); say(o, pick(['Kela kisne phenka?!', 'Aaaiyo!', 'Kamar gayi!']), 1.4); revengeHit(o, pl.p);
+        burst('SLIPPED!', op.x, op.y + 0.5, op.z, '#ffd23f'); sfx('jump'); say(o, pick(['Who threw a banana?!', 'Aiyooo!', 'My back!']), 1.4); revengeHit(o, pl.p);
         vib(40, o); break;
       }
     }
@@ -1602,14 +1733,14 @@ function seatUpdate(dt) {
   const occ = seatOccupant();
   if (occ && occ.ch.stun <= 0) {
     occ.seatT += dt;
-    if (!occ.seatSay || T_now - occ.seatSay > 4) { occ.seatSay = T_now; say(occ.ch, pick(['Seat meri!', 'Yahan se nahi hilunga!', 'Aaram se baitha hoon!', 'Virar tak meri!']), 1.4); }
+    if (!occ.seatSay || T_now - occ.seatSay > 4) { occ.seatSay = T_now; say(occ.ch, pick(['My seat!', 'Not moving from here!', 'Comfy here!', 'Mine till Virar!']), 1.4); }
     if (occ.seatT >= SEAT_WIN) GAME.seatWinner = occ;
   }
-  if (T_now > 75 && !GAME.seatWinner) { const best = [...GAME.roster].filter(p => p.alive).sort((a, b) => b.seatT - a.seatT)[0]; if (best) { GAME.seatWinner = best; banner('Time up! Sabse zyada der seat pe: ' + best.name, 2.5); } }
+  if (T_now > 75 && !GAME.seatWinner) { const best = [...GAME.roster].filter(p => p.alive).sort((a, b) => b.seatT - a.seatT)[0]; if (best) { GAME.seatWinner = best; banner('Time up! Longest on the seat: ' + best.name, 2.5); } }
 }
 // ================= end of match: podium + awards =================
 const MATCH_N = 5;
-const MODE_INFO = {classic: ['AAGE CHALO!', 'Last one inside wins!'], seat: ['SEAT WARS!', 'Glowing seat pe chadho (KOODO) aur ' + SEAT_WIN + ' second tiko!'], virar: ['VIRAR FAST!', 'Koi station nahi rukega. Uncles aate rahenge!'], monsoon: ['MONSOON MADNESS!', 'Poora floor geela. Phisalte raho!']};
+const MODE_INFO = {classic: ['MOVE INSIDE!', 'Last one inside wins!'], seat: ['SEAT WARS!', 'Jump onto the glowing seat and hold it for ' + SEAT_WIN + ' seconds!'], virar: ['VIRAR FAST!', 'No stops. The uncles keep coming!'], monsoon: ['MONSOON MADNESS!', 'The whole floor is wet. Keep sliding!']};
 const PODIUM = {meshes: [], t: 0, next: 0};
 const PODIUM_TEX = ['1', '2', '3'].map((n, i) => canvasTex(128, 128, (c) => { c.fillStyle = ['#ffd23f', '#d0d6dc', '#d08a4a'][i]; c.fillRect(0, 0, 128, 128); c.fillStyle = '#3a1d0e'; c.font = '900 92px system-ui,sans-serif'; c.textAlign = 'center'; c.fillText(n, 64, 100); }));
 function clearPodium() { for (const m of PODIUM.meshes) scene.remove(m); PODIUM.meshes = []; }
@@ -1617,13 +1748,13 @@ function awardsList() {
   const R = GAME.roster, best = (k) => { let b = null; for (const p of R) if (p.stats[k] > 0 && (!b || p.stats[k] > b.stats[k])) b = p; return b; };
   const out = [];
   const top = [...R].sort((a, b) => b.score - a.score)[0];
-  out.push(['🏆', 'Asli Mumbaikar', top, top.score + ' points']);
-  const d = best('outs'); if (d) out.push(['💪', 'Dhakka Master', d, d.stats.outs + ' log bahar']);
-  const k = best('khamba'); if (k) out.push(['🪧', 'Khamba Magnet', k, k.stats.khamba + ' baar khamba']);
-  const c = best('props'); if (c) out.push(['🩴', 'Chappal Chor', c, c.stats.props + ' cheezein udaayi']);
+  out.push(['🏆', 'True Mumbaikar', top, top.score + ' points']);
+  const d = best('outs'); if (d) out.push(['💪', 'Push Master', d, d.stats.outs + ' pushed out']);
+  const k = best('khamba'); if (k) out.push(['🪧', 'Pole Magnet', k, k.stats.khamba + ' pole hits']);
+  const c = best('props'); if (c) out.push(['🩴', 'Chappal Thief', c, c.stats.props + ' things knocked loose']);
   const s = best('saves'); if (s) out.push(['🙌', 'Clutch King', s, s.stats.saves + ' clutch saves']);
-  const f = best('first'); if (f && f.stats.first > 1) out.push(['🚶', 'Paidal Yatri', f, f.stats.first + ' baar sabse pehle bahar']);
-  const r = best('revenge'); if (r) out.push(['🍔', 'Platform ka Badla', r, r.stats.revenge + ' revenge hits']);
+  const f = best('first'); if (f && f.stats.first > 1) out.push(['🚶', 'Walking Home', f, 'first out ' + f.stats.first + ' times']);
+  const r = best('revenge'); if (r) out.push(['🍔', 'Platform Avenger', r, r.stats.revenge + ' revenge hits']);
   return out.slice(0, 5);
 }
 function startPodium() {
@@ -1640,11 +1771,11 @@ function startPodium() {
       x = X[i]; y0 = H[i];
       const b = new CANNON.Body({mass: 0, material: floorMat, collisionFilterGroup: G_WORLD, collisionFilterMask: G_BODY | G_LIMB}); b.addShape(new CANNON.Box(new CANNON.Vec3(0.55, H[i] / 2, 0.5))); b.position.set(x, H[i] / 2, z); world.addBody(b);
     } else { x = -2.6 - (i - 3) * 0.8; z = 0.5; }
-    p.ch = makeChar(x, z, {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, color: COLORS[p.idx % COLORS.length], pants: pick(PANTS), acc: p.acc, ctrl: p.ctrl, yaw: 0, y0});
+    p.ch = makeChar(x, z, {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, look: p.look, color: COLORS[p.idx % COLORS.length], pants: pick(PANTS), acc: p.acc, ctrl: p.ctrl, yaw: 0, y0});
   });
   PODIUM.t = 0; PODIUM.next = 0.5;
   const w = ranked[0];
-  bigText('MATCH KHATAM!', w.name + ' hai asli Mumbaikar! 🏆', 3.5); sfx('win');
+  bigText('MATCH OVER!', w.name + ' is the true Mumbaikar! 🏆', 3.5); sfx('win');
   podiumVisual(ranked, true); netEv('P', ranked.map(p => p.id));
 }
 function podiumVisual(ranked, canRestart) {
@@ -1656,10 +1787,10 @@ function podiumVisual(ranked, canRestart) {
   }
   $('controls').classList.add('hidden'); $('score').classList.add('hidden');
   const el = $('podium'); el.innerHTML = '';
-  const h = document.createElement('h3'); h.textContent = 'Match ke awards'; el.appendChild(h);
+  const h = document.createElement('h3'); h.textContent = 'Match awards'; el.appendChild(h);
   for (const [ic, title, p, why] of awardsList()) { const d = document.createElement('div'); d.className = 'aw'; const a = document.createElement('b'); a.textContent = ic + ' ' + title; const n = document.createElement('span'); n.textContent = p.name + (p.isMe ? ' (you)' : '') + ' · ' + why; d.append(a, n); el.appendChild(d); }
   const tbl = document.createElement('div'); tbl.className = 'fin'; tbl.textContent = ranked.map((p, i) => (i + 1) + '. ' + p.name + ' ' + p.score).join('   '); el.appendChild(tbl);
-  const again = document.createElement('button'); again.textContent = canRestart ? 'Phir se khelo!' : 'Host restart karega…'; again.disabled = !canRestart; again.onclick = () => { if (!canRestart) return; audioInit(); newMatch(); };
+  const again = document.createElement('button'); again.textContent = canRestart ? 'Play again!' : 'Host will restart…'; again.disabled = !canRestart; again.onclick = () => { if (!canRestart) return; audioInit(); newMatch(); };
   const menu = document.createElement('button'); menu.className = 'alt'; menu.textContent = 'Menu'; menu.onclick = () => $('bQuit').onclick();
   const row = document.createElement('div'); row.className = 'btns'; row.append(again, menu); el.appendChild(row);
   setTimeout(() => { if (GAME.phase === 'podium') el.classList.remove('hidden'); }, 1800);
@@ -1669,12 +1800,12 @@ function podiumUpdate(dt) {
   for (const p of GAME.roster) if (p.ctrl) p.ctrl.jump = false;
   if (PODIUM.t > PODIUM.next) {
     PODIUM.next = PODIUM.t + rnd(1.1, 1.6);
-    const w = R[0]; if (w.ch) { w.ctrl.jump = true; const h = w.ch.parts.head.position; confetti(h.x, h.y + 0.8, h.z, 30); w.ch.smugT = T_now + 2; if (Math.random() < 0.5) say(w.ch, pick(['Seat meri! 🪑', 'Mumbai meri jaan!', 'Yeh dabba mera hai!', 'Virar tak khada rahunga!']), 1.6); }
-    const o = pick(R.slice(1)); if (o && o.ch && Math.random() < 0.6) say(o.ch, pick(['Agli baar dekh lena!', 'Match fixed tha!', 'Rematch!', 'Meri chappal wapas do!']), 1.6);
+    const w = R[0]; if (w.ch) { w.ctrl.jump = true; const h = w.ch.parts.head.position; confetti(h.x, h.y + 0.8, h.z, 30); w.ch.smugT = T_now + 2; if (Math.random() < 0.5) say(w.ch, pick(['My seat! 🪑', 'Mumbai, my love!', 'This coach is mine!', 'Standing all the way to Virar!']), 1.6); }
+    const o = pick(R.slice(1)); if (o && o.ch && Math.random() < 0.6) say(o.ch, pick(['Wait till next time!', 'Match was fixed!', 'Rematch!', 'Give my chappal back!']), 1.6);
   }
 }
 function newMatch() {
-  for (const p of GAME.roster) Object.assign(p, newPlayer({}, p.idx), {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, isRemote: p.isRemote, netCtrl: p.netCtrl, idx: p.idx, acc: p.acc});
+  for (const p of GAME.roster) Object.assign(p, newPlayer({}, p.idx), {id: p.id, name: p.name, isMe: p.isMe, isBot: p.isBot, isRemote: p.isRemote, netCtrl: p.netCtrl, look: p.look, idx: p.idx, acc: p.acc});
   if (NET.role === 'host') netSeatWaiting();
   clearPodium(); $('podium').classList.add('hidden'); $('controls').classList.remove('hidden');
   GAME.round = 0; startRound();
@@ -1689,6 +1820,8 @@ function audioInit() {
     const len = AU.ctx.sampleRate, buf = AU.ctx.createBuffer(1, len, AU.ctx.sampleRate), d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     AU.noise = buf; AU.master = AU.ctx.createGain(); AU.master.gain.value = 0.5; AU.master.connect(AU.ctx.destination);
+    for (const k of ['sfxG', 'musG', 'ambG']) { AU[k] = AU.ctx.createGain(); AU[k].connect(AU.master); }
+    audioLevels(); ambInit();
   } catch (e) { AU.ctx = null; }
 }
 function tone(type, f0, f1, dur, vol, delay) {
@@ -1696,19 +1829,19 @@ function tone(type, f0, f1, dur, vol, delay) {
   const t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain();
   o.type = type; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g); g.connect(AU.master); o.start(t); o.stop(t + dur + 0.05);
+  o.connect(g); g.connect(AU.sfxG); o.start(t); o.stop(t + dur + 0.05);
 }
 function noise(dur, freq, q, vol, delay, type) {
   const c = AU.ctx; if (!c || AU.muted) return;
   const t = c.currentTime + (delay || 0), s = c.createBufferSource(); s.buffer = AU.noise;
   const f = c.createBiquadFilter(); f.type = type || 'bandpass'; f.frequency.value = freq; f.Q.value = q;
   const g = c.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  s.connect(f); f.connect(g); g.connect(AU.master); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05);
+  s.connect(f); f.connect(g); g.connect(AU.sfxG); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05);
 }
 let lastSay = 0;
 function sfx(name, arg) {
   netEv('s', name, typeof arg === 'number' ? r2(arg) : (arg ?? null));
-  if (AU.muted || GAME.state !== 'play') return;
+  if (AU.muted || (GAME.state !== 'play' && !GAME.preview)) return;
   switch (name) {
     case 'thud': tone('sine', 170, 55, 0.18, 0.5); noise(0.08, 400, 1, 0.3); break;
     case 'bigthud': tone('sine', 120, 35, 0.35, 0.7); noise(0.18, 300, 0.8, 0.45); tone('square', 80, 40, 0.2, 0.1); break;
@@ -1732,9 +1865,9 @@ function sfx(name, arg) {
     case 'vendor': tone('square', 520, 480, 0.12, 0.05); tone('square', 620, 560, 0.18, 0.05, 0.14); break;
     case 'win': [523, 659, 784, 1046].forEach((f, i) => tone('triangle', f, 0, 0.3, 0.2, i * 0.13)); break;
     case 'say':
-      if (!window.speechSynthesis || performance.now() - lastSay < 1500) break;
+      if (!window.speechSynthesis || SET.voice <= 0.02 || performance.now() - lastSay < 1500) break;
       lastSay = performance.now();
-      try { const u = new SpeechSynthesisUtterance(arg); u.lang = 'hi-IN'; u.rate = 1.05; u.volume = 0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
+      try { const u = new SpeechSynthesisUtterance(arg); u.lang = 'en-IN'; u.rate = 1.05; u.volume = SET.voice; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {}
       break;
   }
 }
@@ -1742,6 +1875,72 @@ function ambient(dt) {
   if (!AU.ctx || AU.muted) return;
   if (TR.speed > 0.08) { AU.clackT -= dt; if (AU.clackT <= 0) { AU.clackT = 0.55 / Math.max(0.25, TR.speed); noise(0.05, 900, 2, 0.09); noise(0.05, 700, 2, 0.08, 0.12); } }
   if (MONSOON.on && Math.random() < dt * 8) noise(0.3, rnd(2000, 5000), 0.5, 0.03, 0, 'highpass');
+}
+
+// ---- music: synthesized dhol + brass band, three moods ----
+// dhol: low "dha" (dagga) and sharp "tilli" (stick). brass: detuned saw stabs through a lowpass, Bhairav-ish scale.
+const MUS = {next: 0, step: 0, mood: '', bpm: 112, bar: 0, fill: false};
+const SCALE = [0, 1, 4, 5, 7, 8, 11, 12]; // Bhairav: Sa re Ga ma Pa dha Ni Sa
+const MOODS = {
+  menu:   {bpm: 100, dha: 'x..x..x.x.......', tik: '..x..x...xx.x.xx', brass: [[0, 0], [6, 2], [8, 4], [12, 3]], bass: 0.7, lead: 0.5},
+  game:   {bpm: 112, dha: 'x..x..x.x..x..x.', tik: '.xx.x.xx.xx.x.xx', brass: [[0, 4], [3, 4], [6, 5], [10, 4], [12, 2]], bass: 0.8, lead: 0.6},
+  final:  {bpm: 138, dha: 'x.xx.xx.x.xx.xxx', tik: 'xxxxxxxxxxxxxxxx', brass: [[0, 4], [2, 5], [4, 6], [6, 7], [8, 6], [10, 5], [12, 4], [14, 7]], bass: 1, lead: 0.75},
+  podium: {bpm: 120, dha: 'x...x.x.x...x.x.', tik: '..x...x...x.xxxx', brass: [[0, 0], [4, 2], [8, 4], [10, 5], [12, 7]], bass: 0.8, lead: 0.8}
+};
+const BARS = [0, 0, 5, 4]; // chord roots in scale steps: Sa Sa ma Pa
+function mood() {
+  if (GAME.preview) return 'menu';
+  if (GAME.state !== 'play') return 'menu';
+  if (GAME.phase === 'podium') return 'podium';
+  if (GAME.phase === 'round' && GAME.roster.filter(p => p.alive).length <= 2 && GAME.roster.length > 2) return 'final';
+  return 'game';
+}
+function hz(st, oct) { return 146.83 * Math.pow(2, (st + 12 * (oct || 0)) / 12); } // D3 as Sa
+function mOsc(type, f, t, dur, vol, cut, det) {
+  const c = AU.ctx, g = c.createGain(), fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(cut || 2400, t); fl.frequency.exponentialRampToValueAtTime(Math.max(200, (cut || 2400) * 0.4), t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.015); g.gain.setValueAtTime(vol * 0.8, t + dur * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  for (const d of det ? [-det, det] : [0]) { const o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.detune.value = d; o.connect(fl); o.start(t); o.stop(t + dur + 0.05); }
+  fl.connect(g); g.connect(AU.musG);
+}
+function mDha(t, v) { const c = AU.ctx, o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(115, t); o.frequency.exponentialRampToValueAtTime(48, t + 0.22); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.55 * v, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3); o.connect(g); g.connect(AU.musG); o.start(t); o.stop(t + 0.35); mNoise(t, 0.04, 260, 1, 0.25 * v); }
+function mTik(t, v) { mNoise(t, 0.05, 2600, 3, 0.22 * v); const c = AU.ctx, o = c.createOscillator(), g = c.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(300, t + 0.05); g.gain.setValueAtTime(0.12 * v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.07); o.connect(g); g.connect(AU.musG); o.start(t); o.stop(t + 0.1); }
+function mNoise(t, dur, f, q, vol) { const c = AU.ctx, s = c.createBufferSource(); s.buffer = AU.noise; const fl = c.createBiquadFilter(); fl.type = 'bandpass'; fl.frequency.value = f; fl.Q.value = q; const g = c.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); s.connect(fl); fl.connect(g); g.connect(AU.musG); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05); }
+function musicTick() {
+  const c = AU.ctx; if (!c || !AU.musG || SET.music <= 0.001 || AU.muted || c.state !== 'running') { MUS.next = 0; return; }
+  const m = mood();
+  if (m !== MUS.mood) { MUS.mood = m; MUS.fill = !!MUS.next; }
+  const M = MOODS[m], s16 = 60 / M.bpm / 4;
+  if (!MUS.next || MUS.next < c.currentTime - 0.3) MUS.next = c.currentTime + 0.05;
+  while (MUS.next < c.currentTime + 0.18) {
+    const t = MUS.next, i = MUS.step % 16, root = BARS[MUS.bar % 4];
+    if (MUS.fill && i >= 12) { mTik(t, 1.1); if (i % 2 === 0) mDha(t, 0.9); }
+    else {
+      if (M.dha[i] === 'x') mDha(t, i === 0 ? 1 : 0.8);
+      if (M.tik[i] === 'x') mTik(t, i % 4 === 0 ? 1 : 0.65);
+    }
+    // bass on the beat
+    if (i % 4 === 0) mOsc('triangle', hz(SCALE[root], -1), t, s16 * 3, 0.22 * M.bass, 900);
+    // brass stabs: chord on the off-beats, melody from the mood's pattern
+    if (i === 2 || i === 10) for (const k of [0, 2, 4]) mOsc('sawtooth', hz(SCALE[(root + k) % 7] + (root + k >= 7 ? 12 : 0)), t, s16 * 1.6, 0.035, 1800, 8);
+    for (const [at, deg] of M.brass) if (at === i && (MUS.bar % 2 === 1 || m === 'final')) mOsc('sawtooth', hz(SCALE[(deg + root) % 8], 1), t, s16 * (m === 'final' ? 1.8 : 2.6), 0.05 * M.lead, 2800, 6);
+    MUS.next += s16; MUS.step++;
+    if (MUS.step % 16 === 0) { MUS.bar++; MUS.fill = false; }
+  }
+}
+// ---- ambience loops: train rumble, crowd murmur, rain ----
+function ambLoop(f, q, type) { const c = AU.ctx, s = c.createBufferSource(); s.buffer = AU.noise; s.loop = true; const fl = c.createBiquadFilter(); fl.type = type; fl.frequency.value = f; fl.Q.value = q; const g = c.createGain(); g.gain.value = 0; s.connect(fl); fl.connect(g); g.connect(AU.ambG); s.start(); return g; }
+function ambInit() { if (AU.rumble) return; AU.rumble = ambLoop(140, 0.7, 'lowpass'); AU.murmur = ambLoop(520, 1.4, 'bandpass'); AU.rain = ambLoop(4200, 0.3, 'highpass'); }
+function ambLevels(dt) {
+  if (!AU.rumble) return; const t = AU.ctx.currentTime, on = GAME.state === 'play' || GAME.preview;
+  const crowd = GAME.npcs.filter(n => !n.dead).length + (TR.phase === 'stop' ? 4 : 0);
+  AU.rumble.gain.setTargetAtTime(on ? 0.05 + TR.speed * 0.32 : 0.06, t, 0.3);
+  AU.murmur.gain.setTargetAtTime(on ? Math.min(0.12, 0.025 + crowd * 0.012) * (0.75 + 0.25 * Math.sin(t * 1.7)) : 0.02, t, 0.4);
+  AU.rain.gain.setTargetAtTime(MONSOON.on && on ? 0.09 : 0, t, 0.6);
+}
+function audioLevels() {
+  if (!AU.ctx || !AU.musG) return; const t = AU.ctx.currentTime;
+  AU.master.gain.setTargetAtTime(AU.muted ? 0 : 0.5, t, 0.03);
+  AU.musG.gain.setTargetAtTime(SET.music * 0.55, t, 0.05); AU.sfxG.gain.setTargetAtTime(SET.sfx, t, 0.05); AU.ambG.gain.setTargetAtTime(SET.sfx, t, 0.05);
 }
 
 // ================= input =================
@@ -1790,7 +1989,7 @@ $('name').addEventListener('change', () => { try { localStorage.setItem('dl_name
 $('bPlay').onclick = () => {
   audioInit();
   const nm = ($('name').value || '').trim().slice(0, 12) || pick(['Rahul','Priya','Aditya','Sneha','Vikram','Neha']);
-  GAME.roster = [newPlayer({id: 'me', name: nm, isMe: true, isBot: false}, 0)];
+  GAME.roster = [newPlayer({id: 'me', name: nm, isMe: true, isBot: false, look: cleanLook(PROF.look)}, 0)];
   const names = [...BOT_NAMES].filter(n => n.toLowerCase() !== nm.toLowerCase()).sort(() => Math.random() - 0.5);
   for (let i = 1; i < GAME.botN; i++) GAME.roster.push(newPlayer({id: 'bot' + i, name: names[i - 1], isBot: true}, i));
   GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0;
@@ -1799,7 +1998,7 @@ $('bPlay').onclick = () => {
   startRound(); checkRotate();
 };
 $('bQuit').onclick = () => { netLeave(); document.body.classList.remove('roundover'); GAME.state = 'menu'; clearPodium(); $('podium').classList.add('hidden'); GAME.big = GAME.banner = null; clearBursts(); document.body.classList.remove('slowmo'); $('hud').classList.add('hidden'); $('controls').classList.add('hidden'); $('topbtns').classList.add('hidden'); $('score').classList.add('hidden'); $('menu').classList.remove('hidden'); if (window.speechSynthesis) speechSynthesis.cancel(); startDemo(); };
-$('bMute').onclick = () => { AU.muted = !AU.muted; $('bMute').textContent = AU.muted ? '🔇' : '🔊'; if (AU.muted && window.speechSynthesis) speechSynthesis.cancel(); };
+$('bMute').onclick = () => { AU.muted = !AU.muted; $('bMute').textContent = AU.muted ? '🔇' : '🔊'; audioLevels(); if (AU.muted && window.speechSynthesis) speechSynthesis.cancel(); };
 let rotDismissed = false;
 // fullscreen: a button on every screen, plus automatic on phones when a match starts
 const FS_OK = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
@@ -1841,7 +2040,7 @@ function lobbyView(v) { $('lbPre').classList.toggle('hidden', v !== 'pre'); $('l
 function openLobby(code) {
   $('menu').classList.add('hidden'); $('lobby').classList.remove('hidden'); lobbyView('pre');
   $('lname').value = $('name').value; if (code) $('code').value = code;
-  lmsg(onlineBlocked() ? 'Is link pe online nahi chalta (yeh sirf practice link hai). Hosted link pe dosto ke saath khelo, ya yahan bots ke saath.' : '');
+  lmsg(onlineBlocked() ? 'Online play does not work on this link (it is a practice link). Use the hosted link to play with friends, or play bots here.' : '');
 }
 function closeLobby() { netLeave(); $('lobby').classList.add('hidden'); $('menu').classList.remove('hidden'); }
 function netFail(t) { lmsg(t); try { NET.peer && NET.peer.destroy(); } catch (e) {} NET.peer = null; NET.role = null; lobbyView('pre'); $('bHost').disabled = $('bJoin').disabled = false; }
@@ -1865,9 +2064,9 @@ async function getIce() {
 const SIGNAL_ERR = new Set(['network', 'server-error', 'socket-error', 'socket-closed', 'disconnected']);
 function netStatus(t) { const el = $('lstat'); if (el) el.textContent = t || ''; }
 async function hostRoom(tries) {
-  if (onlineBlocked()) return lmsg('Is link pe online nahi chalta. Hosted link kholo.');
-  audioInit(); $('bHost').disabled = true; lmsg('Room bana rahe hain…');
-  try { await loadPeer(); } catch (e) { return netFail('Online server tak nahi pahunche. Network check karo.'); }
+  if (onlineBlocked()) return lmsg('Online play does not work on this link. Open the hosted link.');
+  audioInit(); $('bHost').disabled = true; lmsg('Creating room…');
+  try { await loadPeer(); } catch (e) { return netFail('Could not reach the online server. Check your network.'); }
   NET.iceCfg = await getIce();
   hostPeer(randCode(), tries || 0);
 }
@@ -1875,7 +2074,7 @@ async function hostRoom(tries) {
 function hostPeer(code, tries) {
   const peer = new Peer(PEER_PREFIX + code, {debug: 0, config: NET.iceCfg || ICE});
   NET.peer = peer; NET.code = code; if (NET.role !== 'host') NET.peers = new Map();
-  const to = setTimeout(() => { if (!peer.open && NET.role !== 'host') netFail('Online server se connect nahi hua. Network check karo, ya bots ke saath khelo.'); }, 12000);
+  const to = setTimeout(() => { if (!peer.open && NET.role !== 'host') netFail('Could not connect to the online server. Check your network, or play with bots.'); }, 12000);
   peer.on('open', () => {
     clearTimeout(to); NET.retry = 0;
     if (NET.role !== 'host') { NET.role = 'host'; NET.myId = 'me'; lobbyView('room'); $('lcode').textContent = code; $('bHost').disabled = false; lmsg(''); renderLobby(); }
@@ -1885,10 +2084,10 @@ function hostPeer(code, tries) {
     clearTimeout(to);
     if (e.type === 'unavailable-id' && NET.role !== 'host' && tries < 3) { peer.destroy(); hostPeer(randCode(), tries + 1); return; }
     if (e.type === 'peer-unavailable') return;
-    if (NET.role === 'host') { netStatus('🟠 Online server se dobara jud rahe hain…'); hostRejoin(peer); return; }
-    netFail('Room nahi bana: ' + (e.type || e.message) + '. Network check karke phir try karo.');
+    if (NET.role === 'host') { netStatus('🟠 Reconnecting to the online server…'); hostRejoin(peer); return; }
+    netFail('Could not create the room: ' + (e.type || e.message) + '. Check your network and try again.');
   });
-  peer.on('disconnected', () => { if (NET.role === 'host') { netStatus('🟠 Online server se dobara jud rahe hain…'); hostRejoin(peer); } });
+  peer.on('disconnected', () => { if (NET.role === 'host') { netStatus('🟠 Reconnecting to the online server…'); hostRejoin(peer); } });
   peer.on('connection', conn => {
     conn.on('data', d => hostData(conn, d));
     conn.on('close', () => dropPeer(conn.peer));
@@ -1914,10 +2113,10 @@ function hostData(conn, d) {
   if (d.t === 'join') {
     if (P) return;
     if (NET.peers.size + 1 >= MAX_HUMANS) { conn.send({t: 'full'}); return; }
-    const pe = {id, conn, name: String(d.name || 'Yatri').slice(0, 12), p: null, seen: performance.now()};
+    const pe = {id, conn, look: cleanLook(d.look), name: String(d.name || 'Player').slice(0, 12), p: null, seen: performance.now()};
     NET.peers.set(id, pe);
     conn.send({t: 'welcome', id, code: NET.code});
-    if (GAME.state === 'play') { conn.send({t: 'go', spect: true}); feed('🚶 ' + pe.name + ' platform pe aaya. Agle match mein khelega.'); NET.lastSp = ''; NET.lastR = ''; }
+    if (GAME.state === 'play') { conn.send({t: 'go', spect: true}); feed('🚶 ' + pe.name + ' is on the platform. They will play next match.'); NET.lastSp = ''; NET.lastR = ''; }
     renderLobby();
   } else if (d.t === 'i' && P) {
     P.seen = performance.now();
@@ -1928,7 +2127,7 @@ function hostData(conn, d) {
 function dropPeer(id) {
   const P = NET.peers.get(id); if (!P) return;
   NET.peers.delete(id); try { P.conn.close(); } catch (e) {}
-  if (P.p) { const p = P.p; p.isRemote = false; p.isBot = true; if (p.netCtrl) { p.netCtrl.mx = p.netCtrl.mz = 0; p.netCtrl.push = p.netCtrl.jump = p.netCtrl.grab = false; } if (GAME.state === 'play') feed('📵 ' + p.name + ' ka network gaya. Ab bot sambhalega.'); }
+  if (P.p) { const p = P.p; p.isRemote = false; p.isBot = true; if (p.netCtrl) { p.netCtrl.mx = p.netCtrl.mz = 0; p.netCtrl.push = p.netCtrl.jump = p.netCtrl.grab = false; } if (GAME.state === 'play') feed('📵 ' + p.name + ' lost connection. A bot takes over.'); }
   renderLobby();
 }
 function renderLobby() {
@@ -1939,7 +2138,7 @@ function renderLobby() {
   if (bots > 0) { const li = document.createElement('li'); li.className = 'bots'; li.textContent = '🤖 + ' + bots + ' bot' + (bots > 1 ? 's' : '') + ' (khaali seats)'; L.appendChild(li); }
   const host = NET.role === 'host';
   $('bStart').classList.toggle('hidden', !host);
-  $('lhint').textContent = host ? (names.length < 2 ? 'Dosto ko link bhejo. Sab aa jaayein toh train chalao.' : names.length + ' log ready. ' + MODE_INFO[GAME.mode][0] + ' · Train chalao!') : 'Host train chalayega. Ruko…';
+  $('lhint').textContent = host ? (names.length < 2 ? 'Send friends the link. Start the train when everyone is in.' : names.length + ' players ready. ' + MODE_INFO[GAME.mode][0] + ' · Start the train!') : 'The host will start the train. Wait…';
   if (host) { const msg = {t: 'lobby', names, mode: GAME.mode, seats}; for (const h of humans()) try { h.conn.send(msg); } catch (e) {} }
 }
 function enterPlayUI() {
@@ -1950,8 +2149,8 @@ function enterPlayUI() {
 function hostStart() {
   audioInit();
   const nm = myName();
-  GAME.roster = [newPlayer({id: 'me', name: nm, isMe: true, isBot: false}, 0)];
-  for (const h of humans()) { const p = newPlayer({id: h.id, name: h.name, isRemote: true, isBot: false, netCtrl: makeCtrl()}, GAME.roster.length); h.p = p; GAME.roster.push(p); }
+  GAME.roster = [newPlayer({id: 'me', name: nm, isMe: true, isBot: false, look: cleanLook(PROF.look)}, 0)];
+  for (const h of humans()) { const p = newPlayer({id: h.id, name: h.name, look: h.look, isRemote: true, isBot: false, netCtrl: makeCtrl()}, GAME.roster.length); h.p = p; GAME.roster.push(p); }
   const taken = new Set(GAME.roster.map(p => p.name.toLowerCase())), names = BOT_NAMES.filter(n => !taken.has(n.toLowerCase())).sort(() => Math.random() - 0.5);
   while (GAME.roster.length < Math.max(GAME.botN, 2)) GAME.roster.push(newPlayer({id: 'bot' + GAME.roster.length, name: names.pop(), isBot: true}, GAME.roster.length));
   GAME.state = 'play'; GAME.round = 0; GAME.demoWait = 0; NET.lastR = NET.lastSp = NET.lastLed = '';
@@ -1963,8 +2162,8 @@ function netSeatWaiting() {
   for (const h of humans()) {
     if (h.p && GAME.roster.includes(h.p)) continue;
     const bot = GAME.roster.find(p => p.isBot && !NET_IDS().has(p.id));
-    if (bot) { Object.assign(bot, {id: h.id, name: h.name, isBot: false, isRemote: true, netCtrl: makeCtrl()}); h.p = bot; }
-    else if (GAME.roster.length < MAX_HUMANS + 2) { const p = newPlayer({id: h.id, name: h.name, isRemote: true, isBot: false, netCtrl: makeCtrl()}, GAME.roster.length); h.p = p; GAME.roster.push(p); }
+    if (bot) { Object.assign(bot, {id: h.id, name: h.name, look: h.look, isBot: false, isRemote: true, netCtrl: makeCtrl()}); h.p = bot; }
+    else if (GAME.roster.length < MAX_HUMANS + 2) { const p = newPlayer({id: h.id, name: h.name, look: h.look, isRemote: true, isBot: false, netCtrl: makeCtrl()}, GAME.roster.length); h.p = p; GAME.roster.push(p); }
   }
   NET.lastR = NET.lastSp = '';
 }
@@ -1991,7 +2190,7 @@ function hostSnapshot() {
   });
   const m = {ht: Math.round(performance.now()), st};
   const spKey = list.map(c => c.cid).join(',');
-  if (full || spKey !== NET.lastSp) { NET.lastSp = spKey; m.sp = list.map(ch => { const p = rosterOf(ch); return [ch.cid, ch.kind, ch.name, ch.color, ch.pants, ch.skin, ch.acc, ch.heavy ? 1 : 0, ch.isNpc ? 1 : 0, p ? p.id : '']; }); }
+  if (full || spKey !== NET.lastSp) { NET.lastSp = spKey; m.sp = list.map(ch => { const p = rosterOf(ch); return [ch.cid, ch.kind, ch.name, ch.color, ch.pants, ch.skin, ch.acc, ch.heavy ? 1 : 0, ch.isNpc ? 1 : 0, p ? p.id : '', ch.look || 0]; }); }
   const R = GAME.roster.map(p => [p.id, p.name, p.idx, p.alive ? 1 : 0, p.score, p.wins, Math.round(p.seatT * 10) / 10, p.isBot ? 1 : 0, p.ch && !p.ch.removed ? p.ch.cid : 0, p.rs, p.stats, p.acc]);
   const rk = JSON.stringify(R); if (full || rk !== NET.lastR) { NET.lastR = rk; m.R = R; }
   if (full || LED.text !== NET.lastLed) { NET.lastLed = LED.text; m.led = LED.text; }
@@ -2014,11 +2213,11 @@ function hostSnapshot() {
 
 // ---- client: joining and applying snapshots ----
 async function joinRoom(again) {
-  if (onlineBlocked()) return lmsg('Is link pe online nahi chalta. Hosted link kholo.');
+  if (onlineBlocked()) return lmsg('Online play does not work on this link. Open the hosted link.');
   const code = ($('code').value || '').trim().toUpperCase();
-  if (!/^[A-Z]{4}$/.test(code)) return lmsg('4 letter ka room code daalo');
-  audioInit(); $('bJoin').disabled = true; lmsg(again ? 'Ek baar aur koshish…' : 'Dabbe mein ghus rahe hain…');
-  try { await loadPeer(); } catch (e) { return netFail('Online server tak nahi pahunche. Network check karo.'); }
+  if (!/^[A-Z]{4}$/.test(code)) return lmsg('Enter the 4 letter room code');
+  audioInit(); $('bJoin').disabled = true; lmsg(again ? 'Trying once more…' : 'Boarding the coach…');
+  try { await loadPeer(); } catch (e) { return netFail('Could not reach the online server. Check your network.'); }
   try { NET.peer && NET.peer.destroy(); } catch (e) {}
   const cfg = await getIce();
   const peer = new Peer(undefined, {debug: 0, config: cfg}); NET.peer = peer; NET.code = code; NET.stage = 'server'; NET.ice = '';
@@ -2026,31 +2225,31 @@ async function joinRoom(again) {
   const fail = (t) => { clearTimeout(to); if (!done() && NET.peer === peer) netFail(t); };
   const to = setTimeout(() => {
     if (done() || NET.peer !== peer) return;
-    if (NET.stage === 'server') fail('Online server tak nahi pahunche. Internet check karo, phir try karo.');
-    else fail('Room ' + code + ' mil gaya, par host ke phone tak raasta nahi bana' + (NET.ice ? ' (' + NET.ice + ')' : '') + '. Phir try karo. Baar baar ho toh dono phones ek WiFi pe try karo.');
+    if (NET.stage === 'server') fail('Could not reach the online server. Check your internet and try again.');
+    else fail('Found room ' + code + ', but could not connect to the host\'s phone' + (NET.ice ? ' (' + NET.ice + ')' : '') + '. Try again. If it keeps happening, try both phones on the same WiFi.');
   }, 20000);
   peer.on('open', () => {
-    NET.stage = 'connecting'; lmsg('Room ' + code + ' dhoondh rahe hain…');
+    NET.stage = 'connecting'; lmsg('Looking for room ' + code + '…');
     const conn = peer.connect(PEER_PREFIX + code, {reliable: true}); NET.host = conn;
-    conn.on('iceStateChanged', st => { NET.ice = st; if (st === 'checking') { NET.stage = 'ice'; lmsg('Host mil gaya! Connect ho rahe hain…'); } });
-    conn.on('open', () => { NET.stage = 'open'; conn.send({t: 'join', name: myName()}); });
+    conn.on('iceStateChanged', st => { NET.ice = st; if (st === 'checking') { NET.stage = 'ice'; lmsg('Found the host! Connecting…'); } });
+    conn.on('open', () => { NET.stage = 'open'; conn.send({t: 'join', name: myName(), look: cleanLook(PROF.look)}); });
     conn.on('data', d => { if (d && d.t === 'welcome') clearTimeout(to); clientData(d); });
-    conn.on('error', e => { if (!done()) fail('Host ke phone tak raasta nahi bana (' + (e.type || 'network') + '). Phir try karo. Baar baar ho toh dono phones ek WiFi pe try karo.'); });
-    conn.on('close', () => { if (done()) netAbort('Host chala gaya. Train cancel. 😢'); });
+    conn.on('error', e => { if (!done()) fail('Could not connect to the host\'s phone (' + (e.type || 'network') + '). Try again. If it keeps happening, try both phones on the same WiFi.'); });
+    conn.on('close', () => { if (done()) netAbort('The host left. Train cancelled. 😢'); });
   });
   peer.on('error', e => {
     if (done()) return; // the game itself runs phone-to-phone; online-server hiccups after joining don't matter
     if (e.type === 'peer-unavailable') {
       if (!again) { clearTimeout(to); setTimeout(() => { if (NET.peer === peer) joinRoom(true); }, 1500); return; }
-      fail('Room ' + code + ' abhi online nahi hai. Host ke phone pe game khula aur screen on honi chahiye (WhatsApp se wapas game pe aao). Code sahi hai na?');
-    } else if (!SIGNAL_ERR.has(e.type) || NET.stage === 'server') fail('Connection error (' + (e.type || e.message) + '). Phir try karo.');
+      fail('Room ' + code + ' is not online right now. The host needs the game open with the screen on (come back to the game from WhatsApp). Is the code right?');
+    } else if (!SIGNAL_ERR.has(e.type) || NET.stage === 'server') fail('Connection error (' + (e.type || e.message) + '). Try again.');
   });
 }
 function clientData(d) {
   if (!d || typeof d !== 'object') return;
   if (d.t === 'welcome') { NET.role = 'lobby'; NET.myId = d.id; lobbyView('room'); $('lcode').textContent = NET.code; $('bJoin').disabled = false; lmsg(''); renderLobby(); }
-  else if (d.t === 'full') netFail('Dabba full hai. Agli train pakdo.');
-  else if (d.t === 'lobby') { NET.lobby = d.names; GAME.botN = d.seats; renderLobby(); $('lhint').textContent = 'Host train chalayega. Ruko… (' + MODE_INFO[d.mode][0] + ')'; }
+  else if (d.t === 'full') netFail('This coach is full. Catch the next train.');
+  else if (d.t === 'lobby') { NET.lobby = d.names; GAME.botN = d.seats; renderLobby(); $('lhint').textContent = 'The host will start the train. Wait… (' + MODE_INFO[d.mode][0] + ')'; }
   else if (d.t === 'go') clientGo(d.spect);
   else if (d.t === 's' && NET.role === 'client') clientSnap(d.m, d.b);
 }
@@ -2058,7 +2257,7 @@ function clientGo(spect) {
   clearWorld(); GAME.roster = []; GAME.feed = []; GAME.big = GAME.banner = null; GAME.result = null; GAME.phase = 'round'; GAME.demoWait = 0;
   NET.role = 'client'; NET.snaps = []; NET.offset = null; NET.spawn = new Map(); NET.byCid = new Map(); NET.station = -1; NET.lastSnapAt = performance.now();
   GAME.state = 'play'; enterPlayUI();
-  if (spect) bigText('MATCH CHAL RAHA HAI', 'Abhi dekho, agle match mein tum bhi andar!', 3);
+  if (spect) bigText('MATCH IN PROGRESS', 'Watch for now, you are in next match!', 3);
 }
 function toI16(b) {
   if (b instanceof ArrayBuffer) return new Int16Array(b);
@@ -2099,7 +2298,7 @@ function clientSnap(m, b) {
     if (!ch || ch.removed) {
       const sp = NET.spawn.get(cid); if (!sp) return;
       const o = i * 70;
-      ch = makeChar(a[o] / 100, a[o + 2] / 100, {cid, kind: sp[1], name: sp[2], color: sp[3], pants: sp[4], skin: sp[5], acc: sp[6], heavy: !!sp[7], isNpc: !!sp[8], isMe: sp[9] !== '' && sp[9] === NET.myId, isBot: false, yaw: s[5]});
+      ch = makeChar(a[o] / 100, a[o + 2] / 100, {cid, kind: sp[1], name: sp[2], color: sp[3], pants: sp[4], skin: sp[5], acc: sp[6], heavy: !!sp[7], isNpc: !!sp[8], isMe: sp[9] !== '' && sp[9] === NET.myId, isBot: false, look: sp[10] ? cleanLook(sp[10]) : null, yaw: s[5]});
       for (const bd of ch.list) { bd.type = CANNON.Body.KINEMATIC; bd.mass = 0; bd.updateMassProperties(); bd.collisionResponse = false; }
       NET.byCid.set(cid, ch);
     }
@@ -2125,10 +2324,11 @@ function clientSnap(m, b) {
 function clientEvent(e) {
   const [k, ...a] = e;
   switch (k) {
-    case 'k': CAM.shake = Math.max(CAM.shake, a[0]); break;
+    case 'k': CAM.shake = Math.max(CAM.shake, a[0] * (SET.calm ? 0.35 : 1)); break;
     case 'h': FX.hitstop = Math.max(FX.hitstop, a[0]); break;
     case 'p': puff(...a); break;
     case 'c': confetti(...a); break;
+    case 'x': fallFx(...a); break;
     case 'b': burst(a[0], a[1], a[2], a[3], a[4] || null, a[5]); break;
     case 'w': shockwave(...a); break;
     case 's': sfx(a[0], a[1] ?? undefined); break;
@@ -2177,7 +2377,7 @@ function clientFrame(dt, vdt) {
   if (GAME.mode === 'seat' && GAME.seat) { SEATMK.userData.arrow.position.y = 2.1 + Math.sin(T_now * 4) * 0.15; SEATMK.userData.cush.material.opacity = 0.45 + Math.sin(T_now * 6) * 0.25; }
   if (GAME.result) GAME.result.t += dt;
   clientInput(dt);
-  if (performance.now() - NET.lastSnapAt > 7000) netAbort('Host se connection toot gaya. 😢');
+  if (performance.now() - NET.lastSnapAt > 7000) netAbort('Lost connection to the host. 😢');
 }
 function clientInput(dt) {
   const L = NET.latch; L.push = L.push || LOCAL.push; L.jump = L.jump || LOCAL.jump; L.grab = L.grab || LOCAL.grab;
@@ -2207,16 +2407,142 @@ $('bStart').onclick = hostStart;
 $('bLobBack').onclick = closeLobby;
 $('lname').addEventListener('change', () => { $('name').value = $('lname').value; try { localStorage.setItem('dl_name', $('name').value); } catch (e) {} if (NET.role === 'host') renderLobby(); });
 $('code').addEventListener('input', () => { $('code').value = $('code').value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4); });
-$('bShare').onclick = () => { const t = 'Dhakka Local khelega? 🚃 Mere dabbe mein aa ja! Room code: ' + NET.code + '\n' + shareUrl(); window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank'); };
-$('bCopy').onclick = async () => { try { if (navigator.share) { await navigator.share({title: 'Dhakka Local', text: 'Room code ' + NET.code, url: shareUrl()}); return; } await navigator.clipboard.writeText(shareUrl()); $('bCopy').textContent = 'Copied ✓'; setTimeout(() => $('bCopy').textContent = 'Link copy', 1500); } catch (e) { lmsg(shareUrl()); } };
+$('bShare').onclick = () => { const t = 'Play Dhakka Local with me? 🚃 Jump into my coach! Room code: ' + NET.code + '\n' + shareUrl(); window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank'); };
+$('bCopy').onclick = async () => { try { if (navigator.share) { await navigator.share({title: 'Dhakka Local', text: 'Room code ' + NET.code, url: shareUrl()}); return; } await navigator.clipboard.writeText(shareUrl()); $('bCopy').textContent = 'Copied ✓'; setTimeout(() => $('bCopy').textContent = 'Copy link', 1500); } catch (e) { lmsg(shareUrl()); } };
 { const rc = new URLSearchParams(location.search).get('room'); if (rc && /^[A-Za-z]{4}$/.test(rc)) setTimeout(() => { openLobby(rc.toUpperCase()); }, 0); }
+
+// ================= Phase 4: progress, Monthly Pass, Almari, daily challenges, settings =================
+const PROG = {base: null, round: 0, podiumDone: false};
+const STAT_KEYS = ['outs', 'saves', 'props', 'revenge', 'wins', 'kicks', 'throws', 'seatwins', 'khamba'];
+function addLife(k, d) {
+  PROF.life[k] = (PROF.life[k] || 0) + d;
+  const D = ensureDaily();
+  for (const it of D.list) {
+    const [key, n, txt] = DAILY_POOL[it.i]; if (it.done || key !== k) continue;
+    it.p = Math.min(n, it.p + d);
+    if (it.p >= n) { it.done = true; PROF.km += DAILY_KM; you({isMe: true}, 'ban', '✅ Daily task done: ' + txt + '  +' + DAILY_KM + ' km', 3); sfx('pickup'); }
+  }
+  saveProf();
+}
+function stampsOf(km) { return Math.min(PASS.length, Math.floor(km / STAMP_KM)); }
+// watch my own roster stats (works for solo, host and online guests alike) and turn changes into lifetime progress
+function progTick() {
+  if (GAME.state !== 'play' || GAME.tutorial) return;
+  const me = GAME.roster.find(p => p.isMe); if (!me || !me.stats) return;
+  const st = me.stats, b = PROG.base;
+  if (!b || STAT_KEYS.some(k => (st[k] || 0) < (b[k] || 0))) { PROG.base = Object.fromEntries(STAT_KEYS.map(k => [k, st[k] || 0])); PROG.podiumDone = false; return; }
+  for (const k of STAT_KEYS) { const d = (st[k] || 0) - b[k]; if (d > 0) { addLife(k, d); b[k] = st[k]; } }
+  if (GAME.phase === 'podium' && !PROG.podiumDone) {
+    PROG.podiumDone = true;
+    const ranked = [...GAME.roster].sort((a, b2) => b2.score - a.score), rank = ranked.indexOf(me) + 1;
+    const before = stampsOf(PROF.km), gain = 30 + me.score * 8 + (rank === 1 ? 60 : 0);
+    PROF.km += gain; PROF.matches++; if (rank === 1) PROF.mwins++; addLife('matches', 1);
+    const after = stampsOf(PROF.km), news = PASS.slice(before, after).map(itemName);
+    const titlesNow = Object.keys(TITLE_REQ).filter(t => isUnlocked('title', t) && !(PROF.seenTitles || []).includes(t));
+    PROF.seenTitles = [...(PROF.seenTitles || []), ...titlesNow];
+    saveProf(true);
+    const line = document.createElement('div'); line.className = 'kmline';
+    line.textContent = '🚃 +' + gain + ' km · Monthly Pass ' + after + '/' + PASS.length + (news.length ? ' · NEW: ' + news.join(', ') + '!' : '') + (titlesNow.length ? ' · New title: ' + titlesNow.map(titleName).join(', ') : '');
+    const el = $('podium'), btns = el.querySelector('.btns'); if (btns) el.insertBefore(line, btns); else el.appendChild(line);
+    if (news.length || titlesNow.length) setTimeout(() => sfx('save'), 1900);
+    kmBadge();
+  }
+}
+function kmBadge() { const D = ensureDaily(), left = D.list.filter(x => !x.done).length; $('kmBadge').textContent = left ? left : ''; }
+
+// ---- Almari (wardrobe) with a live preview of your yatri ----
+const PREV = {ch: null, t: 0, tab: 'wear'};
+function previewChar() {
+  if (PREV.ch) removeChar(PREV.ch);
+  PREV.ch = makeChar(4.3, 0.5, {id: 'prev', name: myNameSoft(), isMe: false, look: cleanLook(PROF.look), color: COLORS[0], pants: PANTS[0], yaw: 0});
+  if (PREV.ch.pring) { scene.remove(PREV.ch.pring); PREV.ch.pring = null; }
+}
+function myNameSoft() { return ($('name').value || '').trim().slice(0, 12) || 'You'; }
+function openAlmari() {
+  audioInit(); ensureDaily();
+  $('menu').classList.add('hidden'); $('almari').classList.remove('hidden');
+  GAME.preview = true; GAME.demoWait = 0; clearWorld(); GAME.roster = []; GAME.npcs = [];
+  Object.assign(TR, {phase: 'stop', t: 0, dur: 1e9, speed: 0, gx: 0, gz: 0, curve: null, jerk: null, gust: null, khamba: null, platX: null, did: {alight: true, board: true}, tcWarn: 0});
+  MONSOON.on = false; LIGHT.tod = TODS[2]; applyLight(Infinity);
+  previewChar(); renderAlmari();
+}
+function closeAlmari() { $('almari').classList.add('hidden'); GAME.preview = false; camTarget.y = 0.6; CAM.d = 0; if (PREV.ch) { removeChar(PREV.ch); PREV.ch = null; } $('menu').classList.remove('hidden'); startDemo(); }
+function previewUpdate(dt) {
+  const ch = PREV.ch; if (!ch) return;
+  PREV.t += dt; ch.ctrl.jump = false; ch.ctrl.mx = ch.ctrl.mz = 0;
+  if (PREV.t > 3.2) { PREV.t = 0; ch.ctrl.jump = true; }
+  if (Math.abs(ch.yaw) > 0.05) ch.yaw *= 0.9;
+}
+function renderAlmari() {
+  const km = PROF.km, st = stampsOf(km), D = ensureDaily();
+  $('almName').textContent = myNameSoft(); $('almTitle').textContent = titleName(PROF.look.title) || 'New Commuter';
+  $('kmTxt').textContent = '🚃 ' + km + ' km travelled · Monthly Pass ' + st + '/' + PASS.length + (st < PASS.length ? ' · next stamp in ' + ((st + 1) * STAMP_KM - km) + ' km' : ' · complete!');
+  $('kmFill').style.width = (st >= PASS.length ? 100 : (km % STAMP_KM) / STAMP_KM * 100).toFixed(0) + '%';
+  document.querySelectorAll('.alm-tabs button').forEach(b => b.classList.toggle('sel', b.dataset.t === PREV.tab));
+  const B = $('almBody'); B.innerHTML = '';
+  const add = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  if (PREV.tab === 'wear') {
+    for (const cat of ['head', 'face', 'extra', 'fx', 'title']) {
+      B.appendChild(add('h4', '', CAT_NAME[cat]));
+      const row = add('div', 'itm');
+      for (const [id, nm] of ITEMS[cat]) {
+        const ok = isUnlocked(cat, id), b = add('button', (PROF.look[cat] === id ? 'sel' : '') + (ok ? '' : ' lock'), (ok ? '' : '🔒 ') + nm);
+        b.title = ok ? nm : lockText(cat, id);
+        b.onclick = () => {
+          if (!ok) { b.textContent = '🔒 ' + lockText(cat, id); return; }
+          PROF.look[cat] = id; saveProf(true); previewChar(); renderAlmari(); sfx('grab');
+          if (cat === 'fx' && PREV.ch) { const h = PREV.ch.parts.torso.position; if (id === 'dust') puff(h.x, h.y, h.z, 10, 0xd8cbb3, 2); else fallFx(id, h.x, h.y + 0.3, h.z); }
+        };
+        row.appendChild(b);
+      }
+      B.appendChild(row);
+    }
+    B.appendChild(add('div', 'kmtxt', 'Play matches to earn km. Every ' + STAMP_KM + ' km gets a new Monthly Pass stamp.'));
+  } else if (PREV.tab === 'pass') {
+    B.appendChild(add('div', 'kmtxt', 'Each match: 30 km + 8 km per point + 60 km for a win. Daily tasks: ' + DAILY_KM + ' km each.'));
+    const g = add('div', 'stamps');
+    PASS.forEach((key, i) => { const c = add('div', 'stamp' + (i < st ? ' got' : '')); c.appendChild(add('b', '', '#' + (i + 1))); c.appendChild(add('div', '', itemName(key))); c.appendChild(add('div', '', (i + 1) * STAMP_KM + ' km')); g.appendChild(c); });
+    B.appendChild(g);
+  } else if (PREV.tab === 'daily') {
+    B.appendChild(add('div', 'kmtxt', '3 new tasks every day. Each task = ' + DAILY_KM + ' km. Bots or friends, both count.'));
+    for (const it of D.list) { const [k, n, txt] = DAILY_POOL[it.i]; const c = add('div', 'dly' + (it.done ? ' done' : '')); c.appendChild(add('div', '', (it.done ? '✅ ' : '⬜ ') + txt + '  (' + it.p + '/' + n + ')')); const bar = add('div', 'bar'), fi = add('i'); fi.style.width = (it.p / n * 100) + '%'; bar.appendChild(fi); c.appendChild(bar); B.appendChild(c); }
+  } else {
+    const L = PROF.life, rows = [['Matches played', PROF.matches], ['Matches won', PROF.mwins], ['Rounds won', L.wins || 0], ['People pushed out', L.outs || 0], ['Dropkick outs', L.kicks || 0], ['Throw outs', L.throws || 0], ['Clutch saves', L.saves || 0], ['Things knocked loose', L.props || 0], ['Pole hits taken', L.khamba || 0], ['Platform revenge', L.revenge || 0], ['Total travelled', PROF.km + ' km']];
+    for (const [a, v] of rows) { const r = add('div', 'strow'); r.appendChild(add('span', '', a)); r.appendChild(add('b', '', String(v))); B.appendChild(r); }
+    B.appendChild(add('h4', '', 'How to earn titles'));
+    for (const [id, [k, n, why]] of Object.entries(TITLE_REQ)) B.appendChild(add('div', 'strow', (isUnlocked('title', id) ? '✅ ' : '🔒 ') + titleName(id) + ': ' + n + ' ' + why + ' (' + Math.min(n, lifeOf(k)) + '/' + n + ')'));
+  }
+}
+$('bAlmari').onclick = openAlmari; $('bAlmClose').onclick = closeAlmari;
+document.querySelectorAll('.alm-tabs button').forEach(b => b.onclick = () => { PREV.tab = b.dataset.t; renderAlmari(); });
+
+// ---- settings ----
+function applySettings() {
+  document.body.classList.toggle('lefty', !!SET.lefty);
+  document.body.classList.toggle('btn-s', SET.btn === 's'); document.body.classList.toggle('btn-l', SET.btn === 'l');
+  $('sMusic').value = SET.music; $('sSfx').value = SET.sfx; $('sVoice').value = SET.voice;
+  const T = (id, on, a, b) => { const e = $(id); e.classList.toggle('on', on); e.textContent = on ? a : b; };
+  T('tHaptic', SET.haptics, '📳 Vibration: ON', '📴 Vibration: OFF'); T('tCalm', SET.calm, '🧘 Reduced shake: ON', '🎥 Camera shake: Full'); T('tLefty', SET.lefty, '🫲 Left-handed: ON', '🫱 Left-handed: OFF');
+  document.querySelectorAll('[data-bs]').forEach(b => b.classList.toggle('sel', b.dataset.bs === SET.btn));
+  audioLevels(); store.set('dl_set', SET);
+}
+function openSettings() { $('settings').classList.remove('hidden'); applySettings(); }
+$('bSet').onclick = openSettings; $('bSet2').onclick = openSettings; $('bSetClose').onclick = () => $('settings').classList.add('hidden');
+$('sMusic').oninput = e => { SET.music = +e.target.value; applySettings(); };
+$('sSfx').oninput = e => { SET.sfx = +e.target.value; applySettings(); };
+$('sVoice').oninput = e => { SET.voice = +e.target.value; applySettings(); };
+$('tHaptic').onclick = () => { SET.haptics = !SET.haptics; applySettings(); if (SET.haptics) buzz(30); };
+$('tCalm').onclick = () => { SET.calm = !SET.calm; applySettings(); };
+$('tLefty').onclick = () => { SET.lefty = !SET.lefty; applySettings(); };
+document.querySelectorAll('[data-bs]').forEach(b => b.onclick = () => { SET.btn = b.dataset.bs; applySettings(); });
+
 
 // ================= HUD =================
 const v3 = new THREE.Vector3();
 const HUDK = {route: '', chips: ''};
 function updateHUD(dt) {
   const T = TR, nm = STATIONS[T.station % STATIONS.length];
-  $('pillSt').textContent = (T.phase === 'stop' ? '🚉 ' : '🚃 Agla: ') + nm + (MONSOON.on ? '  🌧' : '');
+  $('pillSt').textContent = (T.phase === 'stop' ? '🚉 ' : '🚃 Next: ') + nm + (MONSOON.on ? '  🌧' : '');
   const rk = T.station + T.phase;
   if (HUDK.route !== rk) { HUDK.route = rk; const r = $('route'); r.innerHTML = ''; for (let i = 0; i < 3; i++) { if (i) r.appendChild(document.createElement('s')); const d = document.createElement('i'); if (i === 0) d.className = 'on'; r.appendChild(d); const sp = document.createElement('span'); const sn = STATIONS[(T.station + i) % STATIONS.length]; sp.textContent = sn.length > 9 ? sn.slice(0, 8) + '…' : sn; r.appendChild(sp); } }
   const ck = GAME.roster.map(p => p.alive ? 1 : 0).join('');
@@ -2224,7 +2550,7 @@ function updateHUD(dt) {
   document.body.classList.toggle('slowmo', GAME.slow > 0 || !!CAM.focus);
   document.body.classList.toggle('roundover', !!GAME.result);
   const sh = $('seatHud'); sh.classList.toggle('hidden', GAME.mode !== 'seat' || GAME.phase === 'podium');
-  if (GAME.mode === 'seat') { const top = [...GAME.roster].sort((a, b) => b.seatT - a.seatT).slice(0, 2).filter(p => p.seatT > 0.05); const t = '🪑 ' + (top.length ? top.map(p => p.name + ' ' + p.seatT.toFixed(0) + '/' + SEAT_WIN + 's').join(' · ') : 'Seat khali hai!'); if (sh.textContent !== t) sh.textContent = t; }
+  if (GAME.mode === 'seat') { const top = [...GAME.roster].sort((a, b) => b.seatT - a.seatT).slice(0, 2).filter(p => p.seatT > 0.05); const t = '🪑 ' + (top.length ? top.map(p => p.name + ' ' + p.seatT.toFixed(0) + '/' + SEAT_WIN + 's').join(' · ') : 'The seat is free!'); if (sh.textContent !== t) sh.textContent = t; }
   const bn = $('banner');
   if (GAME.banner) { GAME.banner.t -= dt; if (bn.textContent !== GAME.banner.text) bn.textContent = GAME.banner.text; bn.classList.remove('hidden'); if (GAME.banner.t <= 0) GAME.banner = null; } else bn.classList.add('hidden');
   const bg = $('big');
@@ -2333,6 +2659,13 @@ function updateCamera(dt) {
   const aspect = innerWidth / innerHeight;
   camera.aspect = aspect;
   const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * aspect);
+  if (GAME.preview && PREV.ch) {
+    const tp = PREV.ch.parts.torso.position, d = 5.2, panel = Math.min(430, innerWidth * 0.56) / innerWidth, halfW = d * Math.tan(hfov / 2);
+    camTarget.x = lerpTo(camTarget.x, tp.x + panel * halfW, dt * 4); camTarget.z = lerpTo(camTarget.z, tp.z, dt * 4); camTarget.y = lerpTo(camTarget.y, 0.95, dt * 4);
+    const el = THREE.MathUtils.degToRad(12);
+    camera.position.set(camTarget.x, camTarget.y + Math.sin(el) * d, camTarget.z + Math.cos(el) * d);
+    camera.lookAt(v3b.set(camTarget.x, camTarget.y, camTarget.z)); camera.updateProjectionMatrix(); CAM.d = 0; return;
+  }
   // frame the players who are still in, closer when they bunch up
   let x0 = 9, x1 = -9;
   for (const p of GAME.roster) { if (!p.alive || !p.ch || p.ch.out) continue; const x = p.ch.parts.torso.position.x; x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
@@ -2361,6 +2694,7 @@ let last = performance.now(), acc = 0;
 function step() {
   const dt = STEP * (GAME.slow > 0 ? 0.3 : 1);
   T_now += dt;
+  if (GAME.preview) { previewUpdate(dt); world.gravity.set(0, -18, 0); for (const ch of CHARS) controlChar(ch, dt); windAndGround(dt); world.step(dt); return; }
   const pod = GAME.phase === 'podium';
   if (pod) { TR.gx = TR.gz = 0; podiumUpdate(dt); } else trainUpdate(dt);
   world.gravity.set(TR.gx, -18, TR.gz);
@@ -2391,11 +2725,12 @@ function frame(now) {
   }
   if (NET.role === 'host' && GAME.state === 'play' && NET.peers.size) { NET.sendT -= dt; if (NET.sendT <= 0) { NET.sendT = 0.05; hostSnapshot(); } } else { NET.ev = []; NET.evTo = {}; }
   updateParticles(vdt); updateWaves(vdt);
-  if (GAME.demoWait > 0 && GAME.state !== 'play') { GAME.demoWait -= dt; if (GAME.demoWait <= 0) { GAME.demoWait = 0; startDemo(); } }
+  if (GAME.demoWait > 0 && GAME.state !== 'play' && !GAME.preview) { GAME.demoWait -= dt; if (GAME.demoWait <= 0) { GAME.demoWait = 0; startDemo(); } }
   for (const ch of CHARS) syncChar(ch, dt);
   syncWorld(dt);
   updateCamera(dt);
-  if (GAME.state === 'play') { updateHUD(dt); updateBursts(vdt); ambient(dt); }
+  if (GAME.state === 'play') { updateHUD(dt); updateBursts(vdt); ambient(dt); progTick(); }
+  if (AU.ctx) { musicTick(); ambLevels(dt); }
   if (!window.__noRender) renderer.render(scene, camera);
   perf(dt);
 }
@@ -2404,6 +2739,7 @@ function perf(dt) { pf.t += dt; pf.n++; if (pf.t > 3) { const fps = pf.n / pf.t;
 
 buildPhysics(); buildCoach(); buildOutside(); drawBoard(STATIONS[0]);
 resize();
+applySettings(); kmBadge();
 startDemo();
 $('loading').remove(); $('menu').classList.remove('hidden');
 requestAnimationFrame(frame);
