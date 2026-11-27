@@ -75,11 +75,12 @@ button.shotb{width:auto;margin:0;padding:4px 12px;font-size:16px}
 .lab .tt{font-size:10px;font-weight:800;color:#ffd23f;text-shadow:0 0 3px #000,1px 1px 0 #000;margin-top:-2px}
 .lab .tt:empty{display:none}
 .lab .pw{font-size:13px;line-height:1}
-#pill{position:absolute;top:8px;left:max(10px,env(safe-area-inset-left));background:rgba(20,8,18,.78);border-radius:10px;padding:6px 10px;font-weight:800;font-size:14px;line-height:1.3}
+#pill{position:absolute;top:8px;left:max(10px,env(safe-area-inset-left));background:rgba(20,8,18,.72);border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:6px 10px 7px;font-weight:800;font-size:14px;line-height:1.3}
+#route{display:none!important}
 #pill .st{color:var(--accent)}
-#feed{position:absolute;top:46px;right:max(10px,env(safe-area-inset-right));display:flex;flex-direction:column;align-items:flex-end;gap:3px;max-width:46vw}
-#feed div{background:rgba(20,8,18,.72);padding:2px 8px;border-radius:6px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-#banner{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--btnInk);border:3px solid #000;border-radius:12px;padding:4px 14px;font-weight:900;font-size:15px;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}
+#feed{position:absolute;top:56px;right:max(10px,env(safe-area-inset-right));display:flex;flex-direction:column;align-items:flex-end;gap:3px;max-width:46vw}
+#feed div{background:rgba(20,8,18,.6);padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#banner{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:var(--accent);color:var(--btnInk);border:2px solid #2a1300;box-shadow:0 3px 0 #2a1300;border-radius:999px;padding:4px 16px;font-weight:800;font-size:14px;white-space:nowrap;max-width:62vw;overflow:hidden;text-overflow:ellipsis}
 #big{position:absolute;left:0;right:0;top:22%;text-align:center;transform:rotate(-3deg)}
 #big .a{font-weight:900;font-size:clamp(28px,6.5vw,58px);color:var(--accent);-webkit-text-stroke:2px #000;text-shadow:4px 4px 0 #000;animation:pop .35s ease-out}
 #big .b{font-weight:800;font-size:clamp(14px,2.6vw,22px);color:#fff;text-shadow:0 0 4px #000,2px 2px 0 #000;margin-top:4px}
@@ -122,8 +123,21 @@ button.shotb{width:auto;margin:0;padding:4px 12px;font-size:16px}
 #bGrab{right:calc(max(14px,env(safe-area-inset-right)) + 106px);bottom:80px;width:76px;height:76px;background:rgba(140,255,150,.8)}
 #bPush{right:max(14px,env(safe-area-inset-right));bottom:14px;width:90px;height:90px;background:rgba(255,80,110,.88);color:#fff;font-size:15px}
 #bFS{position:fixed;top:8px;right:max(10px,env(safe-area-inset-right));z-index:26;width:40px;height:34px;padding:0;margin:0;font-size:19px;line-height:1;box-shadow:0 2px 0 #000;background:#fff4d6;color:#3a1d0e}
-#topbtns{position:fixed;top:8px;right:calc(max(10px,env(safe-area-inset-right)) + 48px);z-index:6;display:flex;gap:6px}
-#topbtns button{width:auto;padding:5px 10px;font-size:14px;margin:0;box-shadow:0 2px 0 #000}
+#topbtns{position:fixed;top:8px;right:max(10px,env(safe-area-inset-right));z-index:6;display:flex;gap:6px}
+#bPause{width:40px;height:40px;margin:0;padding:0;border-radius:50%;background:rgba(20,8,18,.72);border:2px solid rgba(255,255,255,.18);box-shadow:none;display:flex;align-items:center;justify-content:center;gap:5px}
+#bPause i{display:block;width:5px;height:15px;border-radius:2px;background:#fff4d6}
+#bPause:active{transform:scale(.92)}
+body:has(#topbtns:not(.hidden)) #bFS{display:none}
+#pause .card.pausec{max-width:380px!important;width:100%;padding:0;overflow:hidden}
+#pause{background:rgba(20,8,18,.62)}
+.pz-row button,.pz-quit{background:#f3dfb4;color:#3a1d0e;border-color:#3a1d0e}
+#bResume{font-family:Bangers,"Baloo 2",sans-serif;letter-spacing:1.5px}
+.pz-quit{background:transparent!important;border:0!important;box-shadow:none!important;color:#7a1f3d!important;text-decoration:underline;padding:2px}
+.pz-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.pz-body button{margin:0}
+#bResume{font-size:26px;padding:10px}
+.pz-row{display:flex;gap:8px}.pz-row button{flex:1;font-size:14px;padding:9px 6px;white-space:nowrap}.pz-row button.hidden{display:none}
+.pz-quit{font-size:14px;opacity:.85}
 #rotate{position:fixed;inset:0;z-index:20;background:rgba(20,8,18,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:20px;font-weight:800}
 #rotate .ph{font-size:64px;animation:rot 1.6s ease-in-out infinite}
 @keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(90deg)}}
@@ -268,7 +282,13 @@ body.vet #keys{opacity:.75}
 .m-prof{width:auto;margin:0;display:flex;align-items:center;gap:8px;padding:5px 10px 5px 6px;background:#fff4d6;color:#3a1d0e;border:3px solid #3a1d0e;border-radius:14px;box-shadow:0 4px 0 #3a1d0e;text-align:left;font-size:13px;min-width:200px}
 .m-av{width:34px;height:34px;border-radius:10px;background:#7a1f3d;display:grid;place-items:center;font-size:19px;flex:none}
 .m-pt{display:flex;flex-direction:column;line-height:1.1;flex:1;min-width:0}
-.m-pt b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.m-pt i{font-style:normal;font-size:11px;color:#e8456b;font-weight:800}
+.m-pt b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-prof{cursor:pointer;user-select:none}
+.m-nm{display:flex;align-items:center;gap:4px}
+.m-nm input{margin:0;padding:0 2px;width:9.5em;max-width:100%;background:transparent;border:0;border-bottom:2px dashed transparent;border-radius:0;box-shadow:none;color:#3a1d0e;font:800 15px "Baloo 2",system-ui,sans-serif;text-align:left;cursor:text}
+.m-nm input::placeholder{color:#3a1d0e88}
+.m-nm input:hover,.m-nm input:focus{border-bottom-color:#e8456b;outline:none}
+.m-nm em{font-style:normal;font-size:11px;opacity:.6;pointer-events:none}.m-pt i{font-style:normal;font-size:11px;color:#e8456b;font-weight:800}
 .m-bar{display:block;height:6px;background:#3a1d0e22;border-radius:4px;margin-top:3px;overflow:hidden}.m-bar s{display:block;height:100%;background:linear-gradient(90deg,#e8456b,#ffd23f);width:0;transition:width .6s}
 .m-st{font-family:Bangers,"Baloo 2",sans-serif;font-size:18px;color:#7a1f3d;letter-spacing:1px}
 .m-logo{font-family:Bangers,"Baloo 2",sans-serif;font-size:clamp(30px,8.5vh,60px);line-height:.82;color:#ffd23f;text-shadow:3px 3px 0 #e8456b,6px 6px 0 #2a1300;letter-spacing:3px;text-align:center;transform:rotate(-4deg);display:flex;flex-direction:column;pointer-events:none;margin-top:2px}
@@ -295,11 +315,10 @@ body.vet #keys{opacity:.75}
 @keyframes shine{0%,62%{left:-60%}100%{left:130%}}
 .m-friends{margin:0;background:#35a7ff;color:#fff;border:3px solid #2a1300;box-shadow:0 4px 0 #2a1300;font-family:Bangers,"Baloo 2",sans-serif;font-weight:400;font-size:21px;letter-spacing:1px;padding:6px;text-shadow:2px 2px 0 #2a1300}
 @media (max-height:380px){.m-ico{width:60px;font-size:10px}.m-ico span{font-size:18px}.m-side{gap:6px}.m-play b{font-size:40px}}
-.m-top,.m-side,.m-right,.m-plate{zoom:var(--ui,1)}
+.m-top,.m-side,.m-right{zoom:var(--ui,1)}
 @media (orientation:portrait){.m-top{flex-wrap:wrap;right:max(12px,env(safe-area-inset-right));row-gap:16px}.m-logo{order:-1;width:100%;margin:34px 0 0}
 .m-right{width:auto;left:max(12px,env(safe-area-inset-left))}
-.m-plate{left:50%;bottom:calc(var(--rh,200px) + 26px);width:min(280px,70vw)}
-.m-side{top:auto;left:50%;transform:translateX(-50%);flex-direction:row;bottom:calc(var(--rh,200px) + 84px)}}
+.m-side{top:auto;left:50%;transform:translateX(-50%);flex-direction:row;bottom:calc(var(--rh,200px) + 26px)}}
 .mcard{max-width:640px}
 .mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 6px;position:relative}
 .mc{margin:0;display:flex;flex-direction:column;align-items:center;gap:1px;background:#fffaf0;color:#3a1d0e;border:3px solid #3a1d0e;box-shadow:0 4px 0 #3a1d0e;padding:7px 5px;font-size:11.5px;text-align:center}
@@ -379,15 +398,25 @@ body.vet #keys{opacity:.75}
   <div id="slide" aria-hidden="true"><div class="sl-track"><i></i><i></i><i></i></div><div class="sl-knob"><span>✊</span></div></div>
 </div>
 <button id="bFS" class="hidden" aria-label="Fullscreen" title="Fullscreen">⛶</button>
-<div id="topbtns" class="hidden"><button id="bSet2" aria-label="Settings">⚙️</button><button id="bMute" aria-label="Mute">🔊</button><button id="bQuit" aria-label="Quit">✕</button></div>
+<div id="topbtns" class="hidden"><button id="bPause" aria-label="Pause" title="Pause (Esc)"><i></i><i></i></button></div>
+<div id="pause" class="overlay hidden">
+  <div class="card ticket pausec">
+    <div class="tk-top"><span id="pzT">PAUSED</span><span>🚃</span></div>
+    <div class="pz-body">
+      <button id="bResume">▶ Resume</button>
+      <div class="pz-row"><button id="bMute" class="alt">🔊 Sound on</button><button id="bSet2" class="alt">⚙️ Settings</button><button id="bFS2" class="alt hidden">⛶ Fullscreen</button></div>
+      <button id="bQuit" class="alt pz-quit">Leave match</button>
+    </div>
+  </div>
+</div>
 
 <div id="menu" class="hidden">
   <div class="m-top">
-    <button id="mProf" class="m-prof" aria-label="Your record">
+    <div id="mProf" class="m-prof" role="button" tabindex="0" aria-label="Your record">
       <span class="m-av">🎫</span>
-      <span class="m-pt"><b id="mName">You</b><i id="mTitle">New Commuter</i><span class="m-bar"><s id="mKm"></s></span></span>
+      <span class="m-pt"><span class="m-nm"><input id="name" maxlength="12" placeholder="Your name" aria-label="Your name" autocomplete="off"><em>✏️</em></span><b id="mName" hidden></b><i id="mTitle">New Commuter</i><span class="m-bar"><s id="mKm"></s></span></span>
       <span class="m-st" id="mStamp">0/16</span>
-    </button>
+    </div>
     <div class="m-logo"><span>DHAKKA</span><span>LOCAL</span></div>
     <button id="bSet" class="m-sq" aria-label="Settings">⚙️</button>
   </div>
@@ -397,7 +426,6 @@ body.vet #keys{opacity:.75}
     <button id="bDaily" class="m-ico"><span>✅</span>Tasks<b id="kmBadge"></b></button>
     <button id="bTrain" class="m-ico"><span>🎓</span>Tutorial</button>
   </div>
-  <div class="m-plate"><input id="name" maxlength="12" placeholder="Your name" aria-label="Your name" autocomplete="off"></div>
   <div class="m-right">
     <button id="bMode" class="m-mode"><span class="m-mi" id="mModeIc">🚪</span><span class="m-mt"><small>MODE · <i id="mModeMeta">4 players · Normal bots</i></small><b id="mModeName">Classic</b></span><span class="m-chev">›</span></button>
     <button id="bPlay" class="m-play"><b>PLAY</b><small>CHURCHGATE → VIRAR · VS BOTS</small></button>
@@ -2409,8 +2437,8 @@ $('bPlay').onclick = () => {
   if (matchMedia('(pointer:coarse)').matches) goFull(true);
   startRound(); checkRotate();
 };
-$('bQuit').onclick = () => { tutCleanup(); netLeave(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); document.body.classList.remove('roundover'); GAME.state = 'menu'; clearPodium(); $('podium').classList.add('hidden'); GAME.big = GAME.banner = null; clearBursts(); document.body.classList.remove('slowmo'); $('hud').classList.add('hidden'); $('controls').classList.add('hidden'); $('topbtns').classList.add('hidden'); $('score').classList.add('hidden'); if (window.speechSynthesis) speechSynthesis.cancel(); openMenu(); };
-$('bMute').onclick = () => { AU.muted = !AU.muted; $('bMute').textContent = AU.muted ? '🔇' : '🔊'; audioLevels(); if (AU.muted && window.speechSynthesis) speechSynthesis.cancel(); };
+$('bQuit').onclick = () => { GAME.paused = false; tutCleanup(); netLeave(); document.querySelectorAll('.overlay').forEach(o => o.classList.add('hidden')); document.body.classList.remove('roundover'); GAME.state = 'menu'; clearPodium(); $('podium').classList.add('hidden'); GAME.big = GAME.banner = null; clearBursts(); document.body.classList.remove('slowmo'); $('hud').classList.add('hidden'); $('controls').classList.add('hidden'); $('topbtns').classList.add('hidden'); $('score').classList.add('hidden'); if (window.speechSynthesis) speechSynthesis.cancel(); openMenu(); };
+$('bMute').onclick = () => { AU.muted = !AU.muted; $('bMute').textContent = AU.muted ? '🔇 Sound off' : '🔊 Sound on'; audioLevels(); if (AU.muted && window.speechSynthesis) speechSynthesis.cancel(); };
 let rotDismissed = false;
 // fullscreen: a button on every screen, plus automatic on phones when a match starts
 const FS_OK = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
@@ -2425,6 +2453,20 @@ function goFull(on) {
 function fsIcon() { $('bFS').textContent = isFull() ? '🗗' : '⛶'; $('bFS').title = isFull() ? 'Exit fullscreen' : 'Fullscreen'; }
 if (FS_OK) $('bFS').classList.remove('hidden');
 $('bFS').onclick = () => { goFull(!isFull()); };
+if (FS_OK) $('bFS2').classList.remove('hidden');
+$('bFS2').onclick = () => { goFull(!isFull()); setTimeout(() => { $('bFS2').textContent = isFull() ? '🗗 Window' : '⛶ Fullscreen'; }, 300); };
+// pause: solo games freeze; online games keep running (the host can't stop for one player)
+function soloGame() { return !NET.role; }
+function openPause() {
+  if (GAME.state !== 'play' || !$('pause').classList.contains('hidden')) return;
+  GAME.paused = soloGame(); LOCAL.push = LOCAL.grab = LOCAL.jump = false; LOCAL.mx = LOCAL.mz = 0;
+  $('pzT').textContent = GAME.paused ? 'PAUSED' : 'MENU · GAME IS STILL ON'; $('bResume').textContent = GAME.paused ? '▶ Resume' : '▶ Back to the train';
+  $('bFS2').textContent = isFull() ? '🗗 Window' : '⛶ Fullscreen'; $('pause').classList.remove('hidden');
+}
+function closePause() { $('pause').classList.add('hidden'); $('settings').classList.add('hidden'); GAME.paused = false; }
+$('bPause').onclick = openPause; $('bResume').onclick = closePause;
+addEventListener('keydown', e => { if (e.code !== 'Escape' || GAME.state !== 'play') return; if (!$('settings').classList.contains('hidden')) { $('settings').classList.add('hidden'); return; } $('pause').classList.contains('hidden') ? openPause() : closePause(); });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState !== 'visible' && GAME.state === 'play' && soloGame() && !GAME.tutorial) openPause(); });
 document.addEventListener('fullscreenchange', () => { fsIcon(); resize(); }); document.addEventListener('webkitfullscreenchange', () => { fsIcon(); resize(); });
 function checkRotate() { const show = GAME.state === 'play' && !rotDismissed && innerHeight > innerWidth * 1.05 && matchMedia('(pointer:coarse)').matches; $('rotate').classList.toggle('hidden', !show); }
 $('bRotOk').onclick = () => { rotDismissed = true; checkRotate(); };
@@ -3085,7 +3127,8 @@ function renderAlmari() {
     for (const [id, [k, n, why]] of Object.entries(TITLE_REQ)) B.appendChild(add('div', 'strow', (isUnlocked('title', id) ? '✅ ' : '🔒 ') + titleName(id) + ': ' + n + ' ' + why + ' (' + Math.min(n, lifeOf(k)) + '/' + n + ')'));
   }
 }
-$('bAlmari').onclick = () => openAlmari('wear'); $('bPassB').onclick = () => openAlmari('pass'); $('bDaily').onclick = () => openAlmari('daily'); $('mProf').onclick = () => openAlmari('stats');
+$('bAlmari').onclick = () => openAlmari('wear'); $('bPassB').onclick = () => openAlmari('pass'); $('bDaily').onclick = () => openAlmari('daily'); $('mProf').onclick = e => { if (e.target.id !== 'name') openAlmari('stats'); }; $('mProf').onkeydown = e => { if (e.target.id !== 'name' && (e.key === 'Enter' || e.key === ' ')) openAlmari('stats'); };
+$('name').addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
 $('bMode').onclick = () => $('modes').classList.remove('hidden');
 $('bModeOk').onclick = () => { $('modes').classList.add('hidden'); store.set('dl_match', {mode: GAME.mode, n: GAME.botN, d: GAME.skill}); renderMenu(); };
 $('modes').onclick = e => { if (e.target.id === 'modes') $('bModeOk').onclick(); };
@@ -3452,7 +3495,7 @@ function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000); last = now;
   if (GAME.state === 'play') readInput();
   let vdt = dt * (GAME.slow > 0 ? 0.3 : 1);
-  if (NET.role === 'rejoin') vdt = 0; // frozen while a guest reconnects
+  if (NET.role === 'rejoin' || GAME.paused) { vdt = 0; acc = 0; } // frozen while a guest reconnects or a solo game is paused
   else if (NET.role === 'client' && GAME.state === 'play') { if (FX.hitstop > 0) { FX.hitstop -= dt; vdt = 0; } clientFrame(dt, vdt); }
   else if (FX.hitstop > 0) { FX.hitstop -= dt; acc = 0; vdt = 0; }
   else {
@@ -3467,7 +3510,7 @@ function frame(now) {
   for (const ch of CHARS) syncChar(ch, dt);
   syncWorld(dt);
   updateCamera(dt);
-  if (GAME.state === 'play') { updateHUD(dt); updateBursts(vdt); ambient(dt); progTick(); tipTick(dt); }
+  if (GAME.state === 'play' && !GAME.paused) { updateHUD(dt); updateBursts(vdt); ambient(dt); progTick(); tipTick(dt); }
   if (AU.ctx) { musicTick(); ambLevels(dt); }
   if (pf.lower && ++pf.sf % 3 === 0) renderer.shadowMap.needsUpdate = true;
   if (!window.__noRender) { renderer.render(scene, camera); if (SHOT.at && performance.now() >= SHOT.at) takeShot(); }
