@@ -64,8 +64,14 @@ button.shotb{width:auto;margin:0;padding:4px 12px;font-size:16px}
 #labels{position:absolute;inset:0}
 .lab{position:absolute;left:0;top:0;text-align:center;white-space:nowrap;will-change:transform}
 .lab .nm{font-weight:800;font-size:12px;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,1px 1px 0 #000}
-.lab.me .nm{color:#ffe14d;font-size:14px}
+.lab.me{z-index:5}
+.lab.me .nm{color:var(--mc,#ffe14d);font-size:14px;text-shadow:0 0 3px #000,0 0 3px #000,1px 1px 0 #000,0 0 8px #000}
 .lab.me .nm::before{content:"▼ "}
+.lab .you{display:none}
+.lab.me .you{display:block;margin:0 auto 3px;width:max-content;font:400 19px/1 Bangers,Impact,sans-serif;letter-spacing:1.5px;color:#fff;background:var(--mc,#ffe14d);border:2.5px solid #fff;border-radius:999px;padding:3px 10px 1px;box-shadow:0 2px 0 #0006,0 0 0 2px #0003;transform:scale(0) translateY(10px);opacity:0;transition:transform .22s cubic-bezier(.3,1.8,.5,1),opacity .18s}
+.lab.me.tag .you{transform:scale(1) translateY(0);opacity:1}
+.lab.me .you::after{content:"";display:block;position:absolute;left:50%;bottom:-7px;margin-left:-6px;border:6px solid transparent;border-top-color:#fff;border-bottom:0}
+.lab.me .you{position:relative}
 .lab .bub{display:inline-block;background:#fff;color:#111;font-weight:800;font-size:12px;border:2px solid #000;border-radius:10px;padding:2px 7px;margin-bottom:2px}
 .lab .bub.npc{background:#fff4c9}
 .lab .bars{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:2px}
@@ -197,6 +203,17 @@ body:has(#topbtns:not(.hidden)) #bFS{display:none}
 .dly.done{background:#e6ffe9;border-color:#2e9e4a}
 .strow{display:flex;justify-content:space-between;border-bottom:1px dotted #3a1d0e44;padding:3px 0}
 .kmline{font-size:13px;font-weight:800;color:#2e7d32;margin:6px 0 2px}
+.rw{margin:8px 0 6px;padding:7px 9px 8px;background:#fff;border:2px solid #3a1d0e;border-radius:10px;box-shadow:0 3px 0 #3a1d0e33}
+.rw-top{display:flex;justify-content:space-between;align-items:baseline}
+.rw-top b{font:400 22px/1 Bangers,"Baloo 2",sans-serif;letter-spacing:1px;color:#2e7d32}
+.rw-top span{font-size:12px;font-weight:800;color:#6b4a35}
+.rw-bar{height:12px;margin:5px 0 4px;background:#f0e2c2;border:2px solid #3a1d0e;border-radius:7px;overflow:hidden}
+.rw-bar i{display:block;height:100%;width:0;background:linear-gradient(#7be37f,#3fb04a);border-radius:5px;transition:width .7s cubic-bezier(.3,.8,.4,1)}
+.rw-bar.stamp{animation:rwpop .4s}
+@keyframes rwpop{40%{transform:scale(1.06)}}
+.rw-next{font-size:12px;font-weight:700;color:#3a1d0e}
+.rw-new{font-size:13px;font-weight:800;color:#e8456b;margin-top:3px;opacity:0;transform:scale(.8);transition:all .3s cubic-bezier(.3,1.8,.5,1)}
+.rw.got .rw-new,.rw:not(:has(.rw-bar.stamp)) .rw-new{opacity:1;transform:none}
 .setc{max-width:420px}
 .set-body{position:relative;padding:8px 16px 12px;display:flex;flex-direction:column;gap:6px;font-weight:800;color:#3a1d0e}
 .set-body label{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -1032,18 +1049,73 @@ function buildCharMesh(ch) {
   const stars = new THREE.Group(); for (let i = 0; i < 3; i++) { const s = mesh(GEO.star, 0xffe14d, {cast: false}); s.position.set(Math.cos(i * 2.09) * 0.32, 0, Math.sin(i * 2.09) * 0.32); stars.add(s); } stars.visible = false; scene.add(stars); ch.stars = stars;
   const ring = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.55, 28), new THREE.MeshBasicMaterial({color: 0xffaa00, transparent: true, opacity: 0.7, side: THREE.DoubleSide, depthWrite: false}));
   ring.rotation.x = -Math.PI / 2; ring.visible = false; scene.add(ring); ch.ring = ring;
-  if (!ch.isNpc && !ch.isMe) { const pr = new THREE.Mesh(PRING_GEO, new THREE.MeshBasicMaterial({color: ch.color, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false})); pr.rotation.x = -Math.PI / 2; scene.add(pr); ch.pring = pr; }
+  if (!ch.isNpc && !ch.isMe) { const pr = new THREE.Mesh(PRING_GEO, new THREE.MeshBasicMaterial({color: ch.color, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false})); pr.rotation.x = -Math.PI / 2; scene.add(pr); ch.pring = pr; }
   if (!ch.isNpc) { const ar = new THREE.Mesh(ARROW_GEO, new THREE.MeshBasicMaterial({color: 0xff3355, transparent: true, opacity: 0.75, side: THREE.DoubleSide, depthWrite: false})); ar.visible = false; scene.add(ar); ch.arrow = ar; }
-  if (ch.isMe) { const yr = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.64, 32), new THREE.MeshBasicMaterial({color: 0xffe14d, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthTest: false, depthWrite: false})); yr.rotation.x = -Math.PI / 2; yr.renderOrder = 10; scene.add(yr); ch.youRing = yr; }
+  if (ch.isMe) meMarker(ch);
   const el = document.createElement('div'); el.className = 'lab' + (ch.isMe ? ' me' : '');
-  el.innerHTML = '<div class="bub hidden"></div><div class="pw"></div><div class="nm"></div><div class="tt"></div><div class="bars"><div class="bar gr hidden"><i></i></div><div class="bar ch hidden"><i></i></div></div>';
+  el.innerHTML = '<div class="you">YOU</div><div class="bub hidden"></div><div class="pw"></div><div class="nm"></div><div class="tt"></div><div class="bars"><div class="bar gr hidden"><i></i></div><div class="bar ch hidden"><i></i></div></div>';
   el.querySelector('.nm').textContent = (ch.kind === 'player' || ch.kind === 'vendor' || ch.kind === 'tc') ? ch.name : '';
   el.querySelector('.tt').textContent = ch.look ? titleName(ch.look.title) : '';
+  if (ch.isMe) el.style.setProperty('--mc', '#' + ch.color.toString(16).padStart(6, '0'));
   $('labels').appendChild(el); ch.el = el; ch.elB = el.querySelector('.bub'); ch.elPw = el.querySelector('.pw'); ch.elGr = el.querySelector('.bar.gr'); ch.elCh = el.querySelector('.bar.ch');
   if (ch.isNpc) ch.elB.classList.add('npc');
 }
 
 let SHARED_GEO = null;
+// ================= "that's me" =================
+// Finding yourself in a scrum is the #1 confusion for new players. Layers, quiet by default, loud when it matters:
+// 1) your marker uses YOUR shirt colour (same as your HUD chip and name), thick, with a white rim and a notch showing where you face;
+//    a soft pool of your colour lights the floor under you;
+// 2) a see-through silhouette of you shows through anyone or anything standing in front of you;
+// 3) each round opens close on you, then the camera pulls back to the whole coach;
+// 4) the marker pops when you touch the controls after standing still, and swells while you're in a crowd;
+// 5) a "YOU" tag shows only at round start and when you pick the controls back up.
+const ME = {intro: 0, introLen: 1, snap: false, tag: 0, flash: 0, idle: 9, crowd: 0, hop: false};
+const POOL_TEX = (() => { const t = canvasTex(128, 128, (g, w) => { const r = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.45, 'rgba(255,255,255,0.55)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, w, w); }); return t; })();
+const ME_GEO = (() => {
+  const flat = g => g.rotateX(-Math.PI / 2);
+  const sh = new THREE.Shape(); sh.moveTo(-0.13, 0.66); sh.lineTo(0.13, 0.66); sh.lineTo(0, 0.86); sh.closePath();
+  return {ring: flat(new THREE.RingGeometry(0.5, 0.66, 40)), rim: flat(new THREE.RingGeometry(0.66, 0.71, 40)), rimIn: flat(new THREE.RingGeometry(0.46, 0.5, 40)),
+    notch: flat(new THREE.ShapeGeometry(sh)).rotateY(Math.PI), pool: flat(new THREE.CircleGeometry(1.5, 32))};
+})();
+function meMarker(ch) {
+  const g = new THREE.Group(), basic = (c, o, top) => new THREE.MeshBasicMaterial({color: c, transparent: true, opacity: o, side: THREE.DoubleSide, depthWrite: false, depthTest: !top});
+  const pool = new THREE.Mesh(ME_GEO.pool, new THREE.MeshBasicMaterial({color: ch.color, map: POOL_TEX, transparent: true, opacity: 0.3, depthWrite: false, blending: THREE.AdditiveBlending}));
+  pool.position.y = -0.01; pool.renderOrder = 2;
+  const ring = new THREE.Mesh(ME_GEO.ring, basic(ch.color, 0.95, true)), rim = new THREE.Mesh(ME_GEO.rim, basic(0xffffff, 0.95, true)), rimIn = new THREE.Mesh(ME_GEO.rimIn, basic(0xffffff, 0.8, true)), notch = new THREE.Mesh(ME_GEO.notch, basic(0xffffff, 1, true));
+  for (const m of [ring, rim, rimIn, notch]) m.renderOrder = 10;
+  g.add(pool, ring, rim, rimIn, notch); scene.add(g);
+  ch.youRing = g; ch.me = {pool, ring, rim, notch};
+  // x-ray: your colour shows wherever something else hides you. Order matters: the world is drawn, then the silhouette
+  // (only where it's behind what's already there), then your own body on top, so your arms never ghost over your chest.
+  const sil = new THREE.MeshBasicMaterial({color: ch.color, transparent: true, opacity: 0.5, depthWrite: false, depthFunc: THREE.GreaterDepth});
+  const own = new Map(), body = [];
+  ch.group.traverse(o => { if (o.isMesh && o.material !== outlineMat) body.push(o); });
+  for (const o of body) {
+    let m = own.get(o.material); if (!m) { m = o.material.clone(); m.transparent = true; m.opacity = 1; own.set(o.material, m); }
+    o.material = m; o.renderOrder = 30;
+  }
+  for (const k in ch.meshes) { const m = ch.meshes[k], s2 = new THREE.Mesh(m.geometry, sil); s2.renderOrder = 21; m.add(s2); }
+}
+function meIntro(first) { ME.intro = ME.introLen = first ? 2.1 : 1.4; ME.snap = true; ME.hop = true; ME.tag = ME.intro + 1.4; ME.flash = 1; ME.idle = 0; }
+function updMe(ch, dt) {
+  const tp = ch.parts.torso.position, g = ch.youRing, M = ch.me;
+  g.visible = !ch.out; if (ch.out) { ch.el.classList.remove('tag'); return; }
+  if (ME.hop && NET.role !== 'client' && !GAME.paused) { ME.hop = false; ch.parts.torso.velocity.y += 3.2; ch.smugT = T_now; }
+  const C = LOCAL, act = Math.abs(C.mx) + Math.abs(C.mz) > 0.25 || C.push || C.grab || C.jump;
+  if (act && ME.idle > 1.6) { ME.flash = 1; ME.tag = Math.max(ME.tag, 1.3); }
+  ME.idle = act ? 0 : ME.idle + dt;
+  let near = 0; for (const o of CHARS) if (o !== ch && !o.out && Math.hypot(o.parts.torso.position.x - tp.x, o.parts.torso.position.z - tp.z) < 1.3) near++;
+  ME.crowd = lerpTo(ME.crowd, near >= 2 ? 1 : 0, dt * 4);
+  ME.flash = Math.max(0, ME.flash - dt * 1.6); ME.tag = Math.max(0, ME.tag - dt);
+  const intro = ME.intro > 0 ? ME.intro / ME.introLen : 0, f = ME.flash * ME.flash;
+  g.position.set(tp.x, Math.max(0.02, tp.y - 1.1), tp.z); g.rotation.y = ch.yaw;
+  g.scale.setScalar(1 + Math.sin(T_now * 5) * 0.05 + ME.crowd * 0.14 + f * 0.4);
+  M.pool.material.opacity = 0.28 + ME.crowd * 0.15 + f * 0.35 + intro * 0.4;
+  M.pool.scale.setScalar(1 + intro * 0.5);
+  M.rim.material.opacity = 0.7 + ME.crowd * 0.3;
+  ch.el.classList.toggle('tag', ME.tag > 0);
+}
 function freeGpu(root) {
   if (!SHARED_GEO) { SHARED_GEO = new Set([...Object.values(GEO), PRING_GEO, ARROW_GEO, ...Object.values(PROP_GEO)]); }
   root.traverse(o => {
@@ -1543,7 +1615,7 @@ for (const dx of DOORX) for (const s of [-1, 1]) for (const ox of [-0.5, 0.5]) S
 function startRound() {
   if (GAME.preview) leavePreview();
   clearWorld();
-  GAME.round++; GAME.result = null; GAME.feed = []; GAME.slow = 0; T_now = 0; GAME.phase = 'round'; GAME.seatWinner = null; clearPodium();
+  GAME.round++; GAME.result = null; GAME.feed = []; GAME.slow = 0; T_now = 0; GAME.phase = 'round'; GAME.seatWinner = null; GAME.rushOn = false; clearPodium();
   netEv('R', GAME.round, GAME.mode);
   for (const p of GAME.roster) { p.rs = []; p.seatT = 0; p.aim = null; p.revCd = 2; p.peelCd = 3; }
   GAME.seat = null; SEATMK.visible = false;
@@ -1564,6 +1636,7 @@ function startRound() {
   const u = GAME.roster.length;
   spawnNpc('uncle', sp[u][0], sp[u][1], 'ride'); if (u > 4) spawnNpc('aunty', sp[u + 1][0], sp[u + 1][1], 'ride');
   if (GAME.mode === 'monsoon') { MONSOON.on = true; MONSOON.t = 1e9; }
+  if (GAME.state === 'play') meIntro(GAME.round === 1);
   if (GAME.state === 'play') { bigText('ROUND ' + GAME.round + '/' + MATCH_N + ': ' + MODE_INFO[GAME.mode][0], LIGHT.tod.label + ' local. ' + MODE_INFO[GAME.mode][1], 2.6); sfx('horn'); sfx('whistle'); }
 }
 
@@ -1771,6 +1844,7 @@ function randomEvent() {
   else { spawnPickup(pick(['vadapav', 'chai'])); banner(pick(['Someone dropped a vada pav!','Free cutting chai!']), 1.8); }
 }
 
+const RUSH_AT = 60;
 function trainUpdate(dt) {
   const T = TR; T.t += dt;
   let gx = 0, gz = 0;
@@ -1815,6 +1889,11 @@ function trainUpdate(dt) {
   if ((T.phase === 'run' || T.phase === 'accel') && T.platX !== null) { T.platX -= 22 * T.speed * dt; if (T.platX < -80) T.platX = null; }
   if (T.curve) { const cv = T.curve; cv.t += dt; gz += cv.dir * cv.mag * Math.sin(Math.PI * Math.min(1, cv.t / cv.dur)); if (cv.t > cv.dur) T.curve = null; }
   if (T.jerk) { const j = T.jerk; j.t += dt; if (j.ax === 'x') gx += j.dir * j.mag; else gz += j.dir * j.mag; if (j.t > j.dur) T.jerk = null; }
+  // RUSH HOUR: after a minute the train starts swaying hard, side to side, so careful players can't stall a round
+  if (!GAME.rushOn && GAME.state === 'play' && !GAME.tutorial && GAME.mode !== 'seat' && GAME.phase === 'round' && !GAME.result && T_now > RUSH_AT) {
+    GAME.rushOn = true; banner('RUSH HOUR! The train is swaying. Hold on!', 2.6); sfx('horn');
+  }
+  if (GAME.rushOn && !GAME.result) { const k = Math.min(1, (T_now - RUSH_AT) / 25); gz += Math.sin(T_now * 1.5) * (1.4 + 3.2 * k); gx += Math.sin(T_now * 0.7) * k; }
   if (T.gust) { const g = T.gust; g.t += dt; if (g.t > 0.5) gz += 3 * Math.sin(Math.PI * Math.min(1, (g.t - 0.5) / 1.1)); if (g.t > 1.6) T.gust = null; }
   if (T.khamba) {
     const k = T.khamba, prev = k.x; k.x -= 40 * dt;
@@ -2086,7 +2165,7 @@ function podiumVisual(ranked, canRestart) {
   const h = document.createElement('h3'); h.textContent = 'Match awards'; el.appendChild(h);
   for (const [ic, title, p, why] of awardsList()) { const d = document.createElement('div'); d.className = 'aw'; const a = document.createElement('b'); a.textContent = ic + ' ' + title; const n = document.createElement('span'); n.textContent = p.name + (p.isMe ? ' (you)' : '') + ' · ' + why; d.append(a, n); el.appendChild(d); }
   const tbl = document.createElement('div'); tbl.className = 'fin'; tbl.textContent = ranked.map((p, i) => (i + 1) + '. ' + p.name + ' ' + p.score).join('   '); el.appendChild(tbl);
-  const again = document.createElement('button'); again.textContent = canRestart ? 'Play again!' : 'Host will restart…'; again.disabled = !canRestart; again.onclick = () => { if (!canRestart) return; audioInit(); newMatch(); };
+  const again = document.createElement('button'); again.textContent = canRestart ? 'Rematch!' + (IS_PC ? ' (Enter)' : '') : 'Host will restart…'; again.id = 'bAgain'; again.disabled = !canRestart; again.onclick = () => { if (!canRestart) return; audioInit(); newMatch(); };
   const menu = document.createElement('button'); menu.className = 'alt'; menu.textContent = 'Menu'; menu.onclick = () => $('bQuit').onclick();
   const row = document.createElement('div'); row.className = 'btns'; row.append(again, menu); shotButton(el); el.appendChild(row);
   setTimeout(() => { if (GAME.phase === 'podium') el.classList.remove('hidden'); }, 1800);
@@ -2310,6 +2389,7 @@ const LOCAL = makeCtrl();
 const KEYS = {};
 const KEYMAP = {KeyJ: 'push', KeyF: 'push', KeyK: 'grab', KeyG: 'grab', ShiftLeft: 'grab', Space: 'jump'};
 addEventListener('keydown', e => { if (e.target && e.target.tagName === 'INPUT') return; KEYS[e.code] = true; if (GAME.state === 'play') { if (KEYMAP[e.code]) LOCAL[KEYMAP[e.code]] = true; if (KEYMAP[e.code] || e.code.startsWith('Arrow')) e.preventDefault(); } });
+addEventListener('keydown', e => { if ((e.code === 'Enter' || e.code === 'KeyR') && GAME.state === 'play' && GAME.phase === 'podium' && !$('podium').classList.contains('hidden')) { const b = $('bAgain'); if (b && !b.disabled) { e.preventDefault(); b.click(); } } });
 addEventListener('keyup', e => { KEYS[e.code] = false; if (KEYMAP[e.code]) LOCAL[KEYMAP[e.code]] = false; });
 addEventListener('blur', () => { for (const k in KEYS) KEYS[k] = false; LOCAL.push = LOCAL.grab = LOCAL.jump = false; STICK.x = STICK.y = 0; });
 const STICK = {id: null, x: 0, y: 0, cx: 0, cy: 0};
@@ -2918,7 +2998,7 @@ function clientEvent(e) {
     case 'F': feed(a[0]); break;
     case 'f': CAM.focus = {x: a[0], z: a[1], t: a[2]}; break;
     case 'Y': if (YOU[a[0]]) YOU[a[0]](...a.slice(1)); break;
-    case 'R': GAME.result = null; GAME.phase = 'round'; GAME.feed = []; clearPodium(); clearBursts(); $('podium').classList.add('hidden'); $('score').classList.add('hidden'); $('controls').classList.remove('hidden'); HUDK.route = HUDK.chips = ''; setTheme(OUT.theme, true); applyLight(Infinity); break;
+    case 'R': meIntro(a[0] === 1); GAME.result = null; GAME.phase = 'round'; GAME.feed = []; clearPodium(); clearBursts(); $('podium').classList.add('hidden'); $('score').classList.add('hidden'); $('controls').classList.remove('hidden'); HUDK.route = HUDK.chips = ''; setTheme(OUT.theme, true); applyLight(Infinity); break;
     case 'S': GAME.result = {w: a[0], t: 0}; renderScore(); break;
     case 'P': { GAME.phase = 'podium'; GAME.result = null; GAME.feed = []; clearBursts(); const by = new Map(GAME.roster.map(p => [p.id, p])); podiumVisual(a[0].map(id => by.get(id)).filter(Boolean), false); break; }
   }
@@ -3025,12 +3105,27 @@ function progTick() {
     const titlesNow = Object.keys(TITLE_REQ).filter(t => isUnlocked('title', t) && !(PROF.seenTitles || []).includes(t));
     PROF.seenTitles = [...(PROF.seenTitles || []), ...titlesNow];
     saveProf(true);
-    const line = document.createElement('div'); line.className = 'kmline';
-    line.textContent = '🚃 +' + gain + ' km · Monthly Pass ' + after + '/' + PASS.length + (news.length ? ' · NEW: ' + news.join(', ') + '!' : '') + (titlesNow.length ? ' · New title: ' + titlesNow.map(titleName).join(', ') : '');
+    const line = rewardCard(PROF.km - gain, gain, news, titlesNow.map(titleName));
     const el = $('podium'), btns = el.querySelector('.btns'); if (btns) el.insertBefore(line, btns); else el.appendChild(line);
     if (news.length || titlesNow.length) setTimeout(() => sfx('save'), 1900);
     kmBadge();
   }
+}
+// after every match: the pass bar fills with what you just earned, a stamp lands, and you see how close the next unlock is
+function rewardCard(km0, gain, news, titles) {
+  const km1 = km0 + gain, el = document.createElement('div'); el.className = 'rw';
+  const done = stampsOf(km1) >= PASS.length, nextKey = PASS[stampsOf(km1)], left = STAMP_KM - (km1 % STAMP_KM);
+  const pct = k => (k % STAMP_KM) / STAMP_KM * 100, crossed = stampsOf(km1) > stampsOf(km0);
+  const add = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+  const top = add('div', 'rw-top'); top.append(add('b', '', '+' + gain + ' km'), add('span', '', '🎫 Pass ' + stampsOf(km1) + '/' + PASS.length)); el.appendChild(top);
+  const bar = add('div', 'rw-bar'), fill = add('i'); fill.style.width = (crossed ? pct(km0) : pct(km0)) + '%'; bar.appendChild(fill); el.appendChild(bar);
+  const nx = add('div', 'rw-next', done ? 'Pass complete! Asli Mumbaikar.' : 'Next: ' + itemName(nextKey) + ' in ' + left + ' km' + (left <= gain ? ' · one more match!' : ' · about ' + Math.ceil(left / Math.max(60, gain)) + ' matches'));
+  el.appendChild(nx);
+  const got = [...news, ...titles]; if (got.length) { const n = add('div', 'rw-new', '🎉 Unlocked: ' + got.join(', ')); el.appendChild(n); }
+  // animate: fill to the end (stamp) then from 0 to where you are now
+  const go = () => { if (crossed) { fill.style.width = '100%'; setTimeout(() => { bar.classList.add('stamp'); fill.style.transition = 'none'; fill.style.width = '0%'; void fill.offsetWidth; fill.style.transition = ''; fill.style.width = pct(km1) + '%'; el.classList.add('got'); }, 750); } else fill.style.width = pct(km1) + '%'; };
+  setTimeout(go, 2200);
+  return el;
 }
 function kmBadge() { const D = ensureDaily(), left = D.list.filter(x => !x.done).length; $('kmBadge').textContent = left ? left : ''; }
 
@@ -3341,7 +3436,8 @@ function updateHUD(dt) {
   for (const ch of CHARS) {
     const h = ch.parts.head.position;
     v3.set(h.x, h.y + 0.42, h.z).project(camera);
-    const x = (v3.x * 0.5 + 0.5) * W, y = (-v3.y * 0.5 + 0.5) * H;
+    let x = (v3.x * 0.5 + 0.5) * W, y = (-v3.y * 0.5 + 0.5) * H;
+    if (ch.isMe) { x = clamp(x, 40, W - 40); y = clamp(y, ch.el.classList.contains('tag') ? 64 : 34, H - 10); }
     ch.el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-100%)`;
     const bt = ch.bubble ? ch.bubble.text : '';
     if (ch.elB.textContent !== bt) ch.elB.textContent = bt;
@@ -3374,7 +3470,7 @@ function syncChar(ch, dt) {
   if (ch.flap) { const wind = (TR.speed > 0.2 && Math.abs(tp.z) > HW - 0.6 ? 0.7 : 0) + Math.min(0.5, Math.hypot(ch.parts.torso.velocity.x, ch.parts.torso.velocity.z) * 0.12); ch.flap.rotation.x = 0.25 + wind + Math.sin(T_now * (7 + wind * 8) + ch.phase) * (0.12 + wind * 0.25); }
   if (ch.pring) { ch.pring.visible = !ch.out; ch.pring.position.set(tp.x, Math.max(0.015, tp.y - 1.1), tp.z); }
   if (ch.arrow) { const on = ch.charging && ch.charge > 0.08 && !ch.out; ch.arrow.visible = on; if (on) { const f = facing(ch); ch.arrow.position.set(tp.x + f.x * 0.35, Math.max(0.03, tp.y - 1.08), tp.z + f.z * 0.35); ch.arrow.rotation.y = ch.yaw; const L = 0.5 + ch.charge * 1.3; ch.arrow.scale.set(0.8 + ch.charge * 0.6, 1, L); ch.arrow.material.opacity = 0.45 + ch.charge * 0.45; } }
-  if (ch.youRing) { ch.youRing.visible = !ch.out; ch.youRing.position.set(tp.x, Math.max(0.02, tp.y - 1.1), tp.z); ch.youRing.scale.setScalar(1 + Math.sin(T_now * 5) * 0.06); }
+  if (ch.youRing) updMe(ch, dt);
   const h = ch.parts.head.position;
   ch.stars.visible = ch.stun > 0.4 && !ch.out; if (ch.stars.visible) { ch.stars.position.set(h.x, h.y + 0.35, h.z); ch.stars.rotation.y += dt * 6; }
   const glow = (ch.power > 0 || ch.speedT > 0 || ch.charging) && !ch.out;
@@ -3449,11 +3545,23 @@ function updateCamera(dt) {
   if (GAME.phase === 'podium') { const card = innerWidth > 560; x0 = card ? -1.2 : -3; x1 = card ? 5.2 : 3; }
   // phone held upright: the whole coach can't fit, so follow your own character up close instead
   const meC = port && CHARS.find(c => c.isMe && !c.out);
-  const halfW = port ? 2.4 : clamp((x1 - x0) / 2 + 2.8, 4, HL + 0.6);
-  let dist = Math.max(halfW / Math.tan(hfov / 2), 2.75 / Math.tan(vfov / 2));
+  // small landscape screens (phones): frame tighter around the action so characters are bigger; big screens keep the whole-coach view
+  const small = !port && Math.min(innerWidth, innerHeight) < 520 && GAME.phase !== 'podium';
+  const halfW = port ? 2.4 : small ? clamp((x1 - x0) / 2 + 1.8, 3, HL + 0.6) : clamp((x1 - x0) / 2 + 2.8, 4, HL + 0.6);
+  let dist = Math.max(halfW / Math.tan(hfov / 2), (small ? 2.25 : 2.75) / Math.tan(vfov / 2));
   let tx = clamp(meC ? meC.parts.torso.position.x : (x0 + x1) / 2, -HL + halfW - 0.4, HL - halfW + 0.4), tz = 0.2;
+  const meP = GAME.state === 'play' && GAME.phase !== 'podium' && CHARS.find(c => c.isMe && !c.out);
+  if (meP && !port) tz = 0.2 + clamp(meP.parts.torso.position.z, -1.6, 1.6) * 0.28; // lean toward your side of the coach so you're never pinned under the top rail
+  if (ME.intro > 0) {
+    ME.intro = Math.max(0, ME.intro - dt);
+    if (meP) {
+      const mp = meP.parts.torso.position, k = Math.min(1, ME.intro / 0.6);
+      if (ME.snap) { ME.snap = false; camTarget.x = mp.x; camTarget.z = mp.z * 0.7; CAM.d = 4.3; }
+      tx = lerpTo(tx, mp.x, k); tz = lerpTo(tz, mp.z * 0.7, k); dist = lerpTo(dist, 4.3, k);
+    }
+  }
   if (CAM.focus) { CAM.focus.t -= dt; const k = Math.min(1, CAM.focus.t * 2) * 0.55; tx = lerpTo(tx, CAM.focus.x, k); tz += CAM.focus.z * k * 0.6; dist *= 1 - k * 0.45; if (CAM.focus.t <= 0) CAM.focus = null; }
-  const ck = CAM.focus ? 5 : 1.6;
+  const ck = CAM.focus ? 5 : ME.intro > 0.6 ? 8 : 1.6;
   camTarget.x = lerpTo(camTarget.x, tx, dt * ck); camTarget.z = lerpTo(camTarget.z, tz, dt * ck);
   CAM.d = CAM.d ? lerpTo(CAM.d, dist, dt * ck) : dist;
   const el = THREE.MathUtils.degToRad(52);
@@ -3525,7 +3633,11 @@ function perf(dt) { pf.t += dt; pf.n++; if (pf.t > 3) { const fps = pf.n / pf.t;
 buildPhysics(); buildCoach(); buildOutside(); drawBoard(STATIONS[0]);
 resize(); if (pf.low) gfxLow(); if (pf.lower) renderer.shadowMap.autoUpdate = false;
 applySettings(); vetCheck();
-$('loading').remove(); openMenu();
+$('loading').remove();
+// first ever visit: no menu, no form. Straight into a match against gentle bots; the menu comes after (sound starts on the first touch or key)
+const FIRST_VISIT = PROF.matches === 0 && !PROF.trained && !PROF.firstGo && !new URLSearchParams(location.search).get('room') && !window.__noAutoStart;
+if (FIRST_VISIT) { PROF.firstGo = 1; saveProf(true); const wake = () => { audioInit(); removeEventListener('pointerdown', wake, true); removeEventListener('keydown', wake, true); }; addEventListener('pointerdown', wake, true); addEventListener('keydown', wake, true); $('bPlay').onclick(); }
+else openMenu();
 requestAnimationFrame(frame);
 window.__sfx = sfx; window.__AU = AU; window.__T = () => T_now; window.__R = renderer; window.__W = () => world; window.__scene = scene; window.__GAME = GAME; window.__CHARS = () => CHARS; window.__TR = TR; window.__LOCAL = LOCAL; window.__NET = NET; window.__podium = () => startPodium(); window.__newMatch = () => newMatch();
 window.__lamp = v => { LAMP_I = v; applyLight(Infinity); };
