@@ -42,3 +42,11 @@ Phase 3 (2026-11-27): online with friends
 - **Friends lobby:** player cards with ping, host picks mode and seat fill, kick, 3-2-1 countdown, version check (`PROTO`), screen kept awake. Guests who drop reconnect automatically and get their seat back.
 - **Install + sharing:** manifest, icons, service worker (hosted site only), WhatsApp/OG preview (`og.jpg`), share-a-moment snapshot on the podium.
 - Tests (scratchpad): `test/netreal3.js` (real PeerJS + local server, includes a drop/reconnect check), `test/aud.js` (per-sound loudness in the phone band).
+
+## Phase 1: "that's me" + first impressions (2026-11-28)
+- **Finding yourself:** your floor marker is in your shirt colour (same as your HUD chip and name) with a white rim, a notch showing where you face and a soft glow on the floor. A see-through silhouette of you shows through anyone or anything in front of you (drawn after the world, before your own body). Each round opens close on you and pulls back to the coach. The marker swells in a crowd and pops when you touch the controls after standing still; a "YOU" tag shows at round start and then. Your name label never leaves the screen. Other players' rings are fainter. Code: `meMarker`, `updMe`, `meIntro`, `ME`.
+- **Camera:** leans toward your side of the coach; phones in landscape frame tighter so characters are bigger.
+- **Rush hour:** after 60 s (`RUSH_AT`) the train sways harder and harder so rounds can't stall (not in Seat Wars).
+- **First visit:** no menu; straight into a match vs gentle bots (sound starts on first touch/key). Not with `?room=`.
+- **After a match:** reward card (km earned, pass bar fills, stamp pops, "next unlock in N km") and Rematch (Enter or R on PC).
+- **CrazyGames build:** progress also saved with the CrazyGames data module (cloud save); `crazygames/build.py` now uses libraries in `crazygames/lib/`.
